@@ -38,6 +38,15 @@ Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
   `step_id` tem semântica diferente por agente; `verified` ⊂ `full` (3.316 únicas).
 - Amostras em `data/samples/{swe-rebench(50),swe-smith/{tool,xml,ticks}(20 cada),codetracebench(60)}/` (fora do git).
 
+## Adaptadores (Fase 2) — `backend/app/adapters/`
+`detect.parse_any(path|obj, row=0)` detecta e converte. Cada módulo: `NAME`, `can_parse(obj)->float`, `parse(source)->Trajectory`.
+`openhands_chat` (SWE-rebench) · `sweagent_smith` (SWE-smith; ação decidida por mensagem) · `generic_chat` (OpenAI/Anthropic) ·
+`ctb_openhands_swe`, `ctb_sweagent`, `ctb_miniswe`, `ctb_terminus2`, `ctb_openhands_events` + `codetracebench.py` (`.tar.zst`/dir,
+manifest → `ground_truth` com `resolved_idx`/`resolved_via`). Testes: `cd backend && uv run pytest` (fixtures reais em `tests/fixtures/`,
+regeneráveis com `scripts/make_fixtures.py`); lote: `uv run python scripts/parse_samples.py`.
+Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` do editor (bash fica p/ a Fase 3); mini-SWE TB sem JSON
+(2/60) → `UnsupportedArtifact`; alinhamento da cauda de OpenHands-TB/Terminus2 e do OpenHands-SWE é hipótese; `generic_chat` só testado com mensagens sintéticas.
+
 ## Regras
 - `schema.py` é o contrato. Mudou o schema → regenerar os tipos TS (`npm run gen:api`).
 - Todo adaptador e toda regra de rotulação tem teste em `backend/tests/` com fixture real
@@ -65,7 +74,7 @@ Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
 
 ## Estado atual
 - [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
-- [ ] Fase 2 — schema + adaptadores + detecção de formato
+- [x] Fase 2 — schema + adaptadores + detecção de formato (`backend/app/schema.py`, `backend/app/adapters/`, `results/parse_report.md`)
 - [ ] Fase 3 — rotulação (regras + fallback Haiku)
 - [ ] Fase 4 — detectores, métricas, API
 - [ ] Fase 5 — frontend: upload, faixa de fases, inspetor, grafo (pôster: seg 23/11)
