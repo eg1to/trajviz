@@ -61,6 +61,12 @@ Endpoints (OpenAPI em `docs/openapi.json`; tipos TS: `npm run gen:api`):
 `GET /api/library?dataset=&agent=&resolved=&q=` · `POST /api/library/{sample_id}/open` · `GET /api/taxonomy` · `GET /api/health`. CORS: http://localhost:5173.
 O front só consome a API; erros são 422 `{detail:{code,message,top_keys?}}` (413 p/ > 200 MB, 404 p/ id/passo inexistente).
 
+## Frontend (Fase 5) — `frontend/`
+Vite + React + TS strict, Tailwind v4, componentes no estilo shadcn (Radix), React Router, TanStack Query (dados do servidor), Zustand (passo/filtros/aba, espelhados na URL),
+`@xyflow/react` (grafo), Recharts (dashboard), prism-react-renderer, html-to-image. Tipos: `npm run gen:api` (de `docs/openapi.json`). Cliente: `src/api/client.ts` (VITE_API_URL, padrão :8000).
+Telas: `/` biblioteca + upload; `/t/:id` cabeçalho + faixa de fases + abas Grafo/Dashboard + inspetor. Paleta fixa em `src/theme/categories.ts`.
+Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com cache isolado), `npm run screenshots`. O front não tem lógica de domínio.
+
 ## Regras
 - `schema.py` é o contrato. Mudou o schema → regenerar os tipos TS (`npm run gen:api`).
 - Todo adaptador e toda regra de rotulação tem teste em `backend/tests/` com fixture real
@@ -91,6 +97,6 @@ O front só consome a API; erros são 422 `{detail:{code,message,top_keys?}}` (4
 - [x] Fase 2 — schema + adaptadores + detecção de formato (`backend/app/schema.py`, `backend/app/adapters/`, `results/parse_report.md`)
 - [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps.csv`)
 - [x] Fase 4 — detectores, métricas, API (`backend/app/analysis/`, `pipeline.py`, `main.py`, `library.py`, `docs/openapi.json`)
-- [ ] Fase 5 — frontend: upload, faixa de fases, inspetor, grafo (pôster: seg 23/11)
+- [x] Fase 5 — frontend: biblioteca, faixa de fases, grafo, inspetor, dashboard (`frontend/`; capturas em `results/screenshots/`)
 - [ ] Fase 6 — dashboard, filtros, avaliação (`scripts/evaluate.py`, `results/`)
 - [ ] Fase 7 — docker compose, polimento, demo (MVP: qua 25/11)
