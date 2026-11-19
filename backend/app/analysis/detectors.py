@@ -26,15 +26,17 @@ def ignored(s: Step) -> bool:
     return s.subcategory in IGNORED_SUB
 
 
-def add_flag(s: Step, flag: str, reason: str) -> None:
+def add_flag(s: Step, flag: str, reason: str, ref: int | None = None) -> None:
     if flag not in s.flags:
         s.flags.append(flag)  # type: ignore[arg-type]
         s.flag_details[flag] = reason
+        if ref is not None:
+            s.flag_refs[flag] = ref
 
 
 def clear_flags(traj: Trajectory) -> Trajectory:
     for s in traj.steps:
-        s.flags, s.flag_details = [], {}
+        s.flags, s.flag_details, s.flag_refs = [], {}, {}
     traj.meta.pop("loops", None)
     return traj
 
@@ -219,7 +221,7 @@ def detect_repeated(traj: Trajectory) -> Trajectory:
         if prev is not None:
             changed = s.category != "edit" and any(prev < e < s.idx for e in edit_marks)
             if not changed:
-                add_flag(s, "repeated", f"igual ao passo {prev}")
+                add_flag(s, "repeated", f"igual ao passo {prev}", prev)
         last_seen[k] = s.idx
     return traj
 
@@ -255,13 +257,13 @@ def detect_no_new_info(traj: Trajectory) -> Trajectory:
                 prior = reads.setdefault(f.path, {})
                 hit = prior.get(None) if None in prior else prior.get(rg)
                 if hit is not None:
-                    add_flag(s, "no_new_info", f"releitura de {f.path} sem edição desde o passo {hit}")
+                    add_flag(s, "no_new_info", f"releitura de {f.path} sem edição desde o passo {hit}", hit)
                 prior[rg] = s.idx
         # (a) observação idêntica
         n = norm_obs(s.observation.content)
         if len(n) >= 20:
             if n in seen_obs and "no_new_info" not in s.flags:
-                add_flag(s, "no_new_info", f"observação idêntica ao passo {seen_obs[n]}")
+                add_flag(s, "no_new_info", f"observação idêntica ao passo {seen_obs[n]}", seen_obs[n])
             seen_obs.setdefault(n, s.idx)
     return traj
 

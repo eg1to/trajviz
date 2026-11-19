@@ -54,6 +54,7 @@ class Step(BaseModel):
     label_source: LabelSource = "fallback"
     confidence: float = 0.0
     flags: list[Flag] = Field(default_factory=list)
+    flag_refs: dict[str, int] = Field(default_factory=dict)  # passo relacionado (idx): repeated/no_new_info → passo original
     flag_details: dict[str, Any] = Field(default_factory=dict)  # motivo curto por flag, ex.: {"repeated": "igual ao passo 12"}
     files: list[FileRef] = Field(default_factory=list)  # arquivos tocados (Fase 3 refina a partir da ação)
 

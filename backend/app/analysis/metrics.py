@@ -70,8 +70,10 @@ class Effort(BaseModel):
 
 class ThirdPhase(BaseModel):
     third: int
-    phase: str | None
+    phase: str | None  # fase dominante
     share: float  # fração dos passos do terço na fase dominante
+    counts: dict[str, int] = Field(default_factory=dict)  # passos do terço por fase (barras empilhadas)
+    n_steps: int = 0
 
 
 class Dynamics(BaseModel):
@@ -254,7 +256,8 @@ def _dynamics(t: Trajectory) -> Dynamics:
             chunk = core[i * size:(i + 1) * size]
             c = Counter(PHASE[Category(s.category)].value for s in chunk)
             top = c.most_common(1)
-            thirds.append(ThirdPhase(third=i + 1, phase=top[0][0] if top else None, share=round(top[0][1] / len(chunk), 2) if top else 0.0))
+            thirds.append(ThirdPhase(third=i + 1, phase=top[0][0] if top else None, share=round(top[0][1] / len(chunk), 2) if top else 0.0,
+                                     counts=dict(c), n_steps=len(chunk)))
     n = len(t.steps)
     return Dynamics(first_edit_idx=first, pct_before_first_edit=_pct(first, n) if first is not None else None,
                     edit_test_cycles=cycles, cycles_passed=passed, cycles_failed=failed, dominant_phase_by_third=thirds)

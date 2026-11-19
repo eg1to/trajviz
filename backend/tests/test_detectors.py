@@ -104,6 +104,7 @@ def test_failing_test_is_not_a_command_error_but_missing_runner_is():
 def test_repeated_same_action_and_reason():
     t = run_detectors(T(S(0, "search", cmd="grep -rn foo src"), S(1, "read", cmd="cat a.py"), S(2, "search", cmd="grep  -rn   foo src")))
     assert "repeated" in flags(t, 2) and t.steps[2].flag_details["repeated"] == "igual ao passo 0" and "repeated" not in flags(t, 1)
+    assert t.steps[2].flag_refs == {"repeated": 0}
 
 
 def test_repeated_normalizes_paths_and_cd_prefix():
@@ -154,7 +155,7 @@ def test_no_new_info_reread_without_edit_and_with_edit():
     r = lambda i, o: S(i, "read", tool="editor", cmd="view", args={"command": "view", "path": "/testbed/a.py"}, files=[("a.py", "read")], obs=o)  # noqa: E731
     ed = S(2, "edit", tool="editor", cmd="str_replace", args={"command": "str_replace", "path": "/testbed/a.py"}, files=[("a.py", "edit")], obs="edited")
     t = run_detectors(T(r(0, "version one " * 5), r(1, "version one " * 5 + "!"), ed, r(3, "version two " * 5)))
-    assert "no_new_info" in flags(t, 1) and "releitura" in t.steps[1].flag_details["no_new_info"]
+    assert "no_new_info" in flags(t, 1) and "releitura" in t.steps[1].flag_details["no_new_info"] and t.steps[1].flag_refs["no_new_info"] == 0
     assert "no_new_info" not in flags(t, 3)  # houve edição no meio
 
 

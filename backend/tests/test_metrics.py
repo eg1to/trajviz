@@ -50,7 +50,7 @@ def test_dynamics_first_edit_and_cycles():
     d = compute_metrics(build()).dynamics
     assert d.first_edit_idx == 6 and d.pct_before_first_edit == round(100 * 6 / 14, 1)
     assert (d.edit_test_cycles, d.cycles_passed, d.cycles_failed) == (2, 1, 1)
-    assert len(d.dominant_phase_by_third) == 3 and d.dominant_phase_by_third[0].phase == "Entendimento"
+    assert sum(sum(t.counts.values()) for t in d.dominant_phase_by_third) == 12 and len(d.dominant_phase_by_third) == 3 and d.dominant_phase_by_third[0].phase == "Entendimento"
     assert d.dominant_phase_by_third[2].phase in ("Verificação", "Modificação", "Controle")
 
 

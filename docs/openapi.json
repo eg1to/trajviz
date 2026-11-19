@@ -1834,6 +1834,13 @@
       "type": "array",
       "title": "Flags"
      },
+     "flag_refs": {
+      "additionalProperties": {
+       "type": "integer"
+      },
+      "type": "object",
+      "title": "Flag Refs"
+     },
      "flag_details": {
       "additionalProperties": true,
       "type": "object",
@@ -1964,6 +1971,18 @@
      "share": {
       "type": "number",
       "title": "Share"
+     },
+     "counts": {
+      "additionalProperties": {
+       "type": "integer"
+      },
+      "type": "object",
+      "title": "Counts"
+     },
+     "n_steps": {
+      "type": "integer",
+      "title": "N Steps",
+      "default": 0
      }
     },
     "type": "object",
