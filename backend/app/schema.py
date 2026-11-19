@@ -63,6 +63,9 @@ class AnnotatedStep(BaseModel):
     action_ref: dict[str, Any] | None = None
     observation_ref: dict[str, Any] | None = None
     resolved_idx: int | None = None  # idx canônico do Step, ou None se não foi possível alinhar
+    # como foi resolvido: action_ref (id nativo confirmado) | rule (regra do step_ref_kind, confirmada) |
+    # hypothesis (regra não confirmada: cauda de OpenHands-TB/Terminus2 e OpenHands-SWE) | None
+    resolved_via: Literal["action_ref", "rule", "hypothesis"] | None = None
 
 
 class StageAnnotation(BaseModel):
