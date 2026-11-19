@@ -14,10 +14,10 @@ Fora do MVP (TCC II): relações semânticas entre passos (Thought→Action etc.
 | Dataset | Papel | Agente / modelo | Volume |
 | --- | --- | --- | --- |
 | nebius/SWE-rebench-openhands-trajectories | Base (sucesso × falha) | OpenHands v0.54 · Qwen3-Coder-480B | 67.074 trajetórias, ~2 GB |
-| SWE-bench/SWE-smith-trajectories | Segundo formato | SWE-agent · Claude 3.7 Sonnet | ~76 mil linhas, splits `tool`/`xml`/`ticks`, ~4 GB |
-| NJU-LINK/CodeTraceBench | Gabarito | OpenHands, mini-SWE-agent, Terminus2, SWE-agent | 4.316 (verified: 1.000) |
+| SWE-bench/SWE-smith-trajectories | Segundo formato | SWE-agent · Claude 3.7 (72%) / 3.5 (26%) / GPT-4o (2%) | 76.002 linhas (24.100 / 26.076 / 25.826), splits `tool`/`xml`/`ticks`, ~3,1 GB (sem `train-*`) |
+| NJU-LINK/CodeTraceBench | Gabarito | OpenHands, mini-SWE-agent, Terminus2, SWE-agent | 3.316 únicas (`verified` 1.000 ⊂ `full`; o "4.316" do README conta o verified em dobro) |
 
-O que se sabe pelos cards (confirmar na fase 1):
+O que se sabe pelos cards (**confirmado na Fase 1 — detalhes e correções em `docs/formats.md`**; ex.: o split `tool` do SWE-smith mistura formato nativo e xml, `patch` do SWE-smith não alinha com a trajetória, e `step_id` do CodeTraceBench tem semântica diferente por agente):
 - **SWE-rebench**: uma linha por trajetória; `trajectory` = lista de mensagens `system`/`user`/`assistant`/`tool`;
   `assistant.tool_calls[].function.arguments` é string JSON; `tool` tem `name` e `tool_call_id`.
   Campos: `trajectory_id`, `instance_id`, `repo`, `model_patch`, `exit_status`, `resolved`,

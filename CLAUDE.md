@@ -32,6 +32,12 @@ Fases: Entendimento (explore, search, read) · Modificação (edit) · Verifica�
 · Controle (setup, think, submit).
 Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
 
+## Achados da Fase 1 (detalhes em `docs/formats.md`)
+- SWE-smith: o split `tool` mistura formato nativo e xml → detectar por mensagem; `patch` não é confiável.
+- CodeTraceBench: 5 formatos brutos (OpenHands log de LLM, OpenHands eventos, SWE-agent `.traj`, mini-SWE `.traj.json`, Terminus2 episódios);
+  `step_id` tem semântica diferente por agente; `verified` ⊂ `full` (3.316 únicas).
+- Amostras em `data/samples/{swe-rebench(50),swe-smith/{tool,xml,ticks}(20 cada),codetracebench(60)}/` (fora do git).
+
 ## Regras
 - `schema.py` é o contrato. Mudou o schema → regenerar os tipos TS (`npm run gen:api`).
 - Todo adaptador e toda regra de rotulação tem teste em `backend/tests/` com fixture real
@@ -58,7 +64,7 @@ Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
 - `cd frontend && npm run gen:api` (gera tipos a partir de `http://localhost:8000/openapi.json`)
 
 ## Estado atual
-- [ ] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`)
+- [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
 - [ ] Fase 2 — schema + adaptadores + detecção de formato
 - [ ] Fase 3 — rotulação (regras + fallback Haiku)
 - [ ] Fase 4 — detectores, métricas, API
