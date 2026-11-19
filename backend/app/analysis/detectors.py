@@ -275,7 +275,7 @@ def _target(s: Step) -> str:
 
 def detect_loop(traj: Trajectory) -> Trajectory:
     loops: list[dict] = []
-    seq = [(s.idx, (s.category, _target(s))) for s in traj.steps if not ignored(s)]
+    seq = [(s.idx, (s.category, _target(s))) for s in traj.steps if not ignored(s) and s.action.tool != "message"]  # message: como keys/harness, fora do loop
     i = 0
     while i + 6 <= len(seq):
         for n in (2, 3, 4):
@@ -317,7 +317,7 @@ def detect_loop(traj: Trajectory) -> Trajectory:
         a, b = lp["range"]
         why = (f"ciclo {lp['pattern']} ×{lp['reps']}" if lp["kind"] == "ngram" else f"edit→test_fail ×{lp['cycles']} em {lp['file']}")
         for s in traj.steps:
-            if a <= s.idx <= b and not ignored(s):
+            if a <= s.idx <= b and not ignored(s) and s.action.tool != "message":
                 if lp["kind"] == "edit_test_fail" and s.category not in ("edit", "test"):
                     continue
                 add_flag(s, "loop", f"{why} [{a},{b}]")

@@ -189,6 +189,15 @@ def test_loop_ignores_keys_and_harness_in_the_window():
     assert t.meta["loops"][0]["range"] == [0, 7] and "loop" not in t.steps[2].flags and "loop" not in t.steps[5].flags
 
 
+def test_loop_excludes_message_steps():
+    t = run_detectors(T(*[S(i, "think", tool="message") for i in range(12)]))
+    assert not any("loop" in s.flags for s in t.steps) and "loops" not in t.meta
+    a = lambda i: S(i, "read", cmd="cat a.py", files=[("a.py", "read")], obs="o" * 25 + str(i))  # noqa: E731
+    b = lambda i: S(i, "search", cmd="grep x a.py", files=[("a.py", "read")], obs="p" * 25 + str(i))  # noqa: E731
+    t = run_detectors(T(a(0), b(1), S(2, "think", tool="message"), a(3), b(4), S(5, "think", tool="message"), a(6), b(7)))
+    assert t.meta["loops"][0]["range"] == [0, 7] and "loop" not in t.steps[2].flags  # mensagens entre os ciclos não quebram nem entram
+
+
 def test_loop_edit_test_fail_cycle_three_times_same_file():
     steps = []
     for k in range(3):
