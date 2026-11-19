@@ -37,4 +37,4 @@ class LLMConfig:
         return f"LLMConfig(enabled={self.enabled}, model={self.model}, budget_usd={self.budget_usd}, api_key={'set' if self.api_key else 'unset'})"
 
 
-CACHE_DIR = BACKEND / ".cache"
+CACHE_DIR = Path(os.environ.get("TRAJVIZ_CACHE_DIR") or BACKEND / ".cache")  # TRAJVIZ_CACHE_DIR: isola caches (e2e)

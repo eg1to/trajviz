@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fafafa; --foreground: #171717; --card: #ffffff; --muted: #f0f0f1; --muted-foreground: #5f6368;
+  --border: #e2e2e5; --input: #d4d4d8; --primary: #0072b2; --primary-foreground: #ffffff; --accent: #eaf3fa;
+  --danger: #d55e00; --ok: #009e73; --ring: #0072b2; --code-bg: #f4f4f5;
+  --radius: 6px;
+}
+.dark {
+  --background: #0f1115; --foreground: #ececee; --card: #161920; --muted: #1d212a; --muted-foreground: #9aa0a9;
+  --border: #2a2f3a; --input: #353b48; --primary: #56b4e9; --primary-foreground: #06121c; --accent: #172433;
+  --danger: #ff8a3d; --ok: #2fd2a1; --ring: #56b4e9; --code-bg: #12151b;
+}
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-border: var(--border);
+  --color-input: var(--input); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent); --color-danger: var(--danger); --color-ok: var(--ok); --color-ring: var(--ring); --color-code: var(--code-bg);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --radius-md: var(--radius);
+}
+html, body, #root { height: 100%; }
+body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+* { border-color: var(--border); }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--input) transparent; }
+/* React Flow: integra ao tema */
+.react-flow { --xy-background-color: var(--background); --xy-edge-stroke-default: var(--muted-foreground); --xy-minimap-background-color-default: var(--card);
+  --xy-controls-button-background-color-default: var(--card); --xy-controls-button-color-default: var(--foreground); --xy-controls-button-border-color-default: var(--border);
+  --xy-attribution-background-color-default: transparent; }
+.react-flow__attribution { font-size: 9px; opacity: .6; background: transparent !important; }
+.react-flow__node { cursor: pointer; }
+.react-flow__controls-button { border-bottom-color: var(--border); }
+@media print { .no-print { display: none !important; } }
