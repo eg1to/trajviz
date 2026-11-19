@@ -72,3 +72,17 @@ Modelo `claude-haiku-5-5` · preços US$ 0,10 / 0,50 por MTok (cache hit 0,01) �
 | CTB `verified` — extrapolado p/ 1000 (×1.01) | 1000 | 2340 | 367 | 800,243 | 105,332 | US$ 0.1327 | US$ 0.0999 |
 
 O `--all` do download tinha 992/1000 artefatos do `verified` no disco na hora do relatório (a extrapolação é linear).
+
+## Execução com LLM (uma vez, só `data/samples/swe-rebench/`)
+
+- Modelo `claude-haiku-5-5` · orçamento US$ 0.20 · trajetórias processadas: 50/50
+- Requisições: 5 · passos rotulados pelo LLM: 5 · passos vindos do cache: 0
+- Tokens: entrada 2,426 · saída 497 · cache leitura 6,080 · cache escrita 1,520
+- **Custo real desta execução: US$ 0.0007** (acumulado em `.cache/llm_usage.json`: US$ 0.0007; antes: US$ 0.0000)
+- Erros: nenhum
+
+Distribuição dos rótulos dados pelo LLM: setup 5
+
+Maiores mudanças (palpite da regra → LLM): setup→setup: 5
+
+`other` (sem keys) em SWE-rebench depois do LLM: 0.0%.

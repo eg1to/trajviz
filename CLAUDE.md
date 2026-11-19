@@ -47,6 +47,11 @@ regeneráveis com `scripts/make_fixtures.py`); lote: `uv run python scripts/pars
 Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` do editor (bash fica p/ a Fase 3); mini-SWE TB sem JSON
 (2/60) → `UnsupportedArtifact`; alinhamento da cauda de OpenHands-TB/Terminus2 e do OpenHands-SWE é hipótese; `generic_chat` só testado com mensagens sintéticas.
 
+## Rotulação (Fase 3) — `backend/app/labeling/`
+`label_trajectory(traj, llm=None)`: `rules.py` (ferramenta) → `bash_parser.py` (bashlex, fallback shlex/regex; regras de `python` em `classify_python`) → `llm.py` (só confiança < 0,6).
+`Step.files` agora é `[{path, mode: read|edit|run}]`. Config por `backend/.env` (ver `.env.example`; a chave nunca é impressa). Testes: `uv run pytest` (249).
+Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold_sample.py`. Limitação conhecida: o critério `other < 15%` mede cobertura, não acerto — o acerto só sai da Fase 6 (gold manual).
+
 ## Regras
 - `schema.py` é o contrato. Mudou o schema → regenerar os tipos TS (`npm run gen:api`).
 - Todo adaptador e toda regra de rotulação tem teste em `backend/tests/` com fixture real
@@ -75,7 +80,7 @@ Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` 
 ## Estado atual
 - [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
 - [x] Fase 2 — schema + adaptadores + detecção de formato (`backend/app/schema.py`, `backend/app/adapters/`, `results/parse_report.md`)
-- [ ] Fase 3 — rotulação (regras + fallback Haiku)
+- [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps.csv`)
 - [ ] Fase 4 — detectores, métricas, API
 - [ ] Fase 5 — frontend: upload, faixa de fases, inspetor, grafo (pôster: seg 23/11)
 - [ ] Fase 6 — dashboard, filtros, avaliação (`scripts/evaluate.py`, `results/`)
