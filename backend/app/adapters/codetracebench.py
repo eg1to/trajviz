@@ -59,7 +59,8 @@ def detect_agent(d: Path) -> str:
     for name in ORDER:
         if AGENTS[name][0].can_parse(d) > 0:
             return name
-    if next(d.rglob("agent.cast"), None) is not None or next(d.rglob("agent.log"), None) is not None:
+    if next(d.rglob("agent.cast"), None) is not None or next(d.rglob("agent.log"), None) is not None \
+            or next(d.rglob("agent-logs"), None) is not None:
         raise UnsupportedArtifact(f"{d.name}: artefato só com logs/asciinema (sem trajetória estruturada)")
     raise UnknownFormat(f"{d.name}: estrutura de CodeTraceBench não reconhecida",
                         sorted(p.name for p in d.iterdir())[:20])

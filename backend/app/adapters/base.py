@@ -6,7 +6,7 @@ import re
 import shlex
 from typing import Any
 
-from app.schema import Action, Observation
+from app.schema import Action, FileRef, Observation
 
 EXIT_CODE_RE = re.compile(r"\[The command completed with exit code (-?\d+)\.\]")
 TRUNC_RE = re.compile(
@@ -102,6 +102,9 @@ def parse_editor_string(act: str) -> dict:
     return args
 
 
-def files_from_args(args: dict) -> list[str]:
+def files_from_args(args: dict) -> list[FileRef]:
+    """Arquivo do editor (`args.path`); modo read para view/read, edit para o resto. A Fase 3 refina (bash, normalização)."""
     p = args.get("path")
-    return [p] if isinstance(p, str) and p else []
+    if not (isinstance(p, str) and p):
+        return []
+    return [FileRef(path=p, mode="read" if args.get("command") in ("view", "read", None) else "edit")]

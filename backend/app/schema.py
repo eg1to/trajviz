@@ -36,6 +36,11 @@ class Observation(BaseModel):
     truncated: bool = False
 
 
+class FileRef(BaseModel):
+    path: str  # normalizado (sem /workspace/<repo>/, /testbed/, /app/)
+    mode: Literal["read", "edit", "run"]
+
+
 class Step(BaseModel):
     idx: int  # 0-based, ordem canônica
     native_id: str | int | None = None  # id da mensagem/tool_call/evento/episódio original
@@ -48,7 +53,7 @@ class Step(BaseModel):
     label_source: LabelSource = "fallback"
     confidence: float = 0.0
     flags: list[Flag] = Field(default_factory=list)
-    files: list[str] = Field(default_factory=list)
+    files: list[FileRef] = Field(default_factory=list)  # arquivos tocados (Fase 3 refina a partir da ação)
 
 
 class StageRange(BaseModel):

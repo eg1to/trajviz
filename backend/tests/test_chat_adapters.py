@@ -49,7 +49,7 @@ def test_openhands_tool_normalization_and_args():
     t = openhands_chat.parse(jload("swe_rebench_row.json"))
     ed = next(s for s in t.steps if s.action.tool == "editor")
     assert ed.action.tool_native == "str_replace_editor" and ed.action.command in {"view", "create", "str_replace", "insert", "undo_edit"}
-    assert isinstance(ed.action.args, dict) and ed.files
+    assert isinstance(ed.action.args, dict) and ed.files and ed.files[0].path == ed.action.args['path']
     b = next(s for s in t.steps if s.action.tool == "bash")
     assert b.action.tool_native == "execute_bash" and b.action.command == b.action.args["command"]
     assert all(s.category == "other" and s.label_source == "fallback" for s in t.steps)

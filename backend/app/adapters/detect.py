@@ -101,8 +101,9 @@ def detect(src: Any, row: int = 0) -> tuple[str, float]:
         if name:
             return name, 0.95
         names = tar_names(obj)
-        if any(n.endswith(("agent.cast", "agent.log")) for n in names):
-            raise UnsupportedArtifact(f"{obj.name}: artefato só com logs/asciinema (sem trajetória estruturada)")
+        if any(n.endswith(("agent.cast", "agent.log")) for n in names) or \
+                {n.split("/")[0] for n in names} & {"terminus2", "openhands", "miniswe", "swe_raw"}:
+            raise UnsupportedArtifact(f"{obj.name}: artefato de agente conhecido, mas sem trajetória estruturada (sem episódios/eventos/JSON)")
         raise UnknownFormat(f"{obj.name}: .tar.zst sem estrutura conhecida do CodeTraceBench", sorted({n.split('/')[0] for n in names})[:20])
     best_name, best = None, 0.0
     for m in ADAPTERS:
@@ -110,7 +111,7 @@ def detect(src: Any, row: int = 0) -> tuple[str, float]:
         if c > best:
             best_name, best = m.NAME, c
     if (best_name is None or best < MIN_CONF) and isinstance(obj, Path) and obj.is_dir() \
-            and (next(obj.rglob("agent.cast"), None) or next(obj.rglob("agent.log"), None)):
+            and (next(obj.rglob("agent.cast"), None) or next(obj.rglob("agent.log"), None) or next(obj.rglob("agent-logs"), None)):
         raise UnsupportedArtifact(f"{obj.name}: artefato só com logs/asciinema (sem trajetória estruturada)")
     if best_name is None or best < MIN_CONF:
         raise UnknownFormat("nenhuma assinatura de formato casou", _top_keys(obj))
