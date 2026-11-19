@@ -1,0 +1,8 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; split_df = pd.read_parquet('mapk14_disynthon.parquet'); print('Train count:', (split_df
+['split1'] == 'train').sum()); print('Valid count:', (split_df['split1'] == 'valid').sum()); print('Test count:', (split_df['split1'] == 'test').sum())"
+Train count: 800105
+Valid count: 99998
+Test count: 99897
+root@rack-ge107-ya-20250517193277:/app#

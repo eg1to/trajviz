@@ -1,0 +1,33 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import boto3; print('boto3 available')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'boto3'
+root@rack-ge107-ya-20250517193277:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

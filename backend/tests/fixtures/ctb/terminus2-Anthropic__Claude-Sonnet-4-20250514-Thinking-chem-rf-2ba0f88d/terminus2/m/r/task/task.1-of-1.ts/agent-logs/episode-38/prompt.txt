@@ -1,0 +1,21 @@
+Current Terminal Screen:
+  spearman_corr_neg, _ = spearmanr(valid_targets, -valid_preds)
+Validation Spearman correlation (inverted): nan
+Validation RMSE: 0.2600
+Saving model...
+Model training completed!
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; train_df = pd.read_parquet('mapk14_1M.parquet'); split_df = pd.read_parquet('mapk14_dis
+ynthon.parquet'); valid_mask = split_df['split1'] == 'valid'; valid_smiles =
+…[cortado p/ fixture]…
+ate(valid_smiles):
+>     print(f'{i}: {smiles}')
+>     try:
+>         mol = Chem.MolFromSmiles(smiles)
+>         if mol is None:
+>             print(f'  -> FAILED to parse')
+>         else:
+>             print(f'  -> OK, {mol.GetNumAtoms()} atoms')
+>     except Exception as e:
+>         print(f'  -> ERROR: {e}')
+> EOF
+root@rack-ge107-ya-20250517193277:/app#

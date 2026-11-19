@@ -1,0 +1,28 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# cat > fit_model.py << 'EOF'
+> import pandas as pd
+> import numpy as np
+> import argparse
+> import pickle
+> from sklearn.ensemble import RandomForestRegressor
+> from sklearn.metrics import mean_squared_error
+> from scipy.stats import spearmanr
+> from rdkit import Chem
+> from rdkit.Chem import Descriptors, rdMolDescriptors
+> from rdkit.Chem.rdMolDescriptors import GetMorganFing
+…[cortado p/ fixture]…
+uared_error(valid_targets, valid_preds))
+>         print(f"Validation RMSE: {rmse:.4f}")
+>
+>     # Save model
+>     print("Saving model...")
+>     with open('/app/trained_model.pkl', 'wb') as f:
+>         pickle.dump(model, f)
+>
+>     print("Model training completed!")
+>
+> if __name__ == '__main__':
+>     main()
+> EOF
+root@rack-ge107-ya-20250517193277:/app#

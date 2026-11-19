@@ -1,0 +1,18 @@
+Current Terminal Screen:
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[16:43:13] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+ableBonds(mol),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rdkit/Chem/Lipinski.py", line 61, in <lambda>
+    NumRotatableBonds = lambda x: rdMolDescriptors.CalcNumRotatableBonds(x)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+root@rack-ge107-ya-20250517193277:/app#

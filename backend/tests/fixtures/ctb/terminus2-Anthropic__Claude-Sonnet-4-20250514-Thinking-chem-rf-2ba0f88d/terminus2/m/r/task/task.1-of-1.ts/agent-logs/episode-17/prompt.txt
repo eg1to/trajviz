@@ -1,0 +1,13 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; df = pd.read_parquet('mapk14_1M.parquet'); print('Training data shape:', df.shape); pri
+nt('Columns:', df.columns.tolist()); print('First few rows:'); print(df.head())"
+Training data shape: (1000000, 13)
+Columns: ['smiles', 'molecule_hash', 'smiles_a', 'smiles_b', 'smiles_c', 'seq_target_1', 'seq_target_2', 'seq_target_3', 'seq_matrix_1', 'seq
+…[cortado p/ fixture]…
+    20          0.440103
+3  CNC(=O)[C@H](CNC(=O)[C@@H](COCc1ccccc1)NC(=O)C...  08acb55545eb03f7c719875537d5b31fb4e1507810bff1...  ...       21          0.440103
+4  CNC(=O)[C@@H](CCNC(=O)[C@@H]1C[C@@H](NC(=O)c2c...  43bf37d24d86c3ac691b5159ff22dec7dcfbb680b0501d...  ...       40          0.337236
+
+[5 rows x 13 columns]
+root@rack-ge107-ya-20250517193277:/app#

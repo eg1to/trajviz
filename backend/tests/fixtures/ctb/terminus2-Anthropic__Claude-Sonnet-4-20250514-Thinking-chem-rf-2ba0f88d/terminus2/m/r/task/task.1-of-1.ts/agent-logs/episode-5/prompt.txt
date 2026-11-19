@@ -1,0 +1,35 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 --version
+Python 3.11.14
+root@rack-ge107-ya-20250517193277:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

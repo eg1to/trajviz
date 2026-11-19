@@ -1,0 +1,19 @@
+Current Terminal Screen:
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+[16:35:51] DEPRECATION WARNING: please use MorganGenerator
+Featurization completed. Failed: 0/50000
+Feature matrix shape: (50000, 520)
+Training model...
+

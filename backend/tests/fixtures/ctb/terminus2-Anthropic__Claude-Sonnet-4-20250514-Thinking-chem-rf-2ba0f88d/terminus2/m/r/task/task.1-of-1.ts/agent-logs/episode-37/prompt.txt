@@ -1,0 +1,14 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; train_df = pd.read_parquet('mapk14_1M.parquet'); split_df = pd.read_parquet('mapk14_dis
+ynthon.parquet'); valid_mask = split_df['split1'] == 'valid'; valid_smiles = train_df.loc[valid_mask, 'smiles'].head(5).tolist(); print('Sample validation SMILE
+S:'); for i, s in enumerate(valid_smiles): print(f'{i}: {s}')"
+  File "<string>", line 1
+    imp
+…[cortado p/ fixture]…
+valid'; valid_smiles = train_df.loc[valid_mask, 'smiles'].head(5).tolist(); print('Sample validation SMILES:'); for i, s in enumerate(valid_smiles): print
+(f'{i}: {s}')
+
+                                                                                                                      ^^^
+SyntaxError: invalid syntax
+root@rack-ge107-ya-20250517193277:/app#

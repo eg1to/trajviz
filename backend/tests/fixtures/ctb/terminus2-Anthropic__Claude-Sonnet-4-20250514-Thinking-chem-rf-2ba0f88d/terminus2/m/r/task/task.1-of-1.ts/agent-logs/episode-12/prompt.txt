@@ -1,0 +1,8 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; df = pd.read_parquet('mapk14_1M.parquet'); print('Training data shape:', df.shape); pri
+nt('Columns:', df.columns.tolist()); print('First few rows:'); print(df.head())"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'pandas'
+root@rack-ge107-ya-20250517193277:/app#

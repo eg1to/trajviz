@@ -1,0 +1,41 @@
+New Terminal Output:
+root@rack-ge107-ya-20250517193277:/app# ls -la
+total 0
+drwxr-xr-x 2 root root 34 Dec 15 08:05 .
+drwxr-xr-x 5 root root 64 Dec 15 16:26 ..
+root@rack-ge107-ya-20250517193277:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 examine_split.py
+Split data shape: (1000000, 5)
+Columns: ['split1', 'split2', 'split3', 'split4', 'split5']
+First few rows:
+  split1 split2 split3 split4 split5
+0  train  train  train  train  train
+1  train  train  train   test  train
+2  valid  train  train  train  train
+3  train  valid  train  train  train
+4  train  valid  valid  train  train
+
+Unique values in each column:
+split1: ['train' 'valid' 'test']
+split2: ['train' 'valid' 'test']
+split3: ['train' 'valid' 'test']
+split4: ['train' 'test' 'valid']
+split5: ['train' 'valid' 'test']
+root@rack-ge107-ya-20250517193277:/app#

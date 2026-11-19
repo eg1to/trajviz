@@ -1,0 +1,10 @@
+New Terminal Output:
+
+Installing collected packages: pytz, tzdata, six, pyarrow, numpy, python-dateutil, pandas
+Successfully installed numpy-2.3.5 pandas-2.3.0 pyarrow-20.0.0 python-dateutil-2.9.0.post0 pytz-2025.2 six-1.17.0 tzdata-2025.3
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@rack-ge107-ya-20250517193277:/app#

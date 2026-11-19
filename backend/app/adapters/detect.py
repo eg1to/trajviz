@@ -109,6 +109,9 @@ def detect(src: Any, row: int = 0) -> tuple[str, float]:
         c = m.can_parse(obj)
         if c > best:
             best_name, best = m.NAME, c
+    if (best_name is None or best < MIN_CONF) and isinstance(obj, Path) and obj.is_dir() \
+            and (next(obj.rglob("agent.cast"), None) or next(obj.rglob("agent.log"), None)):
+        raise UnsupportedArtifact(f"{obj.name}: artefato só com logs/asciinema (sem trajetória estruturada)")
     if best_name is None or best < MIN_CONF:
         raise UnknownFormat("nenhuma assinatura de formato casou", _top_keys(obj))
     return best_name, best

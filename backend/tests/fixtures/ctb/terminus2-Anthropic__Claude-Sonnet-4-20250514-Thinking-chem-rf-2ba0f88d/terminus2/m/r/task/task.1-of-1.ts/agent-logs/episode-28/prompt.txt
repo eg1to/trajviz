@@ -1,0 +1,29 @@
+Current Terminal Screen:
+>         min_samples_leaf=2,
+>         random_state=42,
+>         n_jobs=-1
+>     )
+>
+>     model.fit(X_train, train_targets)
+>
+>     # Evaluate on validation set
+>     valid_mask = split_df['split1'] == 'valid'
+>     if valid_mask.sum() > 0:
+>         # Use smaller validation set for speed
+>         valid_indices = train_df.index[valid_mask].tolist()[:10000]  # Use 10k validation samples
+>         valid_smiles
+…[cortado p/ fixture]…
+uared_error(valid_targets, valid_preds))
+>         print(f"Validation RMSE: {rmse:.4f}")
+>
+>     # Save model
+>     print("Saving model...")
+>     with open('/app/trained_model.pkl', 'wb') as f:
+>         pickle.dump(model, f)
+>
+>     print("Model training completed!")
+>
+> if __name__ == '__main__':
+>     main()
+> EOF
+root@rack-ge107-ya-20250517193277:/app#

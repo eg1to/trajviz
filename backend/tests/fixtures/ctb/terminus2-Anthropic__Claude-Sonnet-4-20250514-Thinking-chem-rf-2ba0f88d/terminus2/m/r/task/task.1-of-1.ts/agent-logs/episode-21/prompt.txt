@@ -1,0 +1,15 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# pip install scikit-learn==1.7.0 rdkit==2025.3.2
+Collecting scikit-learn==1.7.0
+  Downloading scikit_learn-1.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (17 kB)
+Collecting rdkit==2025.3.2
+  Downloading rdkit-2025.3.2-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (4.0 kB)
+Requirement already satisfied: numpy>=1.22.0 in /usr/local/lib/python3.11/site
+…[cortado p/ fixture]…
+ning pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@rack-ge107-ya-20250517193277:/app#

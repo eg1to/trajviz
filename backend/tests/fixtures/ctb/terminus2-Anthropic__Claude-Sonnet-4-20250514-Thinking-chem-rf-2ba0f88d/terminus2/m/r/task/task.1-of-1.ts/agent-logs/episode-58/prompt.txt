@@ -1,0 +1,16 @@
+Current Terminal Screen:
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[16:49:38] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+t root      5827 Dec 15 16:36 fit_model_gradient.py
+-rw-r--r-- 1 root root      5211 Dec 15 16:33 fit_model_optimized.py
+-rw-r--r-- 1 root root 102061071 Dec 15 16:27 mapk14_1M.parquet
+-rw-r--r-- 1 root root   1185406 Dec 15 16:27 mapk14_disynthon.parquet
+-rw-r--r-- 1 root root  12277587 Dec 15 16:49 trained_model.pkl
+root@rack-ge107-ya-20250517193277:/app#

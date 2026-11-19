@@ -1,0 +1,14 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# cat > examine_split.py << 'EOF'
+> import pandas as pd
+> df = pd.read_parquet('mapk14_disynthon.parquet')
+> print('Split data shape:', df.shape)
+> print('Columns:', df.columns.tolist())
+> print('First few rows:')
+> print(df.head())
+> print('\nUnique values in each column:')
+> for col in df.columns:
+>     print(f'{col}: {df[col].unique()}')
+> EOF
+root@rack-ge107-ya-20250517193277:/app#

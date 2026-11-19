@@ -120,8 +120,9 @@ def resolve_idx(t: Trajectory, kind: str, step_id: int, action_ref: dict | None)
         return None, None
     if kind == "index" or kind == "assistant_rank":
         return (step_id - 1, "rule") if 1 <= step_id <= n else (None, None)
-    if kind == "tool_call_rank":
-        return (step_id - 1, "hypothesis") if 1 <= step_id <= n else (None, None)
+    if kind == "tool_call_rank":  # n-ésima tool_call (não conta passos `message`, que não são tool_calls)
+        calls = [s.idx for s in t.steps if s.action.tool != "message"]
+        return (calls[step_id - 1], "hypothesis") if 1 <= step_id <= len(calls) else (None, None)
     if kind == "episode":
         eps = [s for s in t.steps]
         E = len(eps)

@@ -1,0 +1,14 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; df = pd.read_parquet('mapk14_disynthon.parquet'); print('Split data shape:', df.shape);
+ print('Columns:', df.columns.tolist()); print('First few rows:'); print(df.head()); print('Unique values in split columns:'); for col in df.columns: print(f'{c
+ol}: {df[col].unique()}')"
+  File "<string>", line 1
+    import pandas as pd; df = pd.read_parqu
+…[cortado p/ fixture]…
+a shape:', df.shape); print('Columns:', df.columns.tolist()); print('
+First few rows:'); print(df.head()); print('Unique values in split columns:'); for col in df.columns: print(f'{col}: {df[col].unique()}')
+
+                                                                               ^^^
+SyntaxError: invalid syntax
+root@rack-ge107-ya-20250517193277:/app#

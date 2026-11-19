@@ -1,0 +1,20 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 debug_smiles.py
+Sample validation SMILES:
+0: CNC(=O)[C@H](CNC(=O)[C@@H](CNC(=O)COc1ccc(C)cc1)NC(=O)c1cn[nH]c1)NC(=O)c1ccn(C)n1
+  -> OK, 40 atoms
+1: CNC(=O)[C@H](CNC(=O)[C@@H]1CCCN(C(=O)c2cc(O)cc(F)c2)C1)NC(=O)c1ncoc1C
+  -> OK, 34 atoms
+2: CNC(=O)[C@H](Cc1ccccc1Cl)NC(=O)[C@H](Cc1ccc(Cl)cc1)NCc1cccc(OC)c1O
+  -> OK, 36 atoms
+3: CNC(=O)[C@@H](CCNC(=O)CN1CCC(NCc2cccc(C(F)(
+…[cortado p/ fixture]…
+ OK, 39 atoms
+7: CNC(=O)[C@@H](CCNC(=O)CN1C(=O)[C@@H](NC(=O)c2cccc3cc[nH]c23)COc2ccccc21)NC(=O)c1cnc(N)s1
+  -> OK, 44 atoms
+8: CCC(=O)N[C@H]1C[C@@H](C(=O)NC)N(C(=O)[C@@H]2CC(O)CN2C(=O)c2ccc(C)cc2F)C1
+  -> OK, 32 atoms
+9: CNC(=O)[C@@H](CNC(=O)[C@@H](Cc1cccs1)NC(=O)CC1CCc2ccccc21)NC(=O)c1cccc2[nH]ccc12
+  -> OK, 41 atoms
+root@rack-ge107-ya-20250517193277:/app#

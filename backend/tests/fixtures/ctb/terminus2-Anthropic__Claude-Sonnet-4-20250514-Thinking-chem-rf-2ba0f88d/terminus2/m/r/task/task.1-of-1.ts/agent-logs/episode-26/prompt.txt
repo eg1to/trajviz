@@ -1,0 +1,21 @@
+Current Terminal Screen:
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[16:33:20] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+, line 127, in <module>
+    main()
+  File "/app/fit_model.py", line 81, in main
+    X_train = featurize_smiles(train_smiles)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/fit_model.py", line 21, in featurize_smiles
+    mol = Chem.MolFromSmiles(smiles)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+root@rack-ge107-ya-20250517193277:/app#

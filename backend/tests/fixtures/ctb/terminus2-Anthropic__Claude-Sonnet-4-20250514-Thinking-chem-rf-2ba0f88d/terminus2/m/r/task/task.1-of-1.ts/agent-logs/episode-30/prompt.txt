@@ -1,0 +1,19 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import pandas as pd; df = pd.read_parquet('mapk14_1M.parquet'); print('Target stats:'); print(df['target_enr
+ichment'].describe()); print('\nTarget distribution:'); print(df['target_enrichment'].hist(bins=20))"
+Target stats:
+count    1000000.000000
+mean           0.525482
+std            0.281425
+min            0.315125
+25%            0.395197
+50%            0.4401
+…[cortado p/ fixture]…
+_plot_backend
+    module = _load_backend(backend_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/plotting/_core.py", line 1874, in _load_backend
+    raise ImportError(
+ImportError: matplotlib is required for plotting when the default backend "matplotlib" is selected.
+root@rack-ge107-ya-20250517193277:/app#

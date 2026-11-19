@@ -1,0 +1,5 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# which pip
+/usr/local/bin/pip
+root@rack-ge107-ya-20250517193277:/app#

@@ -1,0 +1,5 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import urllib.request; urllib.request.urlretrieve('https://kin-del-2024.s3.amazonaws.com/data/mapk14_1M.parq
+uet', 'mapk14_1M.parquet'); print('Downloaded training data')"
+

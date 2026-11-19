@@ -1,0 +1,18 @@
+Current Terminal Screen:
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[16:39:01] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+orrelation: nan
+/app/fit_model_gradient.py:144: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  spearman_corr_neg, _ = spearmanr(valid_targets, -valid_preds)
+Validation Spearman correlation (inverted): nan
+Validation RMSE: 0.2600
+Saving model...
+Model training completed!
+root@rack-ge107-ya-20250517193277:/app#

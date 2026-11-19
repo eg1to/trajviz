@@ -12,3 +12,7 @@ dependencies = [
     "rich>=15.0.0",
     "zstandard>=0.25.0",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

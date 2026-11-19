@@ -12,6 +12,7 @@ from app.schema import Step, Trajectory
 NAME = "ctb_miniswe"
 BLOCK_RE = re.compile(r"```(?:bash|sh)?[ \t]*\n(.*?)```", re.S)
 RC_RE = re.compile(r"<returncode>\s*(-?\d+)\s*</returncode>\s*(?:<output>\n?(.*?)</output>)?", re.S)
+FORMAT_ERR = "Please always provide EXACTLY ONE action"
 SUBMIT_MARK = "COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT"
 
 
@@ -56,6 +57,8 @@ def parse(source: Any, *, meta: dict | None = None) -> Trajectory:
             ot = text_of(msgs[i + 1].get("content"))
             mm = RC_RE.search(ot)
             obs = make_obs((mm.group(2) or "").strip("\n") if mm else ot, int(mm.group(1)) if mm else None)
+            if not mm and ot.startswith(FORMAT_ERR):  # a ação não foi executada (formato inválido do modelo)
+                obs.is_error = True
         steps.append(Step(idx=len(steps), native_id=i, thought=thought, thought_source="content" if thought else None,
                           action=action, observation=obs))
     info = j.get("info") or {}

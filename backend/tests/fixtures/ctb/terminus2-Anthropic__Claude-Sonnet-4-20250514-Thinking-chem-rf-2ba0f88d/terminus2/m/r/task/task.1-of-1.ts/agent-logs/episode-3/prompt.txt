@@ -1,0 +1,37 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# which wget
+root@rack-ge107-ya-20250517193277:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

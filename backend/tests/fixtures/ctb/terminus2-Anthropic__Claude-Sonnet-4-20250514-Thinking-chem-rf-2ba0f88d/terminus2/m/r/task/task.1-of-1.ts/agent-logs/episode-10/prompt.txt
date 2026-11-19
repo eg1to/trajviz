@@ -1,0 +1,6 @@
+New Terminal Output:
+
+root@rack-ge107-ya-20250517193277:/app# python3 -c "import urllib.request; urllib.request.urlretrieve('https://kin-del-2024.s3.amazonaws.com/data/splits/mapk14_
+disynthon.parquet', 'mapk14_disynthon.parquet'); print('Downloaded split data')"
+Downloaded split data
+root@rack-ge107-ya-20250517193277:/app#

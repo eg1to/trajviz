@@ -1,0 +1,19 @@
+Current Terminal Screen:
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[1
+…[cortado p/ fixture]…
+36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+[16:36:08] DEPRECATION WARNING: please use MorganGenerator
+Featurization completed. Failed: 0/10000
+Validation Spearman correlation: 0.1378
+Validation RMSE: 0.2379
+Saving model...
+Model training completed!
+root@rack-ge107-ya-20250517193277:/app#

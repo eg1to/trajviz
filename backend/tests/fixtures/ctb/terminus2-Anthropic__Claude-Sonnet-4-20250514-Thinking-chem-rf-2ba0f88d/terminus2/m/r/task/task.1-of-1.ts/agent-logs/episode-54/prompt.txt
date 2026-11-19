@@ -1,0 +1,26 @@
+New Terminal Output:
+
+^CTraceback (most recent call last):
+  File "/app/fit_model.py", line 144, in <module>
+    main()
+  File "/app/fit_model.py", line 113, in main
+    model.fit(X_train, train_targets)
+  File "/usr/local/lib/python3.11/site-packages/sklearn/base.py", line 1363, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/
+…[cortado p/ fixture]…
+uared_error(valid_targets, valid_preds))
+>         print(f"Validation RMSE: {rmse:.4f}")
+>
+>     # Save model
+>     print("Saving model...")
+>     with open('/app/trained_model.pkl', 'wb') as f:
+>         pickle.dump(model, f)
+>
+>     print("Model training completed!")
+>
+> if __name__ == '__main__':
+>     main()
+> EOF
+root@rack-ge107-ya-20250517193277:/app#
