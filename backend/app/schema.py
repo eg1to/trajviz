@@ -12,7 +12,7 @@ Category = Literal["explore", "search", "read", "edit", "reproduce", "test", "se
 LabelSource = Literal["rule", "llm", "fallback", "user"]
 ThoughtSource = Literal["content", "think_tool", "field", "analysis_plan"]
 StepRefKind = Literal["index", "assistant_rank", "episode", "run_rank", "tool_call_rank"]
-Flag = Literal["error", "repeated", "loop", "no_new_info", "truncated"]
+Flag = Literal["error", "repeated", "loop", "no_new_info", "truncated", "test_fail", "test_pass"]
 
 # Nomes normalizados de ferramenta (Action.tool). O nome original fica em Action.tool_native.
 TOOLS = ("bash", "editor", "think", "submit", "task_tracker", "message", "keys", "ipython", "swe_cmd", "other")
@@ -32,8 +32,9 @@ class Observation(BaseModel):
     content: str = ""
     exit_code: int | None = None
     is_error: bool | None = None  # preenchido só quando há evidência (exit_code); detectores vêm na Fase 4
-    chars: int = 0
-    truncated: bool = False
+    chars: int = 0  # tamanho ORIGINAL (a API pode devolver `content` cortado; ver content_cut)
+    truncated: bool = False  # a própria ferramenta/agente cortou a saída
+    content_cut: bool = False  # só a API: `content` foi cortado ao responder
 
 
 class FileRef(BaseModel):
@@ -53,6 +54,7 @@ class Step(BaseModel):
     label_source: LabelSource = "fallback"
     confidence: float = 0.0
     flags: list[Flag] = Field(default_factory=list)
+    flag_details: dict[str, Any] = Field(default_factory=dict)  # motivo curto por flag, ex.: {"repeated": "igual ao passo 12"}
     files: list[FileRef] = Field(default_factory=list)  # arquivos tocados (Fase 3 refina a partir da ação)
 
 

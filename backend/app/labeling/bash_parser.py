@@ -398,9 +398,9 @@ def _is_test_target(words: list[str]) -> bool:
     return any(re.search(r"(^|[/_.-])(tests?|spec|check|lint)\b", w) for w in words[1:3])
 
 
-def classify_seg(seg: Seg, ctx: Ctx, depth: int = 0) -> BashResult:
-    words = list(seg.words)
-    # prefixos: VAR=x, sudo, env, timeout N …, palavras de controle (then/do/if…)
+def strip_prefix(words: list[str]) -> list[str]:
+    """Remove VAR=x, sudo/env/timeout N…, e palavras de controle (then/do/if…) do início."""
+    words = list(words)
     while words:
         w = words[0]
         if w in CTRL_PREFIX:
@@ -413,6 +413,37 @@ def classify_seg(seg: Seg, ctx: Ctx, depth: int = 0) -> BashResult:
                 words.pop(0)
         else:
             break
+    return words
+
+
+def _exe_name(w: str) -> str:
+    return os.path.basename(w) if "/" in w and not w.startswith("./") else w
+
+
+def executables(cmd: str) -> list[str]:
+    """Todos os executáveis do comando (1 por segmento/estágio de pipe), sem cd/export e palavras de controle."""
+    out: list[str] = []
+    for seg in parse_segments(cmd or ""):
+        for st in [seg, *seg.pipe_next]:
+            w = strip_prefix(st.words)
+            if w and w[0] not in CTRL and w[0] not in NAV:
+                out.append(_exe_name(w[0]))
+    return out
+
+
+def last_exe(cmd: str) -> str | None:
+    """Executável que define o exit code do comando: último estágio do último segmento não-neutro."""
+    last = None
+    for seg in parse_segments(cmd or ""):
+        st = [seg, *seg.pipe_next][-1]
+        w = strip_prefix(st.words)
+        if w and w[0] not in CTRL and w[0] not in NAV:
+            last = _exe_name(w[0])
+    return last
+
+
+def classify_seg(seg: Seg, ctx: Ctx, depth: int = 0) -> BashResult:
+    words = strip_prefix(seg.words)
     if not words:
         return _finish_redirects(BashResult(C.setup, "env", 0.9), seg, ctx)
     exe_raw = words[0]

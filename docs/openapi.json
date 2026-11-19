@@ -1,0 +1,2233 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "trajviz API",
+  "description": "Visualizador de trajetórias de agentes de código: upload → formato canônico + rótulos + flags + métricas.",
+  "version": "0.4.0"
+ },
+ "paths": {
+  "/api/health": {
+   "get": {
+    "tags": [
+     "meta"
+    ],
+    "summary": "Health",
+    "operationId": "health_api_health_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Health"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/taxonomy": {
+   "get": {
+    "tags": [
+     "meta"
+    ],
+    "summary": "Taxonomy",
+    "operationId": "taxonomy_api_taxonomy_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaxonomyResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/trajectories": {
+   "post": {
+    "tags": [
+     "trajectories"
+    ],
+    "summary": "Upload",
+    "description": "Aceita .json, .jsonl, .traj, .parquet, .tar.zst e .zip (diretório). Limite: 200 MB.\n\n`use_llm` (padrão: falso) liga o fallback Haiku para passos ambíguos; exige LABEL_LLM_ENABLED=1 e ANTHROPIC_API_KEY no servidor.",
+    "operationId": "upload_api_trajectories_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_upload_api_trajectories_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UploadResponse"
+        }
+       }
+      }
+     },
+     "413": {
+      "description": "Content Too Large",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Unprocessable Content",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorDetail"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/trajectories/{tid}": {
+   "get": {
+    "tags": [
+     "trajectories"
+    ],
+    "summary": "Get Trajectory",
+    "operationId": "get_trajectory_api_trajectories__tid__get",
+    "parameters": [
+     {
+      "name": "tid",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tid"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TrajectoryResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/trajectories/{tid}/steps/{idx}": {
+   "get": {
+    "tags": [
+     "trajectories"
+    ],
+    "summary": "Get Step",
+    "operationId": "get_step_api_trajectories__tid__steps__idx__get",
+    "parameters": [
+     {
+      "name": "tid",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tid"
+      }
+     },
+     {
+      "name": "idx",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Idx"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StepResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "trajectories"
+    ],
+    "summary": "Correct Step",
+    "description": "Corrige a categoria de um passo (label_source=\"user\") e registra em results/gold/corrections.jsonl.",
+    "operationId": "correct_step_api_trajectories__tid__steps__idx__patch",
+    "parameters": [
+     {
+      "name": "tid",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tid"
+      }
+     },
+     {
+      "name": "idx",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Idx"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CorrectionBody"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CorrectionResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/trajectories/{tid}/metrics": {
+   "get": {
+    "tags": [
+     "trajectories"
+    ],
+    "summary": "Get Metrics",
+    "operationId": "get_metrics_api_trajectories__tid__metrics_get",
+    "parameters": [
+     {
+      "name": "tid",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tid"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Metrics"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/library": {
+   "get": {
+    "tags": [
+     "library"
+    ],
+    "summary": "Get Library",
+    "operationId": "get_library_api_library_get",
+    "parameters": [
+     {
+      "name": "dataset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Dataset"
+      }
+     },
+     {
+      "name": "agent",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Agent"
+      }
+     },
+     {
+      "name": "resolved",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Resolved"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/LibraryItem"
+         },
+         "title": "Response Get Library Api Library Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/library/{sample_id}/open": {
+   "post": {
+    "tags": [
+     "library"
+    ],
+    "summary": "Open Sample",
+    "operationId": "open_sample_api_library__sample_id__open_post",
+    "parameters": [
+     {
+      "name": "sample_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Sample Id"
+      }
+     },
+     {
+      "name": "use_llm",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Use Llm"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UploadResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorDetail"
+        }
+       }
+      },
+      "description": "Not Found"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorDetail"
+        }
+       }
+      },
+      "description": "Unprocessable Content"
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Action": {
+    "properties": {
+     "tool": {
+      "type": "string",
+      "title": "Tool"
+     },
+     "tool_native": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tool Native"
+     },
+     "command": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Command"
+     },
+     "args": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Args"
+     },
+     "raw": {
+      "type": "string",
+      "title": "Raw",
+      "default": ""
+     }
+    },
+    "type": "object",
+    "required": [
+     "tool"
+    ],
+    "title": "Action"
+   },
+   "AnnotatedStep": {
+    "properties": {
+     "step_id": {
+      "type": "integer",
+      "title": "Step Id"
+     },
+     "labels": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Labels"
+     },
+     "action_ref": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Action Ref"
+     },
+     "observation_ref": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Observation Ref"
+     },
+     "resolved_idx": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Resolved Idx"
+     },
+     "resolved_via": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "action_ref",
+         "rule",
+         "hypothesis"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Resolved Via"
+     }
+    },
+    "type": "object",
+    "required": [
+     "step_id"
+    ],
+    "title": "AnnotatedStep"
+   },
+   "Body_upload_api_trajectories_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     },
+     "format": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Format"
+     },
+     "row": {
+      "type": "integer",
+      "title": "Row",
+      "default": 0
+     },
+     "use_llm": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Use Llm"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_upload_api_trajectories_post"
+   },
+   "CatStat": {
+    "properties": {
+     "count": {
+      "type": "integer",
+      "title": "Count"
+     },
+     "pct_total": {
+      "type": "number",
+      "title": "Pct Total"
+     },
+     "pct_core": {
+      "type": "number",
+      "title": "Pct Core"
+     }
+    },
+    "type": "object",
+    "required": [
+     "count",
+     "pct_total",
+     "pct_core"
+    ],
+    "title": "CatStat"
+   },
+   "Category": {
+    "type": "string",
+    "enum": [
+     "explore",
+     "search",
+     "read",
+     "edit",
+     "reproduce",
+     "test",
+     "setup",
+     "vcs",
+     "think",
+     "submit",
+     "other"
+    ],
+    "title": "Category"
+   },
+   "CategoryInfo": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "phase": {
+      "type": "string",
+      "title": "Phase"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "examples": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Examples"
+     },
+     "order": {
+      "type": "integer",
+      "title": "Order"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "label",
+     "phase",
+     "description",
+     "examples",
+     "order"
+    ],
+    "title": "CategoryInfo"
+   },
+   "Context": {
+    "properties": {
+     "obs_chars": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Obs Chars"
+     },
+     "n_truncated": {
+      "type": "integer",
+      "title": "N Truncated"
+     },
+     "total_obs_chars": {
+      "type": "integer",
+      "title": "Total Obs Chars"
+     },
+     "max_obs_chars": {
+      "type": "integer",
+      "title": "Max Obs Chars"
+     }
+    },
+    "type": "object",
+    "required": [
+     "obs_chars",
+     "n_truncated",
+     "total_obs_chars",
+     "max_obs_chars"
+    ],
+    "title": "Context"
+   },
+   "CorrectionBody": {
+    "properties": {
+     "category": {
+      "$ref": "#/components/schemas/Category"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "type": "object",
+    "required": [
+     "category"
+    ],
+    "title": "CorrectionBody"
+   },
+   "CorrectionResponse": {
+    "properties": {
+     "step": {
+      "$ref": "#/components/schemas/Step"
+     },
+     "metrics": {
+      "$ref": "#/components/schemas/Metrics"
+     }
+    },
+    "type": "object",
+    "required": [
+     "step",
+     "metrics"
+    ],
+    "title": "CorrectionResponse"
+   },
+   "Dynamics": {
+    "properties": {
+     "first_edit_idx": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "First Edit Idx"
+     },
+     "pct_before_first_edit": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Pct Before First Edit"
+     },
+     "edit_test_cycles": {
+      "type": "integer",
+      "title": "Edit Test Cycles"
+     },
+     "cycles_passed": {
+      "type": "integer",
+      "title": "Cycles Passed"
+     },
+     "cycles_failed": {
+      "type": "integer",
+      "title": "Cycles Failed"
+     },
+     "dominant_phase_by_third": {
+      "items": {
+       "$ref": "#/components/schemas/ThirdPhase"
+      },
+      "type": "array",
+      "title": "Dominant Phase By Third"
+     }
+    },
+    "type": "object",
+    "required": [
+     "first_edit_idx",
+     "pct_before_first_edit",
+     "edit_test_cycles",
+     "cycles_passed",
+     "cycles_failed",
+     "dominant_phase_by_third"
+    ],
+    "title": "Dynamics"
+   },
+   "Effort": {
+    "properties": {
+     "n_steps": {
+      "type": "integer",
+      "title": "N Steps"
+     },
+     "n_core_steps": {
+      "type": "integer",
+      "title": "N Core Steps"
+     },
+     "by_category": {
+      "additionalProperties": {
+       "$ref": "#/components/schemas/CatStat"
+      },
+      "type": "object",
+      "title": "By Category"
+     },
+     "by_phase": {
+      "items": {
+       "$ref": "#/components/schemas/PhaseStat"
+      },
+      "type": "array",
+      "title": "By Phase"
+     },
+     "message": {
+      "$ref": "#/components/schemas/Special"
+     },
+     "keys": {
+      "$ref": "#/components/schemas/Special"
+     },
+     "harness_protocol": {
+      "$ref": "#/components/schemas/Special"
+     },
+     "tools_ranking": {
+      "items": {
+       "$ref": "#/components/schemas/Ranked"
+      },
+      "type": "array",
+      "title": "Tools Ranking"
+     },
+     "executables_ranking": {
+      "items": {
+       "$ref": "#/components/schemas/Ranked"
+      },
+      "type": "array",
+      "title": "Executables Ranking"
+     }
+    },
+    "type": "object",
+    "required": [
+     "n_steps",
+     "n_core_steps",
+     "by_category",
+     "by_phase",
+     "message",
+     "keys",
+     "harness_protocol",
+     "tools_ranking",
+     "executables_ranking"
+    ],
+    "title": "Effort"
+   },
+   "ErrorDetail": {
+    "properties": {
+     "code": {
+      "type": "string",
+      "title": "Code"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "top_keys": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Top Keys"
+     }
+    },
+    "type": "object",
+    "required": [
+     "code",
+     "message"
+    ],
+    "title": "ErrorDetail"
+   },
+   "FileRef": {
+    "properties": {
+     "path": {
+      "type": "string",
+      "title": "Path"
+     },
+     "mode": {
+      "type": "string",
+      "enum": [
+       "read",
+       "edit",
+       "run"
+      ],
+      "title": "Mode"
+     }
+    },
+    "type": "object",
+    "required": [
+     "path",
+     "mode"
+    ],
+    "title": "FileRef"
+   },
+   "FileStat": {
+    "properties": {
+     "path": {
+      "type": "string",
+      "title": "Path"
+     },
+     "reads": {
+      "type": "integer",
+      "title": "Reads",
+      "default": 0
+     },
+     "edits": {
+      "type": "integer",
+      "title": "Edits",
+      "default": 0
+     },
+     "runs": {
+      "type": "integer",
+      "title": "Runs",
+      "default": 0
+     },
+     "first_idx": {
+      "type": "integer",
+      "title": "First Idx"
+     },
+     "last_idx": {
+      "type": "integer",
+      "title": "Last Idx"
+     }
+    },
+    "type": "object",
+    "required": [
+     "path",
+     "first_idx",
+     "last_idx"
+    ],
+    "title": "FileStat"
+   },
+   "Files": {
+    "properties": {
+     "table": {
+      "items": {
+       "$ref": "#/components/schemas/FileStat"
+      },
+      "type": "array",
+      "title": "Table"
+     },
+     "edited_never_read": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Edited Never Read"
+     },
+     "read_3plus_no_edit": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Read 3Plus No Edit"
+     }
+    },
+    "type": "object",
+    "required": [
+     "table",
+     "edited_never_read",
+     "read_3plus_no_edit"
+    ],
+    "title": "Files"
+   },
+   "FlagInfo": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "description"
+    ],
+    "title": "FlagInfo"
+   },
+   "GroundTruth": {
+    "properties": {
+     "stages": {
+      "items": {
+       "$ref": "#/components/schemas/StageRange"
+      },
+      "type": "array",
+      "title": "Stages"
+     },
+     "annotations": {
+      "items": {
+       "$ref": "#/components/schemas/StageAnnotation"
+      },
+      "type": "array",
+      "title": "Annotations"
+     },
+     "step_ref_kind": {
+      "type": "string",
+      "enum": [
+       "index",
+       "assistant_rank",
+       "episode",
+       "run_rank",
+       "tool_call_rank"
+      ],
+      "title": "Step Ref Kind",
+      "default": "index"
+     },
+     "ref_rule_confirmed": {
+      "type": "boolean",
+      "title": "Ref Rule Confirmed",
+      "default": true
+     },
+     "manifest_step_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Manifest Step Count"
+     }
+    },
+    "type": "object",
+    "title": "GroundTruth"
+   },
+   "GroundTruthMetrics": {
+    "properties": {
+     "n_incorrect": {
+      "type": "integer",
+      "title": "N Incorrect"
+     },
+     "n_unuseful": {
+      "type": "integer",
+      "title": "N Unuseful"
+     },
+     "unresolved": {
+      "type": "integer",
+      "title": "Unresolved"
+     },
+     "resolved_via": {
+      "additionalProperties": {
+       "type": "integer"
+      },
+      "type": "object",
+      "title": "Resolved Via"
+     },
+     "unuseful_vs_repeated_or_no_new_info": {
+      "$ref": "#/components/schemas/Overlap"
+     },
+     "incorrect_vs_error_or_test_fail": {
+      "$ref": "#/components/schemas/Overlap"
+     },
+     "incorrect_idx": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Incorrect Idx"
+     },
+     "unuseful_idx": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Unuseful Idx"
+     }
+    },
+    "type": "object",
+    "required": [
+     "n_incorrect",
+     "n_unuseful",
+     "unresolved",
+     "resolved_via",
+     "unuseful_vs_repeated_or_no_new_info",
+     "incorrect_vs_error_or_test_fail",
+     "incorrect_idx",
+     "unuseful_idx"
+    ],
+    "title": "GroundTruthMetrics"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "Health": {
+    "properties": {
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "pipeline_version": {
+      "type": "string",
+      "title": "Pipeline Version"
+     },
+     "llm_enabled": {
+      "type": "boolean",
+      "title": "Llm Enabled"
+     }
+    },
+    "type": "object",
+    "required": [
+     "status",
+     "pipeline_version",
+     "llm_enabled"
+    ],
+    "title": "Health"
+   },
+   "IdxCount": {
+    "properties": {
+     "count": {
+      "type": "integer",
+      "title": "Count",
+      "default": 0
+     },
+     "rate": {
+      "type": "number",
+      "title": "Rate",
+      "default": 0.0
+     },
+     "idx": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Idx"
+     }
+    },
+    "type": "object",
+    "title": "IdxCount"
+   },
+   "LibraryItem": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "dataset": {
+      "type": "string",
+      "title": "Dataset"
+     },
+     "format": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Format"
+     },
+     "agent": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Agent"
+     },
+     "model": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Model"
+     },
+     "task": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Task"
+     },
+     "n_steps": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "N Steps"
+     },
+     "resolved": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Resolved"
+     },
+     "processed": {
+      "type": "boolean",
+      "title": "Processed",
+      "default": false
+     },
+     "cache_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cache Id"
+     },
+     "split": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Split"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "dataset"
+    ],
+    "title": "LibraryItem"
+   },
+   "LoopRange": {
+    "properties": {
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "range": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Range"
+     },
+     "detail": {
+      "type": "string",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "required": [
+     "kind",
+     "range",
+     "detail"
+    ],
+    "title": "LoopRange"
+   },
+   "Metrics": {
+    "properties": {
+     "outcome": {
+      "$ref": "#/components/schemas/Outcome"
+     },
+     "effort": {
+      "$ref": "#/components/schemas/Effort"
+     },
+     "dynamics": {
+      "$ref": "#/components/schemas/Dynamics"
+     },
+     "problems": {
+      "$ref": "#/components/schemas/Problems"
+     },
+     "files": {
+      "$ref": "#/components/schemas/Files"
+     },
+     "context": {
+      "$ref": "#/components/schemas/Context"
+     },
+     "ground_truth": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GroundTruthMetrics"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "type": "object",
+    "required": [
+     "outcome",
+     "effort",
+     "dynamics",
+     "problems",
+     "files",
+     "context"
+    ],
+    "title": "Metrics"
+   },
+   "Observation": {
+    "properties": {
+     "content": {
+      "type": "string",
+      "title": "Content",
+      "default": ""
+     },
+     "exit_code": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Exit Code"
+     },
+     "is_error": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Is Error"
+     },
+     "chars": {
+      "type": "integer",
+      "title": "Chars",
+      "default": 0
+     },
+     "truncated": {
+      "type": "boolean",
+      "title": "Truncated",
+      "default": false
+     },
+     "content_cut": {
+      "type": "boolean",
+      "title": "Content Cut",
+      "default": false
+     }
+    },
+    "type": "object",
+    "title": "Observation"
+   },
+   "Outcome": {
+    "properties": {
+     "resolved": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Resolved"
+     },
+     "resolved_validated": {
+      "type": "boolean",
+      "title": "Resolved Validated"
+     },
+     "exit_status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Exit Status"
+     },
+     "n_steps": {
+      "type": "integer",
+      "title": "N Steps"
+     },
+     "ended_with_submit": {
+      "type": "boolean",
+      "title": "Ended With Submit"
+     },
+     "patch_files": {
+      "type": "integer",
+      "title": "Patch Files",
+      "default": 0
+     },
+     "patch_lines_added": {
+      "type": "integer",
+      "title": "Patch Lines Added",
+      "default": 0
+     },
+     "patch_lines_removed": {
+      "type": "integer",
+      "title": "Patch Lines Removed",
+      "default": 0
+     },
+     "patch_source": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Patch Source"
+     }
+    },
+    "type": "object",
+    "required": [
+     "resolved",
+     "resolved_validated",
+     "exit_status",
+     "n_steps",
+     "ended_with_submit"
+    ],
+    "title": "Outcome"
+   },
+   "Overlap": {
+    "properties": {
+     "annotated": {
+      "type": "integer",
+      "title": "Annotated"
+     },
+     "flagged": {
+      "type": "integer",
+      "title": "Flagged"
+     },
+     "precision_hint": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Precision Hint"
+     }
+    },
+    "type": "object",
+    "required": [
+     "annotated",
+     "flagged"
+    ],
+    "title": "Overlap"
+   },
+   "PhaseStat": {
+    "properties": {
+     "phase": {
+      "type": "string",
+      "title": "Phase"
+     },
+     "count": {
+      "type": "integer",
+      "title": "Count"
+     },
+     "pct_total": {
+      "type": "number",
+      "title": "Pct Total"
+     },
+     "pct_core": {
+      "type": "number",
+      "title": "Pct Core"
+     }
+    },
+    "type": "object",
+    "required": [
+     "phase",
+     "count",
+     "pct_total",
+     "pct_core"
+    ],
+    "title": "PhaseStat"
+   },
+   "Problems": {
+    "properties": {
+     "error": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "repeated": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "no_new_info": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "loop": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "loop_ranges": {
+      "items": {
+       "$ref": "#/components/schemas/LoopRange"
+      },
+      "type": "array",
+      "title": "Loop Ranges"
+     },
+     "truncated": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "test_fail": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "test_pass": {
+      "$ref": "#/components/schemas/IdxCount"
+     },
+     "longest_error_streak": {
+      "$ref": "#/components/schemas/Streak"
+     }
+    },
+    "type": "object",
+    "required": [
+     "error",
+     "repeated",
+     "no_new_info",
+     "loop",
+     "loop_ranges",
+     "truncated",
+     "test_fail",
+     "test_pass",
+     "longest_error_streak"
+    ],
+    "title": "Problems"
+   },
+   "Ranked": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "count": {
+      "type": "integer",
+      "title": "Count"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "count"
+    ],
+    "title": "Ranked"
+   },
+   "Special": {
+    "properties": {
+     "count": {
+      "type": "integer",
+      "title": "Count",
+      "default": 0
+     },
+     "pct_total": {
+      "type": "number",
+      "title": "Pct Total",
+      "default": 0.0
+     },
+     "idx": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Idx"
+     }
+    },
+    "type": "object",
+    "title": "Special"
+   },
+   "StageAnnotation": {
+    "properties": {
+     "stage_id": {
+      "type": "integer",
+      "title": "Stage Id"
+     },
+     "incorrect_step_ids": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Incorrect Step Ids"
+     },
+     "unuseful_step_ids": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "title": "Unuseful Step Ids"
+     },
+     "steps": {
+      "items": {
+       "$ref": "#/components/schemas/AnnotatedStep"
+      },
+      "type": "array",
+      "title": "Steps"
+     },
+     "reasoning": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reasoning"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stage_id"
+    ],
+    "title": "StageAnnotation"
+   },
+   "StageRange": {
+    "properties": {
+     "stage_id": {
+      "type": "integer",
+      "title": "Stage Id"
+     },
+     "start_step_id": {
+      "type": "integer",
+      "title": "Start Step Id"
+     },
+     "end_step_id": {
+      "type": "integer",
+      "title": "End Step Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stage_id",
+     "start_step_id",
+     "end_step_id"
+    ],
+    "title": "StageRange"
+   },
+   "Step": {
+    "properties": {
+     "idx": {
+      "type": "integer",
+      "title": "Idx"
+     },
+     "native_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Native Id"
+     },
+     "thought": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Thought"
+     },
+     "thought_source": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "content",
+         "think_tool",
+         "field",
+         "analysis_plan"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Thought Source"
+     },
+     "action": {
+      "$ref": "#/components/schemas/Action"
+     },
+     "observation": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Observation"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "category": {
+      "type": "string",
+      "enum": [
+       "explore",
+       "search",
+       "read",
+       "edit",
+       "reproduce",
+       "test",
+       "setup",
+       "vcs",
+       "think",
+       "submit",
+       "other"
+      ],
+      "title": "Category",
+      "default": "other"
+     },
+     "subcategory": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subcategory"
+     },
+     "label_source": {
+      "type": "string",
+      "enum": [
+       "rule",
+       "llm",
+       "fallback",
+       "user"
+      ],
+      "title": "Label Source",
+      "default": "fallback"
+     },
+     "confidence": {
+      "type": "number",
+      "title": "Confidence",
+      "default": 0.0
+     },
+     "flags": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "error",
+        "repeated",
+        "loop",
+        "no_new_info",
+        "truncated",
+        "test_fail",
+        "test_pass"
+       ]
+      },
+      "type": "array",
+      "title": "Flags"
+     },
+     "flag_details": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Flag Details"
+     },
+     "files": {
+      "items": {
+       "$ref": "#/components/schemas/FileRef"
+      },
+      "type": "array",
+      "title": "Files"
+     }
+    },
+    "type": "object",
+    "required": [
+     "idx",
+     "action"
+    ],
+    "title": "Step"
+   },
+   "StepResponse": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "step": {
+      "$ref": "#/components/schemas/Step"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "step"
+    ],
+    "title": "StepResponse"
+   },
+   "Streak": {
+    "properties": {
+     "length": {
+      "type": "integer",
+      "title": "Length",
+      "default": 0
+     },
+     "start_idx": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Idx"
+     },
+     "end_idx": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "End Idx"
+     }
+    },
+    "type": "object",
+    "title": "Streak"
+   },
+   "TaxonomyResponse": {
+    "properties": {
+     "categories": {
+      "items": {
+       "$ref": "#/components/schemas/CategoryInfo"
+      },
+      "type": "array",
+      "title": "Categories"
+     },
+     "phases": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Phases"
+     },
+     "display_order": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Display Order"
+     },
+     "flags": {
+      "items": {
+       "$ref": "#/components/schemas/FlagInfo"
+      },
+      "type": "array",
+      "title": "Flags"
+     }
+    },
+    "type": "object",
+    "required": [
+     "categories",
+     "phases",
+     "display_order",
+     "flags"
+    ],
+    "title": "TaxonomyResponse"
+   },
+   "ThirdPhase": {
+    "properties": {
+     "third": {
+      "type": "integer",
+      "title": "Third"
+     },
+     "phase": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phase"
+     },
+     "share": {
+      "type": "number",
+      "title": "Share"
+     }
+    },
+    "type": "object",
+    "required": [
+     "third",
+     "phase",
+     "share"
+    ],
+    "title": "ThirdPhase"
+   },
+   "Trajectory": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "source_format": {
+      "type": "string",
+      "title": "Source Format"
+     },
+     "agent": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Agent"
+     },
+     "model": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Model"
+     },
+     "task_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Task Id"
+     },
+     "repo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Repo"
+     },
+     "problem_statement": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Problem Statement"
+     },
+     "resolved": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Resolved"
+     },
+     "resolved_validated": {
+      "type": "boolean",
+      "title": "Resolved Validated",
+      "default": true
+     },
+     "exit_status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Exit Status"
+     },
+     "patch": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Patch"
+     },
+     "steps": {
+      "items": {
+       "$ref": "#/components/schemas/Step"
+      },
+      "type": "array",
+      "title": "Steps"
+     },
+     "ground_truth": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GroundTruth"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "meta": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Meta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "source_format"
+    ],
+    "title": "Trajectory"
+   },
+   "TrajectoryResponse": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "format_detected": {
+      "type": "string",
+      "title": "Format Detected"
+     },
+     "confidence": {
+      "type": "number",
+      "title": "Confidence"
+     },
+     "warnings": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Warnings"
+     },
+     "llm_used": {
+      "type": "boolean",
+      "title": "Llm Used"
+     },
+     "source_filename": {
+      "type": "string",
+      "title": "Source Filename"
+     },
+     "trajectory": {
+      "$ref": "#/components/schemas/Trajectory"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "format_detected",
+     "confidence",
+     "warnings",
+     "llm_used",
+     "source_filename",
+     "trajectory"
+    ],
+    "title": "TrajectoryResponse"
+   },
+   "UploadResponse": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "format_detected": {
+      "type": "string",
+      "title": "Format Detected"
+     },
+     "confidence": {
+      "type": "number",
+      "title": "Confidence"
+     },
+     "n_steps": {
+      "type": "integer",
+      "title": "N Steps"
+     },
+     "warnings": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Warnings"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "format_detected",
+     "confidence",
+     "n_steps",
+     "warnings"
+    ],
+    "title": "UploadResponse"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ }
+}

@@ -52,6 +52,15 @@ Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` 
 `Step.files` agora é `[{path, mode: read|edit|run}]`. Config por `backend/.env` (ver `.env.example`; a chave nunca é impressa). Testes: `uv run pytest` (249).
 Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold_sample.py`. Limitação conhecida: o critério `other < 15%` mede cobertura, não acerto — o acerto só sai da Fase 6 (gold manual).
 
+## Detectores, métricas e API (Fase 4)
+`analysis/detectors.py`: `error`, `test_fail`, `test_pass`, `repeated`, `no_new_info`, `loop`, `truncated` (+ `flag_details`); `analysis/metrics.py`: `compute_metrics`;
+`pipeline.process(...)` = detect → parse → label → detectores → métricas, com cache em `backend/.cache/trajectories/`. Pré-aquecer: `uv run python scripts/warm_cache.py`.
+Endpoints (OpenAPI em `docs/openapi.json`; tipos TS: `npm run gen:api`):
+`POST /api/trajectories` (multipart: file, format?, row?, use_llm?) · `GET /api/trajectories/{id}` (obs. cortadas em 2.000 chars) ·
+`GET /api/trajectories/{id}/steps/{idx}` · `GET /api/trajectories/{id}/metrics` · `PATCH /api/trajectories/{id}/steps/{idx}` ({category}) ·
+`GET /api/library?dataset=&agent=&resolved=&q=` · `POST /api/library/{sample_id}/open` · `GET /api/taxonomy` · `GET /api/health`. CORS: http://localhost:5173.
+O front só consome a API; erros são 422 `{detail:{code,message,top_keys?}}` (413 p/ > 200 MB, 404 p/ id/passo inexistente).
+
 ## Regras
 - `schema.py` é o contrato. Mudou o schema → regenerar os tipos TS (`npm run gen:api`).
 - Todo adaptador e toda regra de rotulação tem teste em `backend/tests/` com fixture real
@@ -81,7 +90,7 @@ Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold
 - [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
 - [x] Fase 2 — schema + adaptadores + detecção de formato (`backend/app/schema.py`, `backend/app/adapters/`, `results/parse_report.md`)
 - [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps.csv`)
-- [ ] Fase 4 — detectores, métricas, API
+- [x] Fase 4 — detectores, métricas, API (`backend/app/analysis/`, `pipeline.py`, `main.py`, `library.py`, `docs/openapi.json`)
 - [ ] Fase 5 — frontend: upload, faixa de fases, inspetor, grafo (pôster: seg 23/11)
 - [ ] Fase 6 — dashboard, filtros, avaliação (`scripts/evaluate.py`, `results/`)
 - [ ] Fase 7 — docker compose, polimento, demo (MVP: qua 25/11)
