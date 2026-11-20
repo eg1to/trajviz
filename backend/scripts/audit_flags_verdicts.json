@@ -1,0 +1,322 @@
+{
+ "error-1": {
+  "verdict": "correto",
+  "why": "o editor recusou a edição (old_str = new_str): comando falhou"
+ },
+ "error-2": {
+  "verdict": "correto",
+  "why": "AttributeError no fim do traceback"
+ },
+ "error-3": {
+  "verdict": "correto",
+  "why": "o editor informa que o caminho não existe"
+ },
+ "error-4": {
+  "verdict": "correto",
+  "why": "view_range inválido: o editor recusou"
+ },
+ "error-5": {
+  "verdict": "correto",
+  "why": "AssertionError levantado pelo script de verificação (traceback real)"
+ },
+ "error-6": {
+  "verdict": "correto",
+  "why": "TypeError real no script de reprodução"
+ },
+ "error-7": {
+  "verdict": "correto",
+  "why": "exit 1 com traceback"
+ },
+ "error-8": {
+  "verdict": "correto",
+  "why": "NameError real"
+ },
+ "error-9": {
+  "verdict": "duvidoso",
+  "why": "o script imprime \"Error: …\" de propósito para mostrar o bug reproduzido; o comando em si não falhou (só o padrão `error:` casou)"
+ },
+ "error-10": {
+  "verdict": "correto",
+  "why": "UnboundLocalError real"
+ },
+ "error-11": {
+  "verdict": "correto",
+  "why": "AttributeError real"
+ },
+ "error-12": {
+  "verdict": "falso_positivo",
+  "why": "o script de teste trata o erro esperado e imprime \"PASSED: Got expected error type\"; nenhuma falha de comando"
+ },
+ "error-13": {
+  "verdict": "correto",
+  "why": "SQLFluffUserError levantado (traceback real)"
+ },
+ "error-14": {
+  "verdict": "correto",
+  "why": "view_range fora do arquivo: editor recusou"
+ },
+ "error-15": {
+  "verdict": "correto",
+  "why": "ParseError real (traceback)"
+ },
+ "error-16": {
+  "verdict": "correto",
+  "why": "view_range inválido: editor recusou"
+ },
+ "error-17": {
+  "verdict": "correto",
+  "why": "exit 1 com AttributeError"
+ },
+ "error-18": {
+  "verdict": "correto",
+  "why": "exit 1 e mensagem de erro do script"
+ },
+ "error-19": {
+  "verdict": "correto",
+  "why": "o editor informa que o caminho não existe"
+ },
+ "error-20": {
+  "verdict": "correto",
+  "why": "traceback real (TypeError)"
+ },
+ "repeated-1": {
+  "verdict": "duvidoso",
+  "why": "`git stash pop` repetido 24 passos depois: o estado do repositório pode ter mudado (stash/commit no meio)"
+ },
+ "repeated-2": {
+  "verdict": "duvidoso",
+  "why": "saída de compilação: algo no ambiente mudou entre as duas execuções (não é uma edição)"
+ },
+ "repeated-3": {
+  "verdict": "correto",
+  "why": "mesmo pytest, mesmo erro de argumento, sem mudança entre as execuções"
+ },
+ "repeated-4": {
+  "verdict": "correto",
+  "why": "a mesma str_replace recusada (\"No replacement was performed\") duas vezes"
+ },
+ "repeated-5": {
+  "verdict": "correto",
+  "why": "mesma str_replace inválida repetida"
+ },
+ "repeated-6": {
+  "verdict": "duvidoso",
+  "why": "reprodução rodada de novo; pode ter havido instalação/ajuste de ambiente entre as duas"
+ },
+ "repeated-7": {
+  "verdict": "correto",
+  "why": "mesma str_replace recusada duas vezes"
+ },
+ "repeated-8": {
+  "verdict": "duvidoso",
+  "why": "pytest rodado de novo sem edição visível entre os passos; ambiente pode ter mudado"
+ },
+ "repeated-9": {
+  "verdict": "correto",
+  "why": "consulta pura (print da versão) repetida"
+ },
+ "repeated-10": {
+  "verdict": "correto",
+  "why": "mesmo grep, ambos sem saída"
+ },
+ "repeated-11": {
+  "verdict": "correto",
+  "why": "mesmo pytest --collect-only, mesmo exit 5"
+ },
+ "repeated-12": {
+  "verdict": "correto",
+  "why": "consulta pura repetida"
+ },
+ "repeated-13": {
+  "verdict": "correto",
+  "why": "mesmo script com o mesmo traceback"
+ },
+ "repeated-14": {
+  "verdict": "correto",
+  "why": "mesmo teste falhando, sem edição entre os dois"
+ },
+ "repeated-15": {
+  "verdict": "correto",
+  "why": "mesmo script, mesma saída, sem edição"
+ },
+ "repeated-16": {
+  "verdict": "correto",
+  "why": "mesma visualização do mesmo intervalo"
+ },
+ "repeated-17": {
+  "verdict": "correto",
+  "why": "mesmo script com o mesmo traceback"
+ },
+ "repeated-18": {
+  "verdict": "correto",
+  "why": "mesmo pytest, mesmo resultado, sem edição"
+ },
+ "repeated-19": {
+  "verdict": "duvidoso",
+  "why": "mesmo script 12 passos depois sem edição visível; pode haver mudança de ambiente no intervalo"
+ },
+ "repeated-20": {
+  "verdict": "correto",
+  "why": "mesma listagem de diretório 25 passos depois"
+ },
+ "loop-1": {
+  "verdict": "falso_positivo",
+  "why": "6 edições seguidas no mesmo arquivo (várias regiões): edição em lote, não um laço"
+ },
+ "loop-2": {
+  "verdict": "duvidoso",
+  "why": "leitura/busca alternadas no mesmo arquivo; pode ser exploração legítima"
+ },
+ "loop-3": {
+  "verdict": "duvidoso",
+  "why": "ciclo editar/rodar o script de reprodução: depuração iterativa comum"
+ },
+ "loop-4": {
+  "verdict": "falso_positivo",
+  "why": "mesmo trecho do caso 1: 6 edições seguidas"
+ },
+ "loop-5": {
+  "verdict": "correto",
+  "why": "3 ciclos edit → test_fail no mesmo arquivo ao longo de 37 passos: luta real com a correção"
+ },
+ "loop-6": {
+  "verdict": "falso_positivo",
+  "why": "8 leituras do mesmo arquivo em intervalos DIFERENTES: exploração, o alvo do detector é o arquivo e não o intervalo"
+ },
+ "loop-7": {
+  "verdict": "duvidoso",
+  "why": "ciclo editar/rodar o script de teste: depuração iterativa"
+ },
+ "loop-8": {
+  "verdict": "falso_positivo",
+  "why": "10 leituras do mesmo arquivo em intervalos diferentes"
+ },
+ "loop-9": {
+  "verdict": "duvidoso",
+  "why": "buscas variando o padrão: tentativa e erro, mas com padrões distintos"
+ },
+ "loop-10": {
+  "verdict": "falso_positivo",
+  "why": "leituras de intervalos diferentes do mesmo arquivo"
+ },
+ "loop-11": {
+  "verdict": "correto",
+  "why": "ciclos edit,edit,test repetidos 3× no mesmo arquivo"
+ },
+ "loop-12": {
+  "verdict": "duvidoso",
+  "why": "mesmo trecho do caso 2"
+ },
+ "loop-13": {
+  "verdict": "correto",
+  "why": "4 ciclos edit → test_fail no mesmo arquivo"
+ },
+ "loop-14": {
+  "verdict": "duvidoso",
+  "why": "6 `python -c` seguidos (inspeção por snippets): pode ser exploração"
+ },
+ "loop-15": {
+  "verdict": "falso_positivo",
+  "why": "10 edições seguidas no mesmo arquivo: edição em lote"
+ },
+ "loop-16": {
+  "verdict": "duvidoso",
+  "why": "ciclo editar/rodar o script de reprodução ×4: depuração iterativa"
+ },
+ "loop-17": {
+  "verdict": "correto",
+  "why": "3 ciclos edit → test_fail em hcloud.py"
+ },
+ "loop-18": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 17"
+ },
+ "loop-19": {
+  "verdict": "falso_positivo",
+  "why": "leituras de intervalos diferentes do mesmo arquivo"
+ },
+ "loop-20": {
+  "verdict": "duvidoso",
+  "why": "mesmo trecho do caso 16"
+ },
+ "test_fail-1": {
+  "verdict": "correto",
+  "why": "1 failed, 6 passed"
+ },
+ "test_fail-2": {
+  "verdict": "duvidoso",
+  "why": "exit 4 do pytest = erro de uso (a execução não rodou testes); não é \"teste falhou\""
+ },
+ "test_fail-3": {
+  "verdict": "duvidoso",
+  "why": "exit 4 (erro de uso do pytest)"
+ },
+ "test_fail-4": {
+  "verdict": "duvidoso",
+  "why": "exit 4 (erro de uso do pytest)"
+ },
+ "test_fail-5": {
+  "verdict": "correto",
+  "why": "pycodestyle encontrou violação (exit 1)"
+ },
+ "test_fail-6": {
+  "verdict": "duvidoso",
+  "why": "exit 4 (erro de uso do pytest)"
+ },
+ "test_fail-7": {
+  "verdict": "duvidoso",
+  "why": "exit 4 (erro de uso do pytest)"
+ },
+ "test_fail-8": {
+  "verdict": "duvidoso",
+  "why": "exit 5 = nenhum teste coletado (--collect-only)"
+ },
+ "test_fail-9": {
+  "verdict": "correto",
+  "why": "pytest exit 1: testes falharam"
+ },
+ "test_fail-10": {
+  "verdict": "duvidoso",
+  "why": "exit 2 do pytest = execução interrompida"
+ },
+ "test_fail-11": {
+  "verdict": "duvidoso",
+  "why": "exit 5 = nenhum teste coletado"
+ },
+ "test_fail-12": {
+  "verdict": "duvidoso",
+  "why": "exit 4 (erro de uso do pytest)"
+ },
+ "test_fail-13": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-14": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-15": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-16": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-17": {
+  "verdict": "duvidoso",
+  "why": "`pytest … | head -20` termina com exit 0 (do head); o padrão `ERRORS` casou na saída cortada: provável erro de coleta, mas incerto"
+ },
+ "test_fail-18": {
+  "verdict": "correto",
+  "why": "4 failed, 31 passed"
+ },
+ "test_fail-19": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-20": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ }
+}

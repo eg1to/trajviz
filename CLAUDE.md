@@ -98,5 +98,5 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
 - [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps.csv`)
 - [x] Fase 4 — detectores, métricas, API (`backend/app/analysis/`, `pipeline.py`, `main.py`, `library.py`, `docs/openapi.json`)
 - [x] Fase 5 — frontend: biblioteca, faixa de fases, grafo, inspetor, dashboard (`frontend/`; capturas em `results/screenshots/`)
-- [ ] Fase 6 — dashboard, filtros, avaliação (`scripts/evaluate.py`, `results/`)
+- [~] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`): **parcial** — falta preencher o gold manual (`results/gold/gold_steps.csv`, 0/210) para acurácia/F1/matriz de confusão; rode `cd backend && uv run python scripts/evaluate.py && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
 - [ ] Fase 7 — docker compose, polimento, demo (MVP: qua 25/11)

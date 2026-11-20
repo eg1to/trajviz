@@ -6,12 +6,12 @@
 
 | dataset | traj. | passos médios | s / trajetória | s / 100 passos |
 |---|---:|---:|---:|---:|
-| codetracebench | 58 | 46.5 | 0.062 | 0.133 |
-| swe-rebench | 50 | 63.7 | 0.037 | 0.058 |
-| swe-smith | 60 | 30.7 | 0.001 | 0.002 |
-| **total** | 168 | — | 0.033 | 0.071 |
+| codetracebench | 58 | 46.5 | 0.002 | 0.004 |
+| swe-rebench | 50 | 63.7 | 0.003 | 0.004 |
+| swe-smith | 60 | 30.7 | 0.001 | 0.004 |
+| **total** | 168 | — | 0.002 | 0.004 |
 
-Meta: < 2 s por trajetória de 100 passos → ✅. Mais lenta: `codetracebench/openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pov-ray-aa2667f5` (500 passos, 0.50 s).
+Meta: < 2 s por trajetória de 100 passos → ✅. Mais lenta: `swe-rebench/chatcmpl-057ac2d879d36dfbab5dd343fb60a126` (86 passos, 0.01 s).
 
 ## % de passos com cada flag (por dataset; sem passos keys/harness)
 

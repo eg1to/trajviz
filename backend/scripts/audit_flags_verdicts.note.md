@@ -1,0 +1,7 @@
+## Padrões sistemáticos observados (para decidir depois — nada foi ajustado)
+
+- **`error`**: 18/20 corretos. Os dois problemas vêm de scripts de reprodução/teste que *imprimem* "Error: …" de propósito (casos 9 e 12): o padrão `^error:` em passos `reproduce` não distingue erro impresso de falha do comando.
+- **`repeated`**: 15/20 corretos e nenhum falso positivo claro. Os 5 duvidosos são reexecuções de `reproduce`/`test`/`git stash pop` sem edição no meio, mas com **outro tipo de mudança de estado** (instalação, build, stash) que a regra ignora — ela só considera passos `edit`.
+- **`loop`**: só 5/20 corretos, 8 duvidosos e 7 falsos positivos. Falsos positivos típicos: (a) várias edições seguidas no mesmo arquivo (edição em lote) e (b) leituras de **intervalos diferentes** do mesmo arquivo — o alvo do n-grama é o arquivo, não o intervalo. Os duvidosos são ciclos editar/rodar o script de reprodução (depuração iterativa). Os ciclos `edit → test_fail` (variante 2) foram os mais confiáveis (4/4 corretos entre os casos dessa variante: 5, 13, 17 e 18).
+- **`test_fail`**: 10/20 corretos e 10 duvidosos; **9 dos 10 duvidosos são códigos de saída do pytest que não significam "teste falhou"** (4 = erro de uso, 5 = nenhum teste coletado, 2 = interrompido). A regra trata qualquer exit ≠ 0 de um passo `test` como falha.
+- Isto mede os detectores; **não** é um conjunto de ajuste. Qualquer mudança de regra baseada nestes achados deve ser combinada antes e reavaliada em amostra nova.

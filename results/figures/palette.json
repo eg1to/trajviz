@@ -1,0 +1,112 @@
+{
+ "kinds": {
+  "explore": {
+   "label": "Explorar",
+   "code": "Ex",
+   "color": "#56B4E9",
+   "phase": "Entendimento",
+   "special": false
+  },
+  "search": {
+   "label": "Buscar",
+   "code": "Bu",
+   "color": "#0072B2",
+   "phase": "Entendimento",
+   "special": false
+  },
+  "read": {
+   "label": "Ler",
+   "code": "Le",
+   "color": "#1F4E79",
+   "phase": "Entendimento",
+   "special": false
+  },
+  "edit": {
+   "label": "Editar",
+   "code": "Ed",
+   "color": "#E69F00",
+   "phase": "Modificação",
+   "special": false
+  },
+  "reproduce": {
+   "label": "Reproduzir",
+   "code": "Rp",
+   "color": "#CC79A7",
+   "phase": "Verificação",
+   "special": false
+  },
+  "test": {
+   "label": "Testar",
+   "code": "Te",
+   "color": "#009E73",
+   "phase": "Verificação",
+   "special": false
+  },
+  "vcs": {
+   "label": "Versionar",
+   "code": "Vc",
+   "color": "#7A5195",
+   "phase": "Verificação",
+   "special": false
+  },
+  "setup": {
+   "label": "Preparar",
+   "code": "Pr",
+   "color": "#8C8C8C",
+   "phase": "Controle",
+   "special": false
+  },
+  "think": {
+   "label": "Pensar",
+   "code": "Pn",
+   "color": "#BDBDBD",
+   "phase": "Controle",
+   "special": false
+  },
+  "submit": {
+   "label": "Entregar",
+   "code": "En",
+   "color": "#222222",
+   "phase": "Controle",
+   "special": false
+  },
+  "other": {
+   "label": "Outro",
+   "code": "··",
+   "color": "#E4E4E7",
+   "phase": null,
+   "special": true
+  },
+  "message": {
+   "label": "Mensagem",
+   "code": "Ms",
+   "color": "#E4E4E7",
+   "phase": null,
+   "special": true
+  },
+  "keys": {
+   "label": "Teclas",
+   "code": "Ky",
+   "color": "#E4E4E7",
+   "phase": null,
+   "special": true
+  },
+  "harness_protocol": {
+   "label": "Protocolo do harness",
+   "code": "Hp",
+   "color": "#E4E4E7",
+   "phase": null,
+   "special": true
+  }
+ },
+ "phase_color": {
+  "Entendimento": "#0072B2",
+  "Modificação": "#E69F00",
+  "Verificação": "#009E73",
+  "Controle": "#8C8C8C"
+ },
+ "error_color": "#D55E00",
+ "dark_submit": "#E8E8E8",
+ "special_fill_light": "#E4E4E7",
+ "source": "frontend/src/theme/categories.ts"
+}
