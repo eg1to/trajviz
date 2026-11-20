@@ -36,7 +36,7 @@ def main() -> None:
         "swe_rebench_resolved": best(rb(True), lambda r: (r["cycles"] >= 2, r["passed"], r["cycles"], r["errors"] + r["repeated"], -abs(r["n"] - 80))),
         "swe_rebench_unresolved": best(rb(False), lambda r: (r["loops"] > 0, r["cycles"], r["failed"], r["errors"] + r["repeated"], -abs(r["n"] - 80))),
         "swe_smith": best([r for r in rows if r["dataset"] == "swe-smith" and 25 <= r["n"] <= 90], lambda r: (r["loops"] > 0, r["cycles"], r["errors"] + r["repeated"])),
-        "ctb_gt_loop": best([r for r in rows if r["dataset"] == "codetracebench" and r["gt_inc"] > 0 and r["n"] >= 30 and r["loops"] > 0],
+        "ctb_gt": best([r for r in rows if r["dataset"] == "codetracebench" and r["gt_inc"] > 0 and r["n"] >= 30 and r["loops"] > 0],
                             lambda r: (r["gt"], r["loops"], r["errors"])) or best([r for r in rows if r["dataset"] == "codetracebench" and r["gt_inc"] > 0],
                                                                              lambda r: (r["loops"], r["gt"], r["n"])),
     }

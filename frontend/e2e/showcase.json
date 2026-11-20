@@ -47,7 +47,7 @@
     "gt_inc": 0,
     "task": "john-kurkowski__tldextract.3d1bf184.pr_300"
   },
-  "ctb_gt_loop": {
+  "ctb_gt": {
     "id": "codetracebench/terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-fix-ocaml-gc-5784d704",
     "dataset": "codetracebench",
     "agent": "Terminus2",

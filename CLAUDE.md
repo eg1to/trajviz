@@ -50,7 +50,7 @@ Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` 
 ## Rotulação (Fase 3) — `backend/app/labeling/`
 `label_trajectory(traj, llm=None)`: `rules.py` (ferramenta) → `bash_parser.py` (bashlex, fallback shlex/regex; regras de `python` em `classify_python`) → `llm.py` (só confiança < 0,6).
 `Step.files` agora é `[{path, mode: read|edit|run}]`. Config por `backend/.env` (ver `.env.example`; a chave nunca é impressa). Testes: `uv run pytest` (249).
-Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold_sample.py`. Limitação conhecida: o critério `other < 15%` mede cobertura, não acerto — o acerto só sai da Fase 6 (gold manual).
+Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold_sample.py`. Limitação conhecida: o critério `other < 15%` mede cobertura, não acerto — o acerto foi medido na Fase 6 (gold manual).
 
 ## Detectores, métricas e API (Fase 4)
 `analysis/detectors.py`: `error`, `test_fail`, `test_pass`, `repeated`, `no_new_info`, `loop`, `truncated` (+ `flag_details`); `analysis/metrics.py`: `compute_metrics`;
@@ -98,5 +98,5 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
 - [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps_cego.csv`)
 - [x] Fase 4 — detectores, métricas, API (`backend/app/analysis/`, `pipeline.py`, `main.py`, `library.py`, `docs/openapi.json`)
 - [x] Fase 5 — frontend: biblioteca, faixa de fases, grafo, inspetor, dashboard (`frontend/`; capturas em `results/screenshots/`)
-- [~] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`): **parcial** — falta preencher o gold manual (`results/gold/gold_steps_cego.csv`, 0/210) para acurácia/F1/matriz de confusão; rode `cd backend && uv run python scripts/evaluate.py && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
+- [x] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`; gold manual `results/gold/gold_steps_cego_pedro.csv`, 210 passos, 1 anotador): regras 94,3% de acurácia, F1 macro 0,92; LLM 91,4%; `setup` é a categoria fraca (sugestões em `results/eval_classifier_sugestoes.md`, não aplicadas). Reproduzir: `cd backend && uv run python scripts/evaluate.py [--gold CSV] && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
 - [ ] Fase 7 — docker compose, polimento, demo (MVP: qua 25/11)

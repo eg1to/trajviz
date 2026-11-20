@@ -8,14 +8,14 @@ Convenção: **Δ de Cliff > 0 = a métrica é MAIOR nas resolvidas**. p = Mann-
 
 ## Tempo do pipeline (detect → parse → rótulos → detectores → métricas, por trajetória, sem cache, sem I/O do Parquet)
 
-- Total desta execução (incluindo leitura dos dados): **195 s** para 3576 trajetórias · só pipeline: 139 s
+- Total desta execução (incluindo leitura dos dados): **219 s** para 3576 trajetórias · só pipeline: 147 s
 
 | dataset | traj. | mediana (s) | p95 (s) | máx (s) | passos medianos |
 |---|---:|---:|---:|---:|---:|
-| CodeTraceBench | 976 | 0.052 | 0.151 | 1.206 | 35 |
-| SWE-rebench | 2000 | 0.031 | 0.059 | 0.121 | 62 |
-| SWE-smith | 600 | 0.010 | 0.028 | 0.059 | 24 |
-| **todos** | 3576 | 0.031 | 0.092 | 1.206 | 50 |
+| CodeTraceBench | 976 | 0.046 | 0.152 | 1.306 | 35 |
+| SWE-rebench | 2000 | 0.035 | 0.071 | 0.114 | 62 |
+| SWE-smith | 600 | 0.012 | 0.035 | 0.073 | 24 |
+| **todos** | 3576 | 0.034 | 0.089 | 1.306 | 50 |
 
 Descartadas: {'ctb_unsupported': 16, 'ctb_sem_artefato': 8, 'erros': 0}.
 
@@ -32,12 +32,12 @@ resolvidas n = 1000 · não resolvidas n = 1000
 | % Controle | 0.092 | 0.082 | 0.103 | 0.0001 | 0.0005*** |
 | % passos test | 0.128 | 0.107 | 0.261 | 0.0000 | 0.0000*** |
 | posição relativa da 1ª edição | 0.405 | 0.383 | 0.104 | 0.0001 | 0.0005*** |
-| taxa de error | 0.042 | 0.048 | -0.084 | 0.0011 | 0.0067** |
+| taxa de error | 0.042 | 0.048 | -0.082 | 0.0014 | 0.0084** |
 | taxa de repeated | 0.000 | 0.000 | -0.011 | 0.5906 | 1.0000 |
 | taxa de no_new_info | 0.020 | 0.029 | -0.161 | 0.0000 | 0.0000*** |
 | taxa de loop | 0.000 | 0.000 | -0.005 | 0.2239 | 0.6716 |
 | ciclos edit→test | 2.000 | 2.000 | 0.014 | 0.5656 | 1.0000 |
-| % ciclos terminando em test_pass | 1.000 | 1.000 | 0.054 | 0.0229 | 0.0916 |
+| % ciclos terminando em test_pass | 1.000 | 1.000 | 0.061 | 0.0115 | 0.0458* |
 
 ## CodeTraceBench verified — todos (solved conhecido)
 
@@ -57,7 +57,7 @@ resolvidas n = 498 · não resolvidas n = 450
 | taxa de no_new_info | 0.000 | 0.000 | -0.025 | 0.4478 | 1.0000 |
 | taxa de loop | 0.000 | 0.000 | -0.013 | 0.0098 | 0.0588 |
 | ciclos edit→test | 0.000 | 0.000 | 0.129 | 0.0001 | 0.0006*** |
-| % ciclos terminando em test_pass | 0.000 | 0.000 | -0.060 | 0.2475 | 1.0000 |
+| % ciclos terminando em test_pass | 0.000 | 0.000 | -0.053 | 0.3120 | 1.0000 |
 
 ## CodeTraceBench verified — OpenHands
 
@@ -74,10 +74,10 @@ resolvidas n = 287 · não resolvidas n = 225
 | posição relativa da 1ª edição | 0.411 | 0.342 | 0.147 | 0.0048 | 0.0406* |
 | taxa de error | 0.077 | 0.100 | -0.172 | 0.0008 | 0.0081** |
 | taxa de repeated | 0.000 | 0.000 | 0.017 | 0.6893 | 1.0000 |
-| taxa de no_new_info | 0.000 | 0.000 | -0.046 | 0.3026 | 0.9623 |
+| taxa de no_new_info | 0.000 | 0.000 | -0.046 | 0.3026 | 1.0000 |
 | taxa de loop | 0.000 | 0.000 | -0.009 | 0.1105 | 0.5524 |
 | ciclos edit→test | 1.000 | 0.000 | 0.132 | 0.0045 | 0.0406* |
-| % ciclos terminando em test_pass | 0.000 | 0.000 | -0.073 | 0.2406 | 0.9623 |
+| % ciclos terminando em test_pass | 0.000 | 0.000 | -0.062 | 0.3176 | 1.0000 |
 
 ## CodeTraceBench verified — SWE-agent
 

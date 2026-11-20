@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Figuras do pôster (matplotlib; paleta do front; fundo branco; PNG 300 dpi + SVG) em results/figures/.
-Depende de: results/batch_stats.{parquet,json}, results/eval_detectors.json (e results/eval_classifier.json para a matriz de confusão)."""
+Depende de: results/batch_stats.{parquet,json}, results/eval_detectors.json e results/eval_classifier.json (matriz de confusão)."""
 from __future__ import annotations
 
 import json
@@ -216,14 +216,46 @@ def fig_formats(df: pd.DataFrame) -> None:
     print("formatos:", len(rows), "barras · fração nativa no split tool (amostra):", round(frac_native, 3), "· CTB:", dict(ctb))
 
 
+# ----------------------------------------------------------------------------- 6. matriz de confusão (gold manual)
+def fig_confusion() -> bool:
+    """Regras × gold e LLM × gold (linhas = gold, normalizadas por linha; números = contagens). Lê as matrizes de results/eval_classifier.json."""
+    p = RESULTS / "eval_classifier.json"
+    ec = json.loads(p.read_text()) if p.exists() else {}
+    if "confusion" not in ec:
+        return False
+    labels = ec["confusion"]["labels"]
+    panels = [(k, t) for k, t in (("rules", "Regras"), ("llm", "LLM (Haiku 5.5, todos os passos)")) if k in ec["confusion"]]
+    tw = ec.get("three_way", {})
+    fig, axes = plt.subplots(1, len(panels), figsize=(5.4 * len(panels), 5.2), squeeze=False)
+    for ax, (k, title) in zip(axes[0], panels):
+        m = np.array(ec["confusion"][k])
+        norm = m / np.maximum(m.sum(1, keepdims=True), 1)
+        ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
+        ax.grid(False)
+        ax.set_xticks(range(len(labels))); ax.set_yticks(range(len(labels)))
+        ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=8); ax.set_yticklabels(labels, fontsize=8)
+        for i in range(len(labels)):
+            for j in range(len(labels)):
+                if m[i, j]:
+                    ax.text(j, i, str(m[i, j]), ha="center", va="center", fontsize=7.5, color="white" if norm[i, j] > 0.5 else "black", fontweight="bold" if i == j else "normal")
+        ax.set_xlabel("previsto"); ax.set_ylabel("gold (manual)")
+        key = "regras" if k == "rules" else "LLM"
+        sub = f"acurácia {tw[key]['acc']:.3f} · F1 macro {tw[key]['macro_f1']:.3f}" if key in tw else f"n = {int(m.sum())}"
+        ax.set_title(f"{title}\n{sub}", fontsize=9)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+    fig.suptitle(f"Classificador × gold manual (n = {ec['gold_filled']} passos de {ec['gold_trajectories']} trajetórias; 1 anotador)", fontsize=10, fontweight="bold")
+    fig.tight_layout()
+    save(fig, "matriz_confusao")
+    return True
+
+
 def main() -> None:
     df = pd.read_parquet(RESULTS / "batch_stats.parquet")
     stats = json.loads((RESULTS / "batch_stats.json").read_text())
     fig_phases(df); fig_metrics(df, stats); fig_detectors(); fig_strips(); fig_formats(df)
-    if (FIG / "matriz_confusao.png").exists():
-        print("matriz_confusao.png já gerada por evaluate.py")
-    else:
-        print("matriz_confusao.png NÃO gerada: gold sem linhas preenchidas")
+    if not fig_confusion():
+        print("matriz_confusao NÃO gerada: results/eval_classifier.json sem matriz (gold sem linhas preenchidas)")
 
 
 if __name__ == "__main__":

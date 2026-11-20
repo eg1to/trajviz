@@ -6,7 +6,7 @@ cada passo e um dashboard de métricas, sem nenhuma rotulação manual.
 
 TCC I — DCC/UFMG · Pedro Henrique Egito Aguiar · Orientador: Marco Túlio Valente
 
-![Grafo de uma trajetória do CodeTraceBench com gabarito e loop](results/screenshots/05-ctb-gabarito-loop-grafo.png)
+![Grafo de uma trajetória do CodeTraceBench com gabarito](results/screenshots/05-ctb-gabarito-grafo.png)
 
 *Faixa de fases (topo), grafo em serpentina com modo compacto, arcos de loop, marcadores do gabarito do CodeTraceBench e inspetor do passo à direita.*
 
@@ -53,7 +53,7 @@ Os testes e2e sobem a API (porta 8011) e o front com cache e `results/` isolados
 | `02-swe-rebench-resolvida-*` | `swe-rebench/chatcmpl-831fa55b…` (96 passos, PASS) | 8 ciclos edit→test (4 terminaram em pass), 6 erros |
 | `03-swe-rebench-nao-resolvida-*` | `swe-rebench/chatcmpl-dd059e8e…` (56 passos, FAIL) | 1 loop, 6 ciclos (3 terminaram em test_fail) |
 | `04-swe-smith-*` | `swe-smith/ticks/john-kurkowski__tldextract…` (76 passos) | 6 ciclos, 9 repetidos/sem informação nova; "resolved não validado" |
-| `05-ctb-gabarito-loop-*` | `codetracebench/terminus2-…fix-ocaml-gc…` (141 passos, FAIL) | 26 passos anotados no gabarito; modo compacto (o `loop` corrigido não marca esta trajetória) |
+| `05-ctb-gabarito-*` | `codetracebench/terminus2-…fix-ocaml-gc…` (141 passos, FAIL) | 26 passos anotados no gabarito; modo compacto (o `loop` corrigido não marca esta trajetória) |
 
 Cada trajetória tem `-grafo`, `-dashboard` (topo) e `-dashboard-completo` (viewport alto).
 

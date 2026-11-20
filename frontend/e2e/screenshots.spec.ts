@@ -68,9 +68,9 @@ test('SWE-smith', async ({ page }) => {
   await graphAndDashboard(page, 'swe_smith', '04-swe-smith', (m) => ({ step: m.problems.test_fail.idx?.[0] ?? m.dynamics.first_edit_idx ?? 0 }))
 })
 
-test('CodeTraceBench com gabarito e loop', async ({ page }) => {
+test('CodeTraceBench com gabarito', async ({ page }) => {
   await light(page)
-  await graphAndDashboard(page, 'ctb_gt_loop', '05-ctb-gabarito-loop', (m) => {
+  await graphAndDashboard(page, 'ctb_gt', '05-ctb-gabarito', (m) => {
     const lp = m.problems.loop_ranges?.[0]
     return { step: m.ground_truth?.incorrect_idx?.[0] ?? 0, range: lp ? [lp.range[0], lp.range[1]] : undefined }
   })

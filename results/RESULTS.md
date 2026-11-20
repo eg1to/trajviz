@@ -1,6 +1,6 @@
 # Índice de resultados (Fase 6)
 
-Tudo é reprodutível com semente fixa (20251119) a partir de `backend/scripts/`. **Leia as ressalvas de cada avaliação**: o gold manual ainda não foi preenchido e as auditorias são pré-avaliações do assistente.
+Tudo é reprodutível com semente fixa (20251119) a partir de `backend/scripts/`. **Leia as ressalvas de cada avaliação**: o gold manual tem 1 anotador e as auditorias de detectores são pré-avaliações do assistente.
 
 | arquivo | o que é | script |
 |---|---|---|
@@ -8,12 +8,14 @@ Tudo é reprodutível com semente fixa (20251119) a partir de `backend/scripts/`
 | `eval_detectors.md` / `.json` | detectores × gabarito do CodeTraceBench (verified, 976 trajetórias) | `eval_detectors.py` |
 | `audit_no_new_info.md` | auditoria do `no_new_info` no SWE-smith (1ª rodada: 80% de falsos positivos; 2ª: 0/20) | `audit_no_new_info.py` |
 | `audit_flags.md` | auditoria leve de `error`, `repeated`, `loop`, `test_fail` (pré-avaliação do assistente) | `audit_flags.py` |
-| `eval_classifier.md` / `.json` | classificador de categorias: concordância regra × LLM; acurácia × gold (**gold vazio**) | `evaluate.py` |
+| `eval_classifier.md` / `.json` | classificador de categorias × gold manual: acurácia, F1 macro e por categoria, matrizes de confusão, por dataset/`label_source`, regras × LLM × gold (kappa), sensibilidade sem as linhas duvidosas, 10 maiores confusões (ICs por bootstrap sobre trajetórias) | `evaluate.py [--gold CSV]` |
+| `eval_classifier_sugestoes.md` | regras que o gold sugere rever — **só lista, nada foi aplicado** | (escrito à mão) |
 | `batch_stats.md` / `.json` / `.parquet` | resolvidas × não resolvidas em 3.576 trajetórias; tempo do pipeline | `batch_stats.py` |
-| `figures/` | 6 figuras do pôster (PNG 300 dpi + SVG) e `palette.json` | `figures.py`, `export_palette.py` |
+| `figures/` | 7 figuras do pôster (inclui `matriz_confusao`) (PNG 300 dpi + SVG) e `palette.json` | `figures.py`, `export_palette.py` |
 | `poster/` | `numeros.md`, `achados_metodologicos.md`, figuras e 3 capturas | `poster_pack.py` |
 | `labeling_report.md`, `parse_report.md` | cobertura da rotulação e do parse (fases 2–3) | `label_report.py`, `parse_samples.py` |
-| `gold/gold_steps_cego.csv` | 210 passos para você rotular — **só contexto + `gold_category` vazio** (sem rótulo da regra, do LLM, confiança nem label_source) | `make_gold_sample.py` |
+| `gold/gold_steps_cego_pedro.csv` | **gold manual** (210 passos rotulados, 21 com `duvida=1`, coluna `notas`); é o padrão do `evaluate.py` | — (manual) |
+| `gold/gold_steps_cego.csv` | o mesmo CSV vazio, como foi entregue ao anotador (só contexto + `gold_category` vazio) | `make_gold_sample.py` |
 | `gold/gold_steps_previsoes.csv`, `eval_classifier_llm_labels.csv` | previsões da regra e do LLM, **para não abrir antes de rotular**; `evaluate.py` junta tudo pelo `id` | `make_gold_sample.py`, `evaluate.py` |
 | `eval_detectors_before.{md,json}`, `batch_stats_before.json` | resultados ANTES da correção de `test_fail` e `loop` (para a comparação lado a lado) | — |
 | `screenshots/` | capturas da interface (Fase 5) | `npm run screenshots` |
@@ -24,8 +26,10 @@ Tudo é reprodutível com semente fixa (20251119) a partir de `backend/scripts/`
 
 **Auditorias manuais** (vereditos meus, "pré-avaliação do assistente — revisar"). `no_new_info`: a 1ª regra tinha 80% de falsos positivos no SWE-smith; corrigida (12,6% → 2,8% dos passos; 0/20 na nova amostra). Rodada 1 dos demais detectores (20 casos por flag): `error` 90% corretos, `repeated` 75% (25% duvidosos), `test_fail` 50% (50% duvidosos, quase todos exit 2/4/5 do pytest) e `loop` 25% (35% falsos positivos). **Rodada 2, depois da correção, em ~1.150 trajetórias novas (semente diferente, nenhum caso reaproveitado):** `test_fail` **80%** corretos (3 duvidosos e 1 falso positivo — o exit do `grep` no fim de um pipe) e `loop` **100%** (20/20, de apenas 11 trajetórias; os laços são genuínos, mas o detector perdeu revocação). A auditoria expôs duas lacunas da minha própria implementação de `loop`, corrigidas antes da amostra final (ver `audit_flags.md`).
 
-**Classificador.** Sem gold preenchido (0 de 210 linhas) **não há acurácia nem matriz de confusão**. Foi medida a concordância regra × LLM (Haiku 5.5 em todos os 210 passos, ignorando as regras): ~89,5%, kappa ~0,88, com custo total de US$ 0,0209 (limite: US$ 0,05; ver `eval_classifier.md`). Concordância não é acerto. **O CSV que você preenche agora é cego** (`gold/gold_steps_cego.csv`: sem rótulos da regra nem do LLM); as previsões ficam em arquivos separados que o `evaluate.py` junta pelo `id`.
+**Classificador** (gold manual cego, 210 passos de 112 trajetórias, 1 anotador; IC 95% por bootstrap sobre trajetórias). Regras: acurácia **0,943** [0,905; 0,974], F1 macro **0,915** [0,860; 0,959], kappa 0,932. LLM (Haiku 5.5 em todos os passos): 0,914 [0,874; 0,952], F1 macro 0,872; diferença LLM − regras −2,9 p.p. [−6,7; +1,0] (indistinguível). Regras + LLM só nos passos incertos (o que o app faz): 0,948 [0,911; 0,980]. Por dataset (regras): SWE-rebench e SWE-smith 1,000; CodeTraceBench 0,829 [0,740; 0,912]. Maiores confusões (regras, gold → previsto): `setup` → `explore` (4), `setup` → `edit` (3, todos `cp`), e cinco casos isolados de 1 passo (`setup` → `reproduce`/`vcs`, `read` ↔ `reproduce`, `reproduce` → `edit`); só há 7 pares distintos de confusão. `setup` é a categoria fraca (F1 0,53; revocação 0,36). **Sensibilidade:** sem as 21 linhas `duvida=1`, as regras vão a 0,979 [0,953; 1,000] (F1 macro 0,962) e o LLM a 0,963; nas 21 duvidosas, as regras acertam 0,619 e o LLM 0,476. **Ressalvas:** 1 anotador (sem concordância entre anotadores); as amostras vêm de `data/samples/`, usadas na Fase 3 para medir cobertura das regras, então 100% no SWE-rebench/SWE-smith pode ser otimista; categorias raras têm ICs largos; só 4 passos do gold caem em `fallback`, então o ganho de "regras + LLM" (+0,5 p.p.) é pouco informativo. Concordância regra × LLM: 89,5%, kappa 0,88 (custo do LLM: US$ 0,0209 no total). Sugestões de revisão de regras, **não aplicadas**: `eval_classifier_sugestoes.md`.
 
 **Resolvidas × não resolvidas.** 2.000 trajetórias do SWE-rebench (1.000 + 1.000), 976 do CodeTraceBench e 600 do SWE-smith (resolved não validado). No SWE-rebench, as resolvidas são menores (mediana 56 × 68 passos, δ de Cliff −0,34), têm mais passos de teste (12,8% × 10,7%, δ = 0,26) e menos `no_new_info` (δ = −0,16), todos com p corrigido por Holm < 0,001. Efeitos pequenos a médios e **associativos**: o tamanho da tarefa, o limite de iterações e o agente confundem. Tempo do pipeline: mediana 31 ms, p95 92 ms por trajetória. (A taxa de `loop` deixou de diferir entre os grupos depois da correção: δ = −0,005, p(Holm) = 0,67.)
+
+**Correção posterior (`pytest … | tail`):** o resultado de um `pytest` dentro de um pipe passou a vir do texto da saída ("N failed"/"N passed"), não do exit code do último comando do pipe. Reexecutados `eval_detectors.py` e `batch_stats.py`: mudou 1 passo marcado no CodeTraceBench (4.383 → 4.382) e nenhum número do pôster. A auditoria `audit_flags.md` (anterior à correção) não foi refeita.
 
 **Figuras e pôster.** `figures/` reúne as figuras (mesma paleta do front) e `poster/` os 14 números-chave com fonte, os achados metodológicos e as capturas escolhidas.

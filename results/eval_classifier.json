@@ -1,34 +1,861 @@
 {
+ "gold_path": "results/gold/gold_steps_cego_pedro.csv",
  "gold_rows": 210,
- "gold_filled": 0,
+ "gold_filled": 210,
+ "gold_doubt": 21,
+ "gold_trajectories": 112,
  "llm": {
   "enabled": true,
   "model": "claude-haiku-5-5",
   "budget_usd": 0.05,
-  "cost_usd": 0.0003137,
-  "requests": 1,
+  "cost_usd": 0.0,
+  "requests": 0,
   "labeled": 210,
-  "from_cache": 209,
+  "from_cache": 210,
   "errors": [],
   "tokens": {
-   "in": 772,
-   "out": 93,
+   "in": 0,
+   "out": 0,
    "cache_read": 0,
-   "cache_write": 1520
+   "cache_write": 0
   }
  },
  "rule_vs_llm": {
   "n": 210,
   "agreement": 0.8952380952380953,
-  "kappa": 0.875,
   "agreement_ci": [
-   0.8523809523809524,
-   0.9333333333333333
+   0.8461448598130841,
+   0.935071396265426
   ],
+  "kappa": 0.875,
   "kappa_ci": [
-   0.8230579093271926,
-   0.92019532935924
+   0.8174451871776969,
+   0.9217427855475292
   ]
  },
- "figures": []
+ "rules_slices": {
+  "todos": {
+   "n": 210,
+   "acc": 0.9428571428571428,
+   "acc_ci": [
+    0.9040404040404041,
+    0.975609756097561
+   ],
+   "macro_f1": 0.9154813509134999,
+   "macro_f1_ci": [
+    0.8606453918718103,
+    0.9606241599112118
+   ]
+  },
+  "dataset = CodeTraceBench": {
+   "n": 70,
+   "acc": 0.8285714285714286,
+   "acc_ci": [
+    0.739711137581894,
+    0.9117647058823529
+   ],
+   "macro_f1": 0.8292821260735699,
+   "macro_f1_ci": [
+    0.6958534202951199,
+    0.9073672942237014
+   ]
+  },
+  "dataset = SWE-rebench": {
+   "n": 70,
+   "acc": 1.0,
+   "acc_ci": [
+    1.0,
+    1.0
+   ],
+   "macro_f1": 1.0,
+   "macro_f1_ci": [
+    1.0,
+    1.0
+   ]
+  },
+  "dataset = SWE-smith": {
+   "n": 70,
+   "acc": 1.0,
+   "acc_ci": [
+    1.0,
+    1.0
+   ],
+   "macro_f1": 1.0,
+   "macro_f1_ci": [
+    1.0,
+    1.0
+   ]
+  },
+  "label_source = fallback": {
+   "n": 4,
+   "acc": 0.25,
+   "acc_ci": [
+    0.0,
+    1.0
+   ],
+   "macro_f1": 0.3333333333333333,
+   "macro_f1_ci": [
+    0.0,
+    1.0
+   ]
+  },
+  "label_source = rule": {
+   "n": 206,
+   "acc": 0.9563106796116505,
+   "acc_ci": [
+    0.9226980259870065,
+    0.9845400273511467
+   ],
+   "macro_f1": 0.9278184290130299,
+   "macro_f1_ci": [
+    0.8678654408168365,
+    0.9720553717561308
+   ]
+  }
+ },
+ "llm_slices": {
+  "todos": {
+   "n": 210,
+   "acc": 0.9142857142857143,
+   "acc_ci": [
+    0.876270332187858,
+    0.9519288277511961
+   ],
+   "macro_f1": 0.872019638953338,
+   "macro_f1_ci": [
+    0.7930568362938327,
+    0.9249973813339615
+   ]
+  },
+  "dataset = CodeTraceBench": {
+   "n": 70,
+   "acc": 0.8428571428571429,
+   "acc_ci": [
+    0.7619047619047619,
+    0.9259395424836601
+   ],
+   "macro_f1": 0.8213105076741439,
+   "macro_f1_ci": [
+    0.6831336219166261,
+    0.8978532931617967
+   ]
+  },
+  "dataset = SWE-rebench": {
+   "n": 70,
+   "acc": 0.9571428571428572,
+   "acc_ci": [
+    0.9047619047619048,
+    1.0
+   ],
+   "macro_f1": 0.9439732142857142,
+   "macro_f1_ci": [
+    0.8251498501498502,
+    1.0
+   ]
+  },
+  "dataset = SWE-smith": {
+   "n": 70,
+   "acc": 0.9428571428571428,
+   "acc_ci": [
+    0.8939393939393939,
+    0.9857193158953722
+   ],
+   "macro_f1": 0.7160037878787879,
+   "macro_f1_ci": [
+    0.6344489072224635,
+    0.9909611133332062
+   ]
+  },
+  "label_source = fallback": {
+   "n": 4,
+   "acc": 0.5,
+   "acc_ci": [
+    0.0,
+    1.0
+   ],
+   "macro_f1": 0.5,
+   "macro_f1_ci": [
+    0.0,
+    1.0
+   ]
+  },
+  "label_source = rule": {
+   "n": 206,
+   "acc": 0.9223300970873787,
+   "acc_ci": [
+    0.8826530612244898,
+    0.9552238805970149
+   ],
+   "macro_f1": 0.8788345588946188,
+   "macro_f1_ci": [
+    0.7870186624865275,
+    0.9323518136734719
+   ]
+  }
+ },
+ "f1_per_class": {
+  "regras": {
+   "explore": 0.75,
+   "search": 1.0,
+   "read": 0.9787234042553191,
+   "edit": 0.9487179487179487,
+   "reproduce": 0.9574468085106383,
+   "test": 1.0,
+   "setup": 0.5263157894736842,
+   "vcs": 0.9090909090909091,
+   "think": 1.0,
+   "submit": 1.0,
+   "other": 1.0
+  },
+  "LLM": {
+   "explore": 0.6666666666666666,
+   "search": 0.9152542372881356,
+   "read": 0.967032967032967,
+   "edit": 0.9315068493150684,
+   "reproduce": 0.9387755102040817,
+   "test": 0.8888888888888888,
+   "setup": 0.75,
+   "vcs": 0.9090909090909091,
+   "think": 0.875,
+   "submit": 1.0,
+   "other": 0.75
+  },
+  "regras+LLM": {
+   "explore": 0.75,
+   "search": 1.0,
+   "read": 0.9787234042553191,
+   "edit": 0.961038961038961,
+   "reproduce": 0.9574468085106383,
+   "test": 1.0,
+   "setup": 0.6,
+   "vcs": 0.9090909090909091,
+   "think": 1.0,
+   "submit": 1.0,
+   "other": 1.0
+  }
+ },
+ "confusion": {
+  "labels": [
+   "explore",
+   "search",
+   "read",
+   "edit",
+   "reproduce",
+   "test",
+   "setup",
+   "vcs",
+   "think",
+   "submit",
+   "other"
+  ],
+  "rules": [
+   [
+    6,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    29,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    46,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    37,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    1,
+    1,
+    45,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    4,
+    0,
+    0,
+    3,
+    1,
+    0,
+    5,
+    1,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    7,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5
+   ]
+  ],
+  "llm": [
+   [
+    4,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0
+   ],
+   [
+    2,
+    27,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    44,
+    0,
+    1,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    34,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    46,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    2,
+    0,
+    2,
+    1,
+    0,
+    9,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    7,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    3
+   ]
+  ]
+ },
+ "three_way": {
+  "n": 210,
+  "regras": {
+   "acc": 0.9428571428571428,
+   "acc_ci": [
+    0.9045394736842105,
+    0.9744897959183674
+   ],
+   "macro_f1": 0.9154813509134999,
+   "macro_f1_ci": [
+    0.8596279985112318,
+    0.959258888750499
+   ],
+   "kappa": 0.9318937326018215,
+   "kappa_ci": [
+    0.8873373481139285,
+    0.9691595913781768
+   ]
+  },
+  "LLM": {
+   "acc": 0.9142857142857143,
+   "acc_ci": [
+    0.8737249253094324,
+    0.9523865944482057
+   ],
+   "macro_f1": 0.872019638953338,
+   "macro_f1_ci": [
+    0.7938520964928947,
+    0.9263960621458726
+   ],
+   "kappa": 0.8979591836734694,
+   "kappa_ci": [
+    0.8502345215707011,
+    0.9422349001536438
+   ]
+  },
+  "regras+LLM": {
+   "acc": 0.9476190476190476,
+   "acc_ci": [
+    0.9107876029763488,
+    0.9801044040879346
+   ],
+   "macro_f1": 0.9233000075359844,
+   "macro_f1_ci": [
+    0.8631848547419554,
+    0.970307736451379
+   ],
+   "kappa": 0.9376080380293863,
+   "kappa_ci": [
+    0.8946153642127356,
+    0.9759952809413415
+   ]
+  },
+  "kappa_rule_llm": 0.875,
+  "kappa_rule_llm_ci": [
+   0.8210638835107194,
+   0.9283795783394383
+  ],
+  "llm_minus_rules_acc": [
+   -0.02857142857142858,
+   -0.0670103092783505,
+   0.009952748818720408
+  ]
+ },
+ "top_confusions_rules": [
+  {
+   "gold": "setup",
+   "pred": "explore",
+   "n": 4,
+   "n_doubt": 3,
+   "id": "terminus2-Anthropic__Claude-Sonnet-4~f1e61c#4",
+   "tool": "keystrokes",
+   "action": "which tesseract",
+   "nota": "Verifica ferramenta disponível no ambiente do sistema com which (setup vs explore).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 4,
+   "pred_sub": "which"
+  },
+  {
+   "gold": "setup",
+   "pred": "edit",
+   "n": 3,
+   "n_doubt": 0,
+   "id": "openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#68",
+   "tool": "run",
+   "action": "cp /app/doom.wad /app/doomgeneric_mips.wad 2>/dev/null \\|\\| true",
+   "nota": "",
+   "ex_doubt": false,
+   "dataset": "CodeTraceBench",
+   "idx": 68,
+   "pred_sub": "cp|true"
+  },
+  {
+   "gold": "setup",
+   "pred": "reproduce",
+   "n": 1,
+   "n_doubt": 1,
+   "id": "openhands-Anthropic__Claude-Sonnet-4~a2c915#19",
+   "tool": "run",
+   "action": "python -c \"import pandas, sklearn, pyarrow, numpy; from rdkit import Chem; print('All packages working!')\"",
+   "nota": "Usa python -c (forma comum de reproduce), mas o objetivo é apenas verificar se os pacotes instalados no ambiente funcionam (setup).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 19,
+   "pred_sub": "python -c"
+  },
+  {
+   "gold": "read",
+   "pred": "reproduce",
+   "n": 1,
+   "n_doubt": 1,
+   "id": "terminus2-Anthropic__Claude-Sonnet-4~d8d8bd#16",
+   "tool": "keystrokes",
+   "action": "python3 -c \"import pandas as pd; df = pd.read_parquet('mapk14_1M.parquet'); print('Training data shape:', df.s…",
+   "nota": "Usa python3 -c para ler e inspecionar esquema/linhas de um arquivo .parquet (funcionalmente read, embora use python -c típico de reproduce).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 16,
+   "pred_sub": "python -c"
+  },
+  {
+   "gold": "reproduce",
+   "pred": "read",
+   "n": 1,
+   "n_doubt": 1,
+   "id": "miniswe-DeepSeek__DeepSeek-V3.2-quer~29bc61#19",
+   "tool": "bash",
+   "action": "sqlite3 /app/oewn.sqlite \"SELECT * FROM (SELECT w.wordid AS word_id, w.word AS word, COUNT(DISTINCT s.synsetid…",
+   "nota": "Executa consulta via sqlite3 para testar a lógica da query desenvolvida (fronteira entre reproduce e read).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 19,
+   "pred_sub": "sqlite3"
+  },
+  {
+   "gold": "reproduce",
+   "pred": "edit",
+   "n": 1,
+   "n_doubt": 1,
+   "id": "miniswe-DeepSeek__DeepSeek-V3.2-fix-~73e7d0#66",
+   "tool": "bash",
+   "action": "cd ocaml && make runtime > simple_build.log 2>&1 && echo \"Compilation successful\" \\|\\| echo \"Compilation faile…",
+   "nota": "Executa make runtime para testar se o projeto compila após ajuste; fronteira entre reproduce (checar erro de build) e setup (compilação do ambiente).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 66,
+   "pred_sub": "make runtime > simple_build.log|echo"
+  },
+  {
+   "gold": "setup",
+   "pred": "vcs",
+   "n": 1,
+   "n_doubt": 1,
+   "id": "openhands-Anthropic__Claude-Sonnet-4~ffeeab#28",
+   "tool": "run",
+   "action": "cd /app && git clone --depth 1 --branch v1.0.0 https://github.com/Anurag461/lm-evaluation-harness.git",
+   "nota": "Usa git clone para baixar e instalar repositório no ambiente (setup), não para inspecionar histórico/status (vcs).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 28,
+   "pred_sub": "git clone"
+  }
+ ],
+ "top_confusions_llm": [
+  {
+   "gold": "edit",
+   "pred": "reproduce",
+   "n": 3,
+   "n_doubt": 0,
+   "id": "chatcmpl-61ca8c1656b85b809c6b6fbdb24~a86c5d#34",
+   "tool": "str_replace_editor",
+   "action": "{\"path\": \"/workspace/MushroomMaula__fastapi_login__1.8/test_raise_issue.py\", \"command\": \"create\", \"file_text\":…",
+   "nota": "",
+   "ex_doubt": false,
+   "dataset": "SWE-rebench",
+   "idx": 34,
+   "pred_sub": "create"
+  },
+  {
+   "gold": "search",
+   "pred": "explore",
+   "n": 2,
+   "n_doubt": 2,
+   "id": "HIPS__autograd.ac044f0d.lm_rewrite__~8f1d88#0",
+   "tool": "bash",
+   "action": "<function=bash> <parameter=command>find /testbed -type f -name \"*.py\" \\| grep -v \"__pycache__\" \\| sort</parame…",
+   "nota": "A ação usa find -name \"*.py\" (exemplo explícito de search na diretriz), mas o pensamento indica listagem/exploração geral dos arquivos do repositório (explore).",
+   "ex_doubt": true,
+   "dataset": "SWE-smith",
+   "idx": 0,
+   "pred_sub": "find -name"
+  },
+  {
+   "gold": "setup",
+   "pred": "search",
+   "n": 2,
+   "n_doubt": 2,
+   "id": "terminus2-Anthropic__Claude-Sonnet-4~f1e61c#4",
+   "tool": "keystrokes",
+   "action": "which tesseract",
+   "nota": "Verifica ferramenta disponível no ambiente do sistema com which (setup vs explore).",
+   "ex_doubt": true,
+   "dataset": "CodeTraceBench",
+   "idx": 4,
+   "pred_sub": "which"
+  },
+  {
+   "gold": "setup",
+   "pred": "edit",
+   "n": 2,
+   "n_doubt": 0,
+   "id": "openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#68",
+   "tool": "run",
+   "action": "cp /app/doom.wad /app/doomgeneric_mips.wad 2>/dev/null \\|\\| true",
+   "nota": "",
+   "ex_doubt": false,
+   "dataset": "CodeTraceBench",
+   "idx": 68,
+   "pred_sub": "cp|true"
+  },
+  {
+   "gold": "explore",
+   "pred": "think",
+   "n": 1,
+   "n_doubt": 0,
+   "id": "chatcmpl-44ff7710ba58a9b923e65bd89ae~cfdd1d#10",
+   "tool": "str_replace_editor",
+   "action": "view /workspace/slarse__labelbot__unknown/requirements",
+   "nota": "",
+   "ex_doubt": false,
+   "dataset": "SWE-rebench",
+   "idx": 10,
+   "pred_sub": "view_dir"
+  }
+ ],
+ "sensitivity": {
+  "n": 189,
+  "methods": {
+   "regras": {
+    "n": 189,
+    "acc": 0.9788359788359788,
+    "acc_ci": [
+     0.9528741596703739,
+     1.0
+    ],
+    "macro_f1": 0.9622195985832349,
+    "macro_f1_ci": [
+     0.9047592651251188,
+     1.0
+    ],
+    "kappa": 0.9744456462952947,
+    "d_acc": 0.035978835978836,
+    "d_macro_f1": 0.046738247669735
+   },
+   "LLM": {
+    "n": 189,
+    "acc": 0.9629629629629629,
+    "acc_ci": [
+     0.932988970799977,
+     0.9893617021276596
+    ],
+    "macro_f1": 0.9567682724246346,
+    "macro_f1_ci": [
+     0.8929489705685357,
+     0.9915136672714664
+    ],
+    "kappa": 0.9553387570468891,
+    "d_acc": 0.04867724867724865,
+    "d_macro_f1": 0.08474863347129657
+   },
+   "regras+LLM": {
+    "n": 189,
+    "acc": 0.9841269841269841,
+    "acc_ci": [
+     0.9605911330049262,
+     1.0
+    ],
+    "macro_f1": 0.9711613745106569,
+    "macro_f1_ci": [
+     0.9189168470418472,
+     1.0
+    ],
+    "kappa": 0.9808523571525055,
+    "d_acc": 0.03650793650793649,
+    "d_macro_f1": 0.04786136697467247
+   }
+  },
+  "top_confusions_rules": [
+   {
+    "gold": "setup",
+    "pred": "edit",
+    "n": 3,
+    "n_doubt": 0,
+    "id": "openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#68",
+    "tool": "run",
+    "action": "cp /app/doom.wad /app/doomgeneric_mips.wad 2>/dev/null \\|\\| true",
+    "nota": "",
+    "ex_doubt": false,
+    "dataset": "CodeTraceBench",
+    "idx": 68,
+    "pred_sub": "cp|true"
+   },
+   {
+    "gold": "setup",
+    "pred": "explore",
+    "n": 1,
+    "n_doubt": 0,
+    "id": "openhands-Anthropic__Claude-Sonnet-4~899ce4#44",
+    "tool": "run",
+    "action": "ln -sf /usr/bin/povray /usr/local/bin/povray && ls -la /usr/local/bin/povray",
+    "nota": "",
+    "ex_doubt": false,
+    "dataset": "CodeTraceBench",
+    "idx": 44,
+    "pred_sub": "ln|ls"
+   }
+  ]
+ }
 }

@@ -13,8 +13,8 @@ from _common import RESULTS, ROOT  # noqa: E402
 
 POSTER = RESULTS / "poster"
 SHOTS = RESULTS / "screenshots"
-BEST_SHOTS = ["05-ctb-gabarito-loop-grafo.png", "02-swe-rebench-resolvida-dashboard-completo.png", "03-swe-rebench-nao-resolvida-grafo.png"]
-FIGS = ["fases_por_terco_resolvidas_vs_nao", "detectores_vs_gabarito", "faixas_exemplo", "formatos_unificados"]
+BEST_SHOTS = ["05-ctb-gabarito-grafo.png", "02-swe-rebench-resolvida-dashboard-completo.png", "03-swe-rebench-nao-resolvida-grafo.png"]
+FIGS = ["fases_por_terco_resolvidas_vs_nao", "detectores_vs_gabarito", "faixas_exemplo", "formatos_unificados", "matriz_confusao"]
 
 
 def line(rel: str, needle: str) -> str:
@@ -48,7 +48,7 @@ Descobertas feitas ao construir os adaptadores e as avaliações; cada uma muda 
 5. **Parte do gabarito mede o protocolo do harness, não o agente.** No SWE-agent/mini-SWE, o submit recusado pelo "STOP! BEFORE SUBMITTING" (`<PATCH_CONTEXT>`) aparece como passo incorreto/inútil. O pipeline marca esses passos como `submit/harness_protocol`; excluí-los quase não muda os resultados (`results/eval_detectors.md`, recorte "sem harness_protocol"), mas é uma fonte de ruído conhecida.
 6. **Observações são cortadas em tamanhos diferentes por ferramenta** (OpenHands ~30 mil caracteres, SWE-agent ~100 mil, Terminus2 ~10 mil) e há três formas de marcar o corte; o campo `truncated` unifica o que dá para detectar.
 7. **A primeira versão do detector `no_new_info` errava em 80% dos casos** (16 de 20 auditados no SWE-smith): tratava uma leitura inteira *abreviada* como cobertura total do arquivo e não entendia `view_range` em texto. Depois da correção: 0 de 20 na nova amostra e 12,6% → 2,8% dos passos marcados (`results/audit_no_new_info.md`). Lição: auditar manualmente uma amostra de cada detector antes de reportar métricas.
-8. **A auditoria leve dos demais detectores mostra pontos fracos conhecidos** (`results/audit_flags.md`, pré-avaliação do assistente): `loop` marca edições em lote e leituras de intervalos diferentes do mesmo arquivo; `test_fail` trata exit 2/4/5 do pytest (erro de uso, nada coletado) como teste falhando; `error` casa `Error:` impresso de propósito por scripts de reprodução. Nada foi ajustado por causa dela.
+8. **A auditoria leve dos demais detectores mostra pontos fracos conhecidos** (`results/audit_flags.md`, pré-avaliação do assistente): `loop` marca edições em lote e leituras de intervalos diferentes do mesmo arquivo; `test_fail` trata exit 2/4/5 do pytest (erro de uso, nada coletado) como teste falhando; `error` casa `Error:` impresso de propósito por scripts de reprodução. Nada foi ajustado por causa dela (única exceção posterior e declarada: `pytest … | tail` passou a valer pelo texto da saída, ver `docs/decisions.md`).
 9. **Os detectores concordam pouco com o gabarito** (`results/eval_detectors.md`): só `error ∪ test_fail` fica claramente acima do acaso para os passos incorretos (lift ~1,6×), e `repeated ∪ no_new_info` é indistinguível de sorteio para os passos "inúteis". Reportado como resultado, não escondido; o conceito de "incorreto/inútil" do benchmark não é o mesmo que "comando falhou/leitura repetida".
 10. **{n_eval} das 1.000 trajetórias do `verified` foram avaliadas** (8 não têm artefato e 16 são só logs sem trajetória estruturada); só uma parte delas tem algum passo anotado como problemático — as demais valem como "sem problemas", o que pode não ser verdade.
 """
@@ -72,11 +72,18 @@ def main() -> None:
     N.append("**9 formatos brutos de logs de agentes viram 1 único modelo canônico** (Trajectory/Step): OpenHands chat, SWE-smith (3 variantes de ação), e 5 formatos do CodeTraceBench. "
              f"Fonte: {line('results/parse_report.md', 'CodeTraceBench por adaptador')} e a figura `formatos_unificados`.")
     N.append(f"**Mediana de {pt(bs['pipeline_median_s'] * 1000, 0)} ms e p95 de {pt(bs['pipeline_p95_s'] * 1000, 0)} ms por trajetória** para detectar o formato, converter, rotular, detectar problemas e calcular métricas (sem cache), **sem nenhuma rotulação manual** (o tempo de rotular à mão não foi medido). Fonte: {line('results/batch_stats.md', '| **todos**')}.")
-    N.append(f"**{pt(100 * (1 - 0.026), 1)}% a 99,8% dos passos são rotulados só por regras** (97,4% no CodeTraceBench, 99,8% no SWE-rebench e no SWE-smith); o LLM só é chamado nos 0,2%–2,6% restantes. «rotulado por regra» = confiança ≥ 0,6; **a acurácia dessas regras ainda não foi medida** (falta o gold). Fonte: {line('results/labeling_report.md', '| **CodeTraceBench**')}.")
+    N.append(f"**{pt(100 * (1 - 0.026), 1)}% a 99,8% dos passos são rotulados só por regras** (97,4% no CodeTraceBench, 99,8% no SWE-rebench e no SWE-smith); o LLM só é chamado nos 0,2%–2,6% restantes. «rotulado por regra» = confiança ≥ 0,6; a acurácia dessas regras contra o gold manual está no número seguinte. Fonte: {line('results/labeling_report.md', '| **CodeTraceBench**')}.")
     N.append(f"**Custo total do LLM em todo o projeto: US$ {pt(usage['cost_usd'], 4)}** ({usage['requests']} requisições; orçamento planejado: US$ 4,91). Fonte: `backend/.cache/llm_usage.json` e {line('results/eval_classifier.md', 'custo desta execução')}.")
-    if ec.get("rule_vs_llm"):
-        r = ec["rule_vs_llm"]
-        N.append(f"**Regras e LLM concordam em {pt(100 * r['agreement'], 1)}% dos passos** (kappa de Cohen {pt(r['kappa'], 2)}; n = {r['n']}) — **não** é acurácia contra gold: o gold manual ainda não foi preenchido ({ec['gold_filled']}/{ec['gold_rows']}). Fonte: {line('results/eval_classifier.md', 'kappa de Cohen')}.")
+    tw, sens = ec["three_way"], ec["sensitivity"]
+    ci = lambda d, k="acc": f"IC 95% {pt(100 * d[k + '_ci'][0])}–{pt(100 * d[k + '_ci'][1])}%"  # noqa: E731
+    N.append(f"**O classificador de regras acerta {pt(100 * tw['regras']['acc'])}% dos passos contra um gold manual cego** ({ec['gold_filled']} passos de {ec['gold_trajectories']} trajetórias, 1 anotador; {ci(tw['regras'])}; F1 macro {pt(tw['regras']['macro_f1'], 2)}, kappa {pt(tw['regras']['kappa'], 2)}), "
+             f"contra {pt(100 * tw['LLM']['acc'])}% do Haiku 5.5 rotulando todos os passos (diferença LLM − regras {pt(100 * tw['llm_minus_rules_acc'][0])} p.p., IC {pt(100 * tw['llm_minus_rules_acc'][1])} a {pt(100 * tw['llm_minus_rules_acc'][2])}: indistinguível) "
+             f"e {pt(100 * tw['regras+LLM']['acc'])}% das regras + LLM só nos passos incertos (o que o app faz). Os acertos não são uniformes: 100% no SWE-rebench e no SWE-smith, {pt(100 * ec['rules_slices']['dataset = CodeTraceBench']['acc'])}% no CodeTraceBench; "
+             f"a categoria mais fraca é `setup` (F1 {pt(ec['f1_per_class']['regras']['setup'], 2)}). Fonte: {line('results/eval_classifier.md', '## Três vias')}.")
+    N.append(f"**Sensibilidade ao anotador:** sem as {ec['gold_doubt']} linhas que o anotador marcou como duvidosas, a acurácia das regras vai a {pt(100 * sens['methods']['regras']['acc'])}% ({ci(sens['methods']['regras'])}); nas duvidosas é de ~62% (n = 21). "
+             f"As confusões restantes são `setup` → `edit` (`cp`) e `setup` → `explore` (`which`). Fonte: {line('results/eval_classifier.md', '## Sensibilidade')}.")
+    r = ec["rule_vs_llm"]
+    N.append(f"**Regras e LLM concordam em {pt(100 * r['agreement'], 1)}% dos passos** (kappa {pt(r['kappa'], 2)}; n = {r['n']}), mas concordância não é acerto: contra o gold, os dois erram em lugares diferentes (só regras acertam 13 passos, só LLM 7, nenhum 5). Fonte: {line('results/eval_classifier.md', 'kappa de Cohen')}.")
     N.append(f"**Detectores × gabarito (CodeTraceBench, {ed['n_evaluated']} trajetórias):** `error ∪ test_fail` acha passos incorretos com precisão de {pt(100 * e['precision'])}% e revocação de {pt(100 * e['recall'])}% (F1 {pt(e['f1'], 3)}, **{pt(e['lift_f1'], 2)}× melhor que sorteio**, IC 95% {pt(e['lift_ci'][0], 2)}–{pt(e['lift_ci'][1], 2)}). Fonte: {line('results/eval_detectors.md', '## incorrect × error ∪ test_fail')}.")
     N.append(f"**`repeated ∪ no_new_info` não reproduz os passos \"inúteis\" do gabarito:** lift de {pt(u['lift_f1'], 2)}× (IC {pt(u['lift_ci'][0], 2)}–{pt(u['lift_ci'][1], 2)}, contém 1 = indistinguível de acaso). Resultado negativo reportado como tal. Fonte: {line('results/eval_detectors.md', '## unuseful × repeated')}.")
     for r in sig:
@@ -93,7 +100,9 @@ def main() -> None:
     for i, n in enumerate(N, 1):
         lines.append(f"{i}. {n}")
     lines += ["", "## Ressalvas que devem acompanhar os números", "",
-              "- O gold manual (210 passos) ainda não foi preenchido: **não há acurácia do classificador** — só concordância regra × LLM.",
+              "- **O gold tem 1 anotador** (o autor do projeto, que conhece a taxonomia): não há concordância entre anotadores; 21 dos 210 passos foram marcados como duvidosos.",
+              "- **As amostras do gold são as mesmas de `data/samples/`, usadas na Fase 3 para medir a cobertura das regras**: a acurácia de 100% no SWE-rebench/SWE-smith pode ser otimista; o CodeTraceBench (formatos mais variados) é o recorte mais informativo.",
+              "- Categorias raras (`explore` 6, `vcs` 5, `submit` 5, `other` 5, `think` 7 passos) têm F1 com IC muito largo; o F1 macro pesa todas igualmente.",
               "- O SWE-smith traz `resolved` não validado: nenhuma conclusão sobre sucesso real vem dele.",
               "- Resolvidas × não resolvidas é **associação**, não causalidade (tamanho da tarefa, limite de iterações e agente confundem).",
               "- Os vereditos das auditorias são do assistente (1ª leitura), não de um humano."]

@@ -90,6 +90,25 @@ def is_pytest(s: Step) -> bool:
     return bool(PYTEST_CMD.search(cmd))
 
 
+_QUOTED = re.compile(r"\"[^\"]*\"|'[^']*'")
+
+
+def pytest_in_pipe(s: Step) -> bool:
+    """`pytest … | tail`: o exit code observado é o do ÚLTIMO comando do pipe (tail/grep), não o do pytest."""
+    a = s.action
+    cmd = " ".join(c.get("keystrokes", "") for c in a.args["commands"]) if a.tool == "keys" and a.args.get("commands") else (a.command or a.raw or "")
+    cmd = re.sub(r"\d*>&\d*|&>", " ", _QUOTED.sub("''", cmd))  # aspas e redirecionamentos (2>&1) não separam comandos
+    return any(re.match(r"[^;&|\n]*\|(?!\|)", cmd[m.end():]) for m in PYTEST_CMD.finditer(cmd))
+
+
+def effective_exit_code(s: Step) -> int | None:
+    """Exit code que vale para classificar o passo: ignorado (None → decide o texto "N failed"/"N passed") se o pytest está num pipe."""
+    o = s.observation
+    if o is None or o.exit_code is None:
+        return None
+    return None if o.exit_code not in NOEXIT_CODES and is_pytest(s) and pytest_in_pipe(s) else o.exit_code
+
+
 def pytest_verdict(code: int) -> str:
     """Códigos do pytest: 0 passou · 1 testes falharam · 5 nenhum teste coletado · 2/3/4 (e qualquer outro) = a execução em si falhou."""
     return {0: "pass", 1: "fail", 5: "none"}.get(code, "error")
@@ -108,7 +127,7 @@ def detect_error(traj: Trajectory) -> Trajectory:
             continue
         o, cat = s.observation, s.category
         text = o.content or ""
-        if o.exit_code is not None:
+        if effective_exit_code(s) is not None:
             code = o.exit_code
             if code in NOEXIT_CODES:
                 continue
@@ -178,7 +197,7 @@ def detect_test_result(traj: Trajectory) -> Trajectory:
             continue
         o = s.observation
         text = o.content or ""
-        code = o.exit_code
+        code = effective_exit_code(s)  # None se `pytest | tail`: vale o texto da saída
         if code in NOEXIT_CODES:
             continue
         py = is_pytest(s)

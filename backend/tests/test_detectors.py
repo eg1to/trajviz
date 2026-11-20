@@ -131,6 +131,22 @@ def test_pytest_without_exit_code_follows_the_same_meaning(obs, expected):
     assert flags(t, 0) & {"test_fail", "test_pass", "error"} == expected
 
 
+@pytest.mark.parametrize("cmd,obs,code,expected", [
+    ("pytest tests/ 2>&1 | tail -20", "=== 3 failed, 2 passed in 1.2s ===", 0, {"test_fail"}),  # exit do tail = 0
+    ("python -m pytest -x | tail -5", "=== 5 passed in 0.5s ===", 0, {"test_pass"}),
+    ("cd /testbed && pytest tests/ -q 2>&1 | grep -E 'passed|failed'", "5 passed in 0.5s", 1, {"test_pass"}),  # exit do grep = 1
+    ("pytest tests/ | head -50", "=== 1 failed in 0.1s ===", 141, {"test_fail"}),  # SIGPIPE
+    ("pytest tests/ | tail -3", "collected 0 items\n=== no tests ran in 0.01s ===", 0, set()),
+    ("pytest tests/ | tail -3", "ERROR: file or directory not found: tests/x.py", 0, {"error"}),
+    ("pytest tests/ | tail -3", "saída sem veredito", 1, set()),  # nada no texto → sem flag (o exit 1 é do tail)
+    ("pytest -k 'a|b' tests/", "saída", 1, {"test_fail"}),  # `|` dentro de aspas não é pipe
+    ("pytest tests/ || true", "saída", 1, {"test_fail"}),  # `||` não é pipe
+])
+def test_pytest_in_pipe_uses_output_text_not_last_exit_code(cmd, obs, code, expected):
+    t = run_detectors(T(S(0, "test", cmd=cmd, obs=obs, code=code)))
+    assert flags(t, 0) & {"test_fail", "test_pass", "error"} == expected
+
+
 # ----------------------------------------------------------------------------- repeated
 def test_repeated_same_action_and_reason():
     t = run_detectors(T(S(0, "search", cmd="grep -rn foo src"), S(1, "read", cmd="cat a.py"), S(2, "search", cmd="grep  -rn   foo src")))
