@@ -308,6 +308,11 @@ export interface components {
              * @enum {string}
              */
             mode: "read" | "edit" | "run";
+            /**
+             * Created
+             * @default false
+             */
+            created: boolean;
         };
         /** FileStat */
         FileStat: {
@@ -332,6 +337,11 @@ export interface components {
             first_idx: number;
             /** Last Idx */
             last_idx: number;
+            /**
+             * Created By Agent
+             * @default false
+             */
+            created_by_agent: boolean;
         };
         /** Files */
         Files: {
@@ -341,6 +351,8 @@ export interface components {
             edited_never_read: string[];
             /** Read 3Plus No Edit */
             read_3plus_no_edit: string[];
+            /** Created By Agent */
+            created_by_agent: string[];
         };
         /** FlagInfo */
         FlagInfo: {
@@ -618,6 +630,8 @@ export interface components {
             category: "explore" | "search" | "read" | "edit" | "reproduce" | "test" | "setup" | "vcs" | "think" | "submit" | "other";
             /** Subcategory */
             subcategory?: string | null;
+            /** Summary */
+            summary?: string | null;
             /**
              * Label Source
              * @default fallback

@@ -70,6 +70,25 @@ def test_files_table_and_lists():
     assert "b.py" in f.edited_never_read and f.read_3plus_no_edit == ["a.py"]
 
 
+def test_files_created_by_the_agent_are_not_edited_without_reading():
+    ed = lambda i, p, created: S(i, "edit", tool="editor", cmd="create" if created else "str_replace", files=[(p, "edit")], obs="ok")  # noqa: E731
+    steps = [ed(0, "novo.py", True), ed(1, "antigo.py", False), ed(2, "novo.py", False),
+             S(3, "read", cmd="cat lido.py", files=[("lido.py", "read")], obs="x" * 30), ed(4, "lido.py", False),
+             S(5, "edit", cmd="cat > gen.py", files=[("gen.py", "edit")], obs="ok"),
+             S(6, "read", cmd="cat velho.py", files=[("velho.py", "read")], obs="y" * 30), ed(7, "velho.py", True)]  # lido antes → recriar não é criação
+    t = T(*steps)
+    t.steps[0].files[0].created = True
+    t.steps[5].files[0].created = True  # redirecionamento
+    t.steps[7].files[0].created = True
+    f = compute_metrics(run_detectors(t)).files
+    assert f.created_by_agent == ["novo.py", "gen.py"] or set(f.created_by_agent) == {"novo.py", "gen.py"}
+    assert "novo.py" not in f.edited_never_read and "gen.py" not in f.edited_never_read
+    assert "antigo.py" in f.edited_never_read  # editado sem ler e que já existia
+    assert "lido.py" not in f.edited_never_read and "velho.py" not in f.edited_never_read
+    assert next(x for x in f.table if x.path == "novo.py").created_by_agent is True
+    assert next(x for x in f.table if x.path == "antigo.py").created_by_agent is False
+
+
 def test_outcome_derives_patch_from_edit_steps_when_untrusted():
     t = build()
     t.resolved, t.resolved_validated, t.patch = True, False, "diff --git a/x b/x\n+z"

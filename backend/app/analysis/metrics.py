@@ -116,12 +116,14 @@ class FileStat(BaseModel):
     runs: int = 0
     first_idx: int
     last_idx: int
+    created_by_agent: bool = False  # o 1º evento do arquivo foi uma criação (editor create / redirecionamento)
 
 
 class Files(BaseModel):
     table: list[FileStat]
-    edited_never_read: list[str]
+    edited_never_read: list[str]  # editados sem leitura, EXCLUINDO os criados pelo agente
     read_3plus_no_edit: list[str]
+    created_by_agent: list[str]
 
 
 class Context(BaseModel):
@@ -291,7 +293,9 @@ def _files(t: Trajectory) -> Files:
     d: dict[str, FileStat] = {}
     for s in t.steps:
         for f in s.files:
-            st = d.setdefault(f.path, FileStat(path=f.path, first_idx=s.idx, last_idx=s.idx))
+            st = d.get(f.path)
+            if st is None:
+                st = d[f.path] = FileStat(path=f.path, first_idx=s.idx, last_idx=s.idx, created_by_agent=f.mode == "edit" and f.created)
             st.last_idx = s.idx
             if f.mode == "read":
                 st.reads += 1
@@ -300,8 +304,9 @@ def _files(t: Trajectory) -> Files:
             else:
                 st.runs += 1
     table = sorted(d.values(), key=lambda x: (-(x.reads + x.edits + x.runs), x.first_idx))
-    return Files(table=table, edited_never_read=[f.path for f in table if f.edits and not f.reads],
-                 read_3plus_no_edit=[f.path for f in table if f.reads >= 3 and not f.edits])
+    return Files(table=table, edited_never_read=[f.path for f in table if f.edits and not f.reads and not f.created_by_agent],
+                 read_3plus_no_edit=[f.path for f in table if f.reads >= 3 and not f.edits],
+                 created_by_agent=[f.path for f in table if f.created_by_agent])
 
 
 def _context(t: Trajectory) -> Context:

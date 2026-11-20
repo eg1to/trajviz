@@ -939,6 +939,11 @@
        "run"
       ],
       "title": "Mode"
+     },
+     "created": {
+      "type": "boolean",
+      "title": "Created",
+      "default": false
      }
     },
     "type": "object",
@@ -976,6 +981,11 @@
      "last_idx": {
       "type": "integer",
       "title": "Last Idx"
+     },
+     "created_by_agent": {
+      "type": "boolean",
+      "title": "Created By Agent",
+      "default": false
      }
     },
     "type": "object",
@@ -1008,13 +1018,21 @@
       },
       "type": "array",
       "title": "Read 3Plus No Edit"
+     },
+     "created_by_agent": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Created By Agent"
      }
     },
     "type": "object",
     "required": [
      "table",
      "edited_never_read",
-     "read_3plus_no_edit"
+     "read_3plus_no_edit",
+     "created_by_agent"
     ],
     "title": "Files"
    },
@@ -1801,6 +1819,17 @@
        }
       ],
       "title": "Subcategory"
+     },
+     "summary": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Summary"
      },
      "label_source": {
       "type": "string",

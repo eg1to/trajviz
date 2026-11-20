@@ -29,6 +29,7 @@ def label_trajectory(traj: Trajectory, llm: LLMLabeler | None = None) -> Traject
             ctx.add(w)
         s.category = lab.category.value  # type: ignore[assignment]
         s.subcategory = lab.subcategory
+        s.summary = lab.summary
         s.confidence = lab.confidence
         s.files = _dedupe(lab.files)
         if lab.final or lab.confidence >= RULE_MIN_CONF:

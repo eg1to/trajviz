@@ -40,6 +40,7 @@ class Observation(BaseModel):
 class FileRef(BaseModel):
     path: str  # normalizado (sem /workspace/<repo>/, /testbed/, /app/)
     mode: Literal["read", "edit", "run"]
+    created: bool = False  # edit que CRIA o arquivo (editor create / redirecionamento): não é "editado sem ler"
 
 
 class Step(BaseModel):
@@ -51,6 +52,7 @@ class Step(BaseModel):
     observation: Observation | None = None  # None = ação sem resposta (finish/submit, trajetória cortada)
     category: Category = "other"
     subcategory: str | None = None
+    summary: str | None = None  # segmento do comando que definiu a categoria (para rótulos de nó); None = usar a ação
     label_source: LabelSource = "fallback"
     confidence: float = 0.0
     flags: list[Flag] = Field(default_factory=list)

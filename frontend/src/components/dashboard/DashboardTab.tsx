@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { CATEGORY_ORDER, ERROR_COLOR, KINDS, PHASES, PHASE_COLOR, type Kind } from '@/theme/categories'
 import { outcomeOf } from '@/lib/steps'
-import { fmtInt, fmtPct, cn } from '@/lib/utils'
+import { fmtInt, fmtPct, cn, roundTicks } from '@/lib/utils'
 import { useUI } from '@/store/ui'
 import { useTheme } from '@/theme/useTheme'
 
@@ -43,8 +43,8 @@ export function DashboardTab({ id, trajectory, metrics, loading }: { id: string;
 }
 
 // ---------------------------------------------------------------- KPIs
-function Kpi({ label, value, sub, testid }: { label: string; value: React.ReactNode; sub?: string; testid?: string }) {
-  return <div className="rounded border bg-muted/40 px-2.5 py-1.5" data-testid={testid}><div className="text-[11px] text-muted-foreground">{label}</div><div className="text-lg font-semibold leading-tight tabular-nums">{value}</div>{sub && <div className="text-[11px] text-muted-foreground">{sub}</div>}</div>
+function Kpi({ label, value, sub, testid, title }: { label: string; value: React.ReactNode; sub?: string; testid?: string; title?: string }) {
+  return <div className="min-w-0 overflow-hidden rounded border bg-muted/40 px-2.5 py-1.5" data-testid={testid} title={title}><div className="text-[11px] text-muted-foreground">{label}</div><div className="text-lg font-semibold leading-tight tabular-nums">{value}</div>{sub && <div className="break-words text-[11px] leading-tight text-muted-foreground">{sub}</div>}</div>
 }
 
 function Kpis({ m, trajectory }: { m: Metrics; trajectory: Trajectory }) {
@@ -54,7 +54,7 @@ function Kpis({ m, trajectory }: { m: Metrics; trajectory: Trajectory }) {
     <DashCard id="kpis" title="Desfecho" subtitle={o.exit_status ? `exit_status: ${o.exit_status}` : undefined} className="2xl:col-span-1">
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Kpi label="resultado" testid="kpi-outcome" value={<Badge tone={oc.tone} className="px-2 py-0.5 text-sm">{oc.label === 'PASS' ? '✓ PASS' : oc.label === 'FAIL' ? '✕ FAIL' : oc.label}</Badge>} sub={o.resolved_validated ? undefined : 'resolved/patch não confiáveis'} />
-        <Kpi label="passos" value={fmtInt(o.n_steps)} sub={`${fmtInt(m.effort.n_core_steps)} sem message/keys/harness`} />
+        <Kpi label="passos" value={fmtInt(o.n_steps)} sub={`${fmtInt(m.effort.n_core_steps)} úteis`} title="úteis = sem message, keys e harness_protocol" />
         <Kpi label="terminou em submit" value={o.ended_with_submit ? 'sim' : 'não'} />
         <Kpi label="arquivos alterados" value={fmtInt(o.patch_files)} sub={o.patch_source === 'patch' ? 'do patch' : o.patch_source === 'steps' ? 'derivado dos passos edit' : 'sem edição'} />
         <Kpi label="linhas +/−" value={<span><span className="text-ok">+{fmtInt(o.patch_lines_added)}</span> <span className="text-danger">−{fmtInt(o.patch_lines_removed)}</span></span>} />
@@ -74,6 +74,7 @@ function EffortCard({ m }: { m: Metrics }) {
     const special = include ? SPECIAL.map((k) => { const s = e[k]; return { kind: k as Kind, count: s.count, pct: s.pct_total } }) : []
     return [...base, ...special].filter((r) => r.count > 0 || !KINDS[r.kind].special).map((r) => ({ ...r, name: `${KINDS[r.kind].code}  ${KINDS[r.kind].label}` }))
   }, [e, include])
+  const ticks = roundTicks(Math.max(...rows.map((r) => r.pct), 0))
   return (
     <DashCard id="esforco" title="Esforço por categoria" subtitle={include ? '% sobre todos os passos (inclui message/keys/harness)' : `% sobre ${e.n_core_steps} passos (sem message/keys/harness)`}
       actions={<label className="flex items-center gap-1.5 text-[11px]"><Switch checked={include} onCheckedChange={setInclude} aria-label="Incluir message/keys" data-testid="include-special" />incluir message/keys</label>}>
@@ -81,7 +82,7 @@ function EffortCard({ m }: { m: Metrics }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 54, top: 2, bottom: 2 }}>
             <CartesianGrid horizontal={false} stroke="var(--border)" />
-            <XAxis type="number" tick={AXIS} unit="%" domain={[0, 'dataMax']} />
+            <XAxis type="number" tick={AXIS} unit="%" domain={[0, ticks[ticks.length - 1]]} ticks={ticks} allowDecimals={false} />
             <YAxis type="category" dataKey="name" tick={AXIS} width={118} interval={0} />
             <Tooltip formatter={(v, _n, p) => [`${fmtPct(Number(v))} (${(p.payload as { count: number }).count} passos)`, 'participação']} contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} cursor={{ fill: 'var(--muted)' }} />
             <Bar dataKey="pct" isAnimationActive={false} label={{ position: 'right', fontSize: 11, fill: 'var(--muted-foreground)', formatter: (v: unknown) => fmtPct(Number(v)) }}>
@@ -202,6 +203,7 @@ function FilesCard({ m }: { m: Metrics }) {
   const f = m.files
   const never = new Set(f.edited_never_read)
   const reread = new Set(f.read_3plus_no_edit)
+  const created = new Set(f.created_by_agent)
   const go = useGoStep()
   return (
     <DashCard id="arquivos" title="Arquivos" subtitle={`${f.table.length} arquivos tocados`} className="xl:col-span-2">
@@ -216,7 +218,7 @@ function FilesCard({ m }: { m: Metrics }) {
                   <td className="px-2 text-right tabular-nums">{r.reads}</td><td className="px-2 text-right tabular-nums">{r.edits}</td><td className="px-2 text-right tabular-nums">{r.runs}</td>
                   <td className="px-2 text-right"><button className="mono text-primary hover:underline" onClick={() => go(r.first_idx)}>#{r.first_idx}</button></td>
                   <td className="px-2 text-right"><button className="mono text-primary hover:underline" onClick={() => go(r.last_idx)}>#{r.last_idx}</button></td>
-                  <td className="pl-2">{never.has(r.path) && <Badge tone="warn" data-testid="warn-never-read">editado sem ler</Badge>}{reread.has(r.path) && <Badge tone="muted" className="ml-1" data-testid="warn-reread">lido ≥ 3× sem editar</Badge>}</td>
+                  <td className="pl-2">{created.has(r.path) && <Badge tone="muted" data-testid="badge-created" title="o 1º evento deste arquivo foi uma criação (editor create ou redirecionamento)">criado pelo agente</Badge>}{never.has(r.path) && <Badge tone="warn" data-testid="warn-never-read">editado sem ler</Badge>}{reread.has(r.path) && <Badge tone="muted" className="ml-1" data-testid="warn-reread">lido ≥ 3× sem editar</Badge>}</td>
                 </tr>
               ))}
             </tbody>

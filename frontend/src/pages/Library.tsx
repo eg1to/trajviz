@@ -31,7 +31,7 @@ export default function Library() {
   const agents = useMemo(() => [...new Set((all.data ?? []).map((i) => i.agent).filter(Boolean) as string[])], [all.data])
 
   const goTo = (r: UploadResponse) => {
-    toast.success(`Formato detectado: ${r.format_detected} (${Math.round(r.confidence * 100)}% de confiança) · ${r.n_steps} passos`, { id: `fmt-${r.id}` })
+    toast.success(`Formato detectado: ${r.format_detected} (${Math.round(r.confidence * 100)}% de confiança) · ${r.n_steps} passos`, { id: `fmt-${r.id}`, duration: 4000 })
     if (r.warnings.length) toast.warning(r.warnings.join(' · '), { duration: 8000, id: `warn-${r.id}` })
     nav(`/t/${r.id}`)
   }

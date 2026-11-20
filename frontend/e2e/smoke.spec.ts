@@ -78,3 +78,40 @@ test('teclas j/k navegam e o modo compacto expande um grupo', async ({ page }) =
     await expect.poll(nodes).toBeGreaterThan(before)  // o grupo "read × 3" virou 3 nós
   }
 })
+
+test('revisão visual: rótulo do nó, numeração, arquivos criados e minimapa', async ({ page }) => {
+  await openSample(page, 'swe-rebench')
+  // 1) o rótulo mostra o segmento que definiu a categoria (sem `cd …` nem /workspace/<repo>/)
+  const labels = await page.locator('[data-testid=step-node] .mono.truncate').allTextContents()
+  expect(labels.length).toBeGreaterThan(5)
+  for (const l of labels) { expect(l.startsWith('cd ')).toBe(false); expect(l).not.toContain('/workspace/'); expect(l).not.toContain('/testbed/') }
+  // 3) numeração: #idx (0-based) + ordinal de 1 a N
+  const n = Number(((await page.getByTestId('n-steps').textContent()) ?? '0').replace(/\D/g, ''))
+  await page.goto(page.url().split('?')[0] + '?step=4')
+  await expect(page.getByTestId('inspector-idx')).toHaveText('Passo #4')
+  await expect(page.getByTestId('inspector-ordinal')).toHaveText(`· 5º de ${n}`)
+  // 5) minimapa recolhível
+  await expect(page.locator('.react-flow__minimap')).toBeVisible()
+  await page.getByTestId('toggle-minimap').click()
+  await expect(page.locator('.react-flow__minimap')).toHaveCount(0)
+  await page.getByTestId('toggle-minimap').click()
+  await expect(page.locator('.react-flow__minimap')).toBeVisible()
+  // 2) arquivos criados pelo agente nunca aparecem como "editado sem ler"
+  await page.getByTestId('tab-dashboard').click()
+  await expect(page.getByTestId('files-table')).toBeVisible()
+  const rows = page.locator('[data-testid=files-table] tbody tr')
+  const total = await rows.count()
+  let created = 0
+  for (let i = 0; i < total; i++) {
+    const r = rows.nth(i)
+    const isCreated = (await r.getByTestId('badge-created').count()) > 0
+    created += isCreated ? 1 : 0
+    if (isCreated) await expect(r.getByTestId('warn-never-read')).toHaveCount(0)
+  }
+  expect(created).toBeGreaterThan(0)  // essa amostra cria scripts de reprodução
+  // 4) KPI "passos" cabe no cartão
+  const kpi = page.locator('[data-testid=card-kpis] >> text=úteis')
+  await expect(kpi).toBeVisible()
+  const box = await kpi.boundingBox(), card = await page.getByTestId('card-kpis').boundingBox()
+  expect(box!.x + box!.width).toBeLessThanOrEqual(card!.x + card!.width)
+})

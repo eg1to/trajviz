@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, ReactFlowProvider, useReactFlow, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { Download, Maximize } from 'lucide-react'
+import { Download, Map, Maximize } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Metrics, Step, Trajectory } from '@/api/client'
 import { Legend } from '@/components/Legend'
@@ -27,6 +27,10 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
   const rf = useReactFlow()
   const box = useRef<HTMLDivElement>(null)
   const compact = ui.compact ?? steps.length > COMPACT_THRESHOLD
+  const [mini, setMini] = useState(() => { try { return localStorage.getItem('trajviz-minimap') !== '0' } catch { return true } })
+  const toggleMini = () => setMini((v) => { try { localStorage.setItem('trajviz-minimap', v ? '0' : '1') } catch { /* sem storage */ } return !v })
+  // o enquadramento deixa livre o canto do minimapa (ele nunca cobre nós no fit)
+  const pad = useMemo(() => ({ top: '6%', left: '4%', right: mini ? '176px' : '4%', bottom: mini ? '116px' : '6%' } as const), [mini])
   const gt = useMemo(() => gtSets(trajectory), [trajectory])
   const hasGT = gt.incorrect.size + gt.unuseful.size > 0
   const loops = metrics?.problems.loop_ranges ?? []
@@ -58,10 +62,10 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
     const items = buildItems(steps.filter((s) => passesFilters(s, ui.filters)), compact, ui.expanded)
     const keys = new Set(items.filter((it) => itemLastIdx(it) >= a && itemFirstIdx(it) <= b).map((it) => it.key))
     const nodes = graph.nodes.filter((n) => keys.has(n.id))
-    if (nodes.length) rf.fitView({ nodes, padding: 0.25, duration: 300, maxZoom: 1.3 })
+    if (nodes.length) rf.fitView({ nodes, padding: pad, duration: 300, maxZoom: 1.3 })
   }, [ui.range]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { const t = setTimeout(() => rf.fitView({ padding: 0.1, duration: 0 }), 50); return () => clearTimeout(t) }, [id, compact]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const t = setTimeout(() => rf.fitView({ padding: pad, duration: 0 }), 50); return () => clearTimeout(t) }, [id, compact, mini]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onNodeClick = useCallback((_: unknown, n: Node) => { if (n.type === 'step') ui.select((n.data.step as Step).idx) }, [ui])
   const miniColor = useCallback((n: Node) => (n.type === 'step' ? fill(kindOf(n.data.step as Step), dark) : n.type === 'group' ? fill(n.data.kind as never, dark) : 'transparent'), [dark])
@@ -89,17 +93,19 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
         {(ui.filters.cats.length > 0 || ui.filters.onlyErrors || ui.filters.onlyLoops || ui.filters.hideSpecial) &&
           <button className="text-primary hover:underline" onClick={() => ui.setFilters({ cats: [], onlyErrors: false, onlyLoops: false, hideSpecial: false })}>limpar filtros</button>}
         <span className="ml-auto text-muted-foreground" data-testid="visible-count">{visibleCount} de {steps.length} passos · {graph.nodes.filter((n) => n.type === 'step' || n.type === 'group').length} nós</span>
-        <Button size="sm" variant="outline" onClick={() => rf.fitView({ padding: 0.1, duration: 250 })}><Maximize />Enquadrar</Button>
+        <Button size="sm" variant="outline" onClick={toggleMini} aria-pressed={mini} data-testid="toggle-minimap"><Map />Minimapa</Button>
+        <Button size="sm" variant="outline" onClick={() => rf.fitView({ padding: pad, duration: 250 })}><Maximize />Enquadrar</Button>
         <Button size="sm" variant="outline" onClick={doExport} data-testid="export-graph"><Download />Exportar PNG</Button>
       </div>
       <div ref={box} className="relative min-h-0 flex-1" data-testid="graph-canvas">
         {visibleCount === 0 ? <div className="flex h-full items-center justify-center text-muted-foreground" data-testid="graph-empty">Nenhum passo com esses filtros.</div> : (
           <ReactFlow nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} onNodeClick={onNodeClick}
             nodesDraggable={false} nodesConnectable={false} edgesFocusable={false} minZoom={0.04} maxZoom={2} onlyRenderVisibleElements
-            fitView fitViewOptions={{ padding: 0.1 }}>
+            fitView fitViewOptions={{ padding: pad }}>
             <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
             <Controls showInteractive={false} data-no-export />
-            <MiniMap pannable zoomable nodeColor={miniColor} nodeStrokeWidth={1} maskColor={dark ? 'rgba(0,0,0,0.5)' : 'rgba(240,240,240,0.6)'} data-no-export />
+            {mini && <MiniMap pannable zoomable nodeColor={miniColor} nodeStrokeWidth={1} maskColor={dark ? 'rgba(0,0,0,0.45)' : 'rgba(240,240,240,0.55)'} data-no-export
+              className="!m-2 !rounded !border !opacity-55 transition-opacity hover:!opacity-100" style={{ width: 150, height: 96 }} data-testid="minimap" />}
           </ReactFlow>
         )}
       </div>

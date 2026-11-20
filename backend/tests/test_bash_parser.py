@@ -158,3 +158,18 @@ def test_bashlex_failure_falls_back_to_regex():
     assert r.category == C.edit
     r = classify_command("grep -n \"foo bar src/a.py")
     assert r.category == C.search
+
+
+@pytest.mark.parametrize("cmd,segment", [
+    ('cd /workspace/org__repo__1.0 && python -c "import git; print(git.__version__)"', 'python -c "import git; print(git.__version__)"'),
+    ("cd /testbed && pytest test/test_x.py -x", "pytest test/test_x.py -x"),
+    ("cd /testbed && FOO=1 timeout 60 python reproduce.py", "python reproduce.py"),
+    ("sudo -E apt-get install -y gcc", "apt-get install -y gcc"),
+    ("cd /app && grep -rn 'foo' /testbed/src | head -5", "grep -rn 'foo' src"),
+    ("ls && cat /workspace/org__repo__1.0/a.py", "cat a.py"),  # precedência: read vence explore
+    ("cd /x && sed -i 's/a/b/' f.py && python reproduce.py", "sed -i 's/a/b/' f.py"),  # edit vence reproduce
+    ("python - <<'EOF'\nimport a\nprint(a.f())\nEOF", "python -"),
+    ("git status", "git status"),
+])
+def test_segment_is_the_part_that_defined_the_category(cmd, segment):
+    assert classify_command(cmd, Ctx()).segment == segment

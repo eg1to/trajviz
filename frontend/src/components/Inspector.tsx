@@ -80,7 +80,7 @@ function StepDetail({ id, step, total, gt, onNav, onJump, steps }: { id: string;
       <div className="flex items-center gap-2 border-b px-3 py-2">
         <Button variant="ghost" size="icon" onClick={() => onNav(-1)} disabled={step.idx === 0} aria-label="Passo anterior"><ChevronLeft /></Button>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5"><span className="text-sm font-semibold tabular-nums" data-testid="inspector-idx">Passo #{step.idx}</span><span className="text-xs text-muted-foreground">de {total - 1}</span>
+          <div className="flex items-center gap-1.5"><span className="text-sm font-semibold tabular-nums" data-testid="inspector-idx">Passo #{step.idx}</span><span className="text-xs text-muted-foreground" data-testid="inspector-ordinal">· {step.idx + 1}º de {total}</span>
             <KindChip kind={kind} /></div>
           <div className="mono truncate text-muted-foreground">{step.action.tool_native ?? step.action.tool}{step.action.command && step.action.tool === 'editor' ? ` · ${step.action.command}` : ''}{step.native_id != null ? ` · id ${String(step.native_id).slice(0, 18)}` : ''}</div>
         </div>

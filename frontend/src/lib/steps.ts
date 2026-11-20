@@ -18,7 +18,7 @@ export function commandShort(s: Step, n = 40): string {
   if (a.tool === 'message') return truncate(s.thought ?? 'mensagem', n)
   if (a.tool === 'submit') return truncate(a.tool_native ?? 'submit', n)
   if (a.tool === 'task_tracker') return 'task_tracker'
-  return truncate(a.command ?? a.raw ?? a.tool, n)
+  return truncate(s.summary ?? a.command ?? a.raw ?? a.tool, n) // summary = segmento que definiu a categoria (sem cd/env/caminhos do repo)
 }
 
 export function kindLabelOfStep(s: Step): Kind {

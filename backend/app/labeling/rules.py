@@ -29,6 +29,7 @@ class Label:
     confidence: float = 0.3
     files: list[FileRef] = field(default_factory=list)
     writes: list[str] = field(default_factory=list)
+    summary: str | None = None  # segmento que definiu a categoria
     final: bool = False  # True = rótulo definitivo (não vai para o LLM): keys, harness, ferramenta exata
 
 
@@ -48,7 +49,7 @@ def harness_protocol(step: Step) -> bool:
 
 
 def _from_bash(r: BashResult, final: bool = False) -> Label:
-    return Label(r.category, r.subcategory, r.confidence, r.files, r.writes, final=final or r.keys_only)
+    return Label(r.category, r.subcategory, r.confidence, r.files, r.writes, summary=r.segment, final=final or r.keys_only)
 
 
 def label_step_rules(step: Step, ctx: Ctx) -> Label:
@@ -74,6 +75,8 @@ def label_step_rules(step: Step, ctx: Ctx) -> Label:
             return Label(C.read, "view", 1.0, [f] if f else [], final=True)
         if cmd in EDIT_CMDS:
             f = fref(path, "edit")
+            if f is not None and cmd == "create":
+                f.created = True
             if cmd == "create" and path:
                 ctx.add(normalize_path(path) or path)
             return Label(C.edit, cmd, 1.0, [f] if f else [], [normalize_path(path) or path] if cmd == "create" and path else [], final=True)
@@ -113,7 +116,7 @@ def _label_shell(step: Step, ctx: Ctx) -> Label:
         chosen = next(r for r in rs if r.category is cat)
         sub = "|".join(dict.fromkeys(r.subcategory for r in rs if r.subcategory))
         files = [f for r in rs for f in r.files]
-        return Label(cat, sub or None, chosen.confidence, files, [w for r in rs for w in r.writes])
+        return Label(cat, sub or None, chosen.confidence, files, [w for r in rs for w in r.writes], summary=chosen.segment)
     if _truthy(a.args.get("is_input")) or is_keys_only(a.command or ""):
         return Label(C.other, "keys", 1.0, final=True)
     return _from_bash(classify_command(a.command or a.raw or "", ctx))

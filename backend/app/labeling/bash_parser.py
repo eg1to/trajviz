@@ -39,6 +39,7 @@ class BashResult:
     files: list[FileRef] = field(default_factory=list)
     writes: list[str] = field(default_factory=list)  # arquivos escritos (para Ctx.created)
     keys_only: bool = False
+    segment: str | None = None  # texto (limpo) do segmento que definiu a categoria
 
 
 # ----------------------------------------------------------------------------- normalização de caminhos
@@ -469,6 +470,7 @@ def _finish_redirects(r: BashResult, seg: Seg, ctx: Ctx) -> BashResult:
     for _, t in reds:
         f = fref(t, "edit")
         if f:
+            f.created = True
             r.files.append(f)
     r.writes += tg
     if r.category is not C.edit:
@@ -612,6 +614,25 @@ def _classify_exe(exe: str, words: list[str], seg: Seg, ctx: Ctx, depth: int) ->
     return BashResult(C.other, e, 0.3)
 
 
+# ----------------------------------------------------------------------------- texto curto do segmento
+_WRAP_RE = re.compile(r"^\s*(?:[A-Za-z_]\w*=\S*\s+|sudo\s+(?:-\S+\s+)*|env\s+(?:-\S+\s+)*|nohup\s+|time\s+|command\s+|timeout\s+(?:-\S+\s+)*\d+[smhd]?\s+)")
+_PATH_IN_CMD = re.compile(r"(?<![\w.])/(?:workspace/[^/\s]+|testbed|app|repo)/")
+
+
+def clean_segment(text: str) -> str:
+    """Segmento sem prefixos (env/sudo/timeout), sem `cd x &&` e sem /workspace/<repo>/, /testbed/…; 1ª linha, espaços colapsados."""
+    t = re.sub(r"\s*<\s*__HD\d+__", "", text or "")
+    t = t.split("\n", 1)[0] if "<<" in t else t
+    for _ in range(6):
+        n = _WRAP_RE.sub("", t, count=1)
+        if n == t:
+            break
+        t = n
+    t = re.sub(r"^\s*cd\s+\S+\s*(?:&&|;)\s*", "", t)
+    t = _PATH_IN_CMD.sub("", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
 # ----------------------------------------------------------------------------- comando completo
 def classify_command(cmd: str, ctx: Ctx | None = None, depth: int = 0) -> BashResult:
     ctx = ctx or Ctx()
@@ -639,6 +660,8 @@ def classify_command(cmd: str, ctx: Ctx | None = None, depth: int = 0) -> BashRe
     chosen = next(r for _, r in kept if r.category is cat)
     out = BashResult(cat, "|".join(dict.fromkeys(r.subcategory for _, r in kept if r.subcategory)) or None,
                      chosen.confidence, [], [])
+    chosen_seg = next(sg for sg, r in kept if r.category is cat)
+    out.segment = clean_segment(chosen_seg.text)
     for _, r in results:
         for f in r.files:
             if f not in out.files:

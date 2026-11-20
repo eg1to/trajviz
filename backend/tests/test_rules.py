@@ -163,3 +163,22 @@ def test_terminus2_keys_steps_and_mini_harness():
     assert all(s.category != "other" or s.subcategory == "keys" or s.confidence < 0.6 for s in t.steps)
     m = label_trajectory(parse_any(ctb_path("miniswe-OpenAI"), manifest_dir=CTB))
     assert any(s.subcategory == "harness_protocol" for s in m.steps)  # <PATCH_CONTEXT> / <context_received>
+
+
+def test_step_summary_is_the_deciding_segment_and_keys_use_the_chosen_command():
+    t = label_trajectory(parse_any(FX / "swe_rebench_row.json"))
+    bash = [s for s in t.steps if s.action.tool == "bash" and s.category in ("reproduce", "test", "search", "read")]
+    assert bash and all(s.summary and not s.summary.startswith("cd ") and "/workspace/" not in s.summary and "/testbed/" not in s.summary for s in bash)
+    assert [s for s in t.steps if s.action.tool == "editor"][0].summary is None  # editor: a ação já é curta
+    k = step("keys", "keystrokes", "x", {"commands": [{"keystrokes": "ls -la\n"}, {"keystrokes": "cat /app/a.py\n"}]})
+    assert lab(k).summary == "cat a.py"
+
+
+def test_created_files_are_flagged_for_editor_create_and_redirects():
+    ctx = Ctx()
+    r = lab(step("editor", "str_replace_editor", "create", {"command": "create", "path": "/testbed/new.py"}), ctx)
+    assert [(f.path, f.created) for f in r.files] == [("new.py", True)]
+    r = lab(step("editor", "str_replace_editor", "str_replace", {"command": "str_replace", "path": "/testbed/old.py"}), ctx)
+    assert [(f.path, f.created) for f in r.files] == [("old.py", False)]
+    r = lab(step("bash", "execute_bash", "cat > /testbed/gen.py <<EOF\nx=1\nEOF", {"command": "cat > /testbed/gen.py <<EOF\nx=1\nEOF"}), ctx)
+    assert ("gen.py", "edit", True) in [(f.path, f.mode, f.created) for f in r.files]
