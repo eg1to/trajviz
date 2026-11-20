@@ -64,6 +64,7 @@ Detecção automática (`backend/app/adapters/detect.py`); todos viram o esquema
 |---|---|---|---|
 | OpenHands (log de chat) | SWE-rebench | `openhands_chat` | `resolved` e `exit_status` da fonte |
 | SWE-agent (nativo, xml e ticks) | SWE-smith | `sweagent_smith` | ação decidida por mensagem (o split `tool` mistura formatos); `resolved` **não validado** |
+| Sessão do Claude Code (`.jsonl` de `~/.claude/projects/`) | Claude Code | `claude_code_session` | 1 passo por `tool_use`; fixture sintética; mapeia Read/Grep/Glob/Edit/Write/Bash às regras existentes |
 | Chat genérico OpenAI/Anthropic | qualquer | `generic_chat` | só testado com mensagens sintéticas; agente = "desconhecido" |
 | SWE-agent `.traj` | CodeTraceBench, TraceView | `ctb_sweagent` | abre também os `.traj` avulsos do `evaluation_samples/` do TraceView |
 | mini-SWE `.traj.json` | CodeTraceBench | `ctb_miniswe` | 2 de 60 artefatos sem JSON → erro claro (`UnsupportedArtifact`) |
@@ -94,7 +95,7 @@ Detalhes, ressalvas e scripts em [`results/RESULTS.md`](results/RESULTS.md).
 ### Testes e capturas
 
 ```bash
-cd backend  && uv run pytest                          # backend (362 testes)
+cd backend  && uv run pytest                          # backend (454 testes)
 cd frontend && npm test                               # vitest (paleta, contraste, URL ⇄ estado)
 cd frontend && npm run test:e2e                       # Playwright: fumaça (biblioteca → passo → dashboard → problema)
 cd frontend && npm run screenshots                    # results/screenshots/*.png (1600×1000, tema claro, 2×)

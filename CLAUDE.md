@@ -41,7 +41,7 @@ Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
 ## Adaptadores (Fase 2) — `backend/app/adapters/`
 `detect.parse_any(path|obj, row=0)` detecta e converte. Cada módulo: `NAME`, `can_parse(obj)->float`, `parse(source)->Trajectory`.
 `openhands_chat` (SWE-rebench) · `sweagent_smith` (SWE-smith; ação decidida por mensagem) · `generic_chat` (OpenAI/Anthropic) ·
-`ctb_openhands_swe`, `ctb_sweagent`, `ctb_miniswe`, `ctb_terminus2`, `ctb_openhands_events` + `codetracebench.py` (`.tar.zst`/dir,
+`ctb_openhands_swe`, `ctb_sweagent`, `ctb_miniswe`, `ctb_terminus2`, `ctb_openhands_events` + `codetracebench.py` · `claude_code_session` (Fase 7; `.jsonl` de sessão inteira = 1 trajetória) (`.tar.zst`/dir,
 manifest → `ground_truth` com `resolved_idx`/`resolved_via`). Testes: `cd backend && uv run pytest` (fixtures reais em `tests/fixtures/`,
 regeneráveis com `scripts/make_fixtures.py`); lote: `uv run python scripts/parse_samples.py`.
 Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` do editor (bash fica p/ a Fase 3); mini-SWE TB sem JSON
@@ -91,6 +91,7 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
 - `cd backend && uv run uvicorn app.main:app --reload`
 - `cd frontend && npm run dev`
 - `cd frontend && npm run gen:api` (gera tipos a partir de `http://localhost:8000/openapi.json`)
+- `docker compose up --build` (web :5173 e API :8010; `WEB_PORT`/`API_PORT`; `backend/.env` opcional)
 
 ## Estado atual
 - [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
@@ -99,4 +100,5 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
 - [x] Fase 4 — detectores, métricas, API (`backend/app/analysis/`, `pipeline.py`, `main.py`, `library.py`, `docs/openapi.json`)
 - [x] Fase 5 — frontend: biblioteca, faixa de fases, grafo, inspetor, dashboard (`frontend/`; capturas em `results/screenshots/`)
 - [x] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`; gold manual `results/gold/gold_steps_cego_pedro.csv`, 210 passos, 1 anotador): regras 94,3% de acurácia, F1 macro 0,92; LLM 91,4%; `setup` é a categoria fraca (sugestões em `results/eval_classifier_sugestoes.md`, não aplicadas). Reproduzir: `cd backend && uv run python scripts/evaluate.py [--gold CSV] && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
-- [ ] Fase 7 — docker compose, polimento, demo (MVP: qua 25/11)
+- [x] Fase 7 — entrega do MVP (`v0.1-mvp`): gold held-out cego (`results/gold/gold_holdout_cego.csv`, `make_gold_sample.py --holdout`; `evaluate.py --gold … --tag holdout` gera `eval_classifier_holdout.md` e a tabela desenvolvimento × held-out no `RESULTS.md`), comparação com o TraceView (`docs/comparacao_traceview.md`, capturas em `results/screenshots/comparacao/`, `frontend/e2e/comparacao.mjs`), mapeamento de taxonomias (`docs/taxonomia_mapeamento.md`), Docker (`docker-compose.yml`: `api` + `web`/nginx; `WEB_PORT`/`API_PORT`), README + `docs/demo.gif`, roteiro da demo (`docs/roteiro_demo.md`, URLs validadas por `frontend/e2e/demo-urls.mjs`) e o adaptador stretch `claude_code_session` (`.jsonl` de `~/.claude/projects/`).
+  **Pendências:** (1) Pedro rotular o gold held-out e rodar o `evaluate.py --tag holdout` (sem isso não há número held-out); (2) completar a seção ASE'25 de `docs/taxonomia_mapeamento.md` (TODO); (3) decidir se uma sessão real do Claude Code entra na biblioteca como demo (nenhum log real foi incluído no repositório); (4) a tela "Comparar" não foi implementada.

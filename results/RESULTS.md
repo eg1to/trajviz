@@ -17,6 +17,7 @@ Tudo é reprodutível com semente fixa (20251119) a partir de `backend/scripts/`
 | `gold/gold_steps_cego_pedro.csv` | **gold manual** (210 passos rotulados, 21 com `duvida=1`, coluna `notas`); é o padrão do `evaluate.py` | — (manual) |
 | `gold/gold_steps_cego.csv` | o mesmo CSV vazio, como foi entregue ao anotador (só contexto + `gold_category` vazio) | `make_gold_sample.py` |
 | `gold/gold_steps_previsoes.csv`, `eval_classifier_llm_labels.csv` | previsões da regra e do LLM, **para não abrir antes de rotular**; `evaluate.py` junta tudo pelo `id` | `make_gold_sample.py`, `evaluate.py` |
+| `gold/gold_holdout_cego.csv`, `gold_holdout_previsoes.csv` | **gold held-out** (90 passos de trajetórias fora de `data/samples/`, semente 2026) para rotular às cegas: salvar como `gold/gold_holdout_cego_pedro.csv` e rodar `evaluate.py --gold results/gold/gold_holdout_cego_pedro.csv --tag holdout` → `eval_classifier_holdout.md` e a tabela desenvolvimento × held-out abaixo. **Ainda não rotulado.** | `make_gold_sample.py --holdout --n 90 --seed 2026` |
 | `eval_detectors_before.{md,json}`, `batch_stats_before.json` | resultados ANTES da correção de `test_fail` e `loop` (para a comparação lado a lado) | — |
 | `screenshots/` | capturas da interface (Fase 5) | `npm run screenshots` |
 
