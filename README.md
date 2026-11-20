@@ -50,10 +50,10 @@ Os testes e2e sobem a API (porta 8011) e o front com cache e `results/` isolados
 | captura | amostra | por que |
 |---|---|---|
 | `01-biblioteca` | — | biblioteca + upload |
-| `02-swe-rebench-resolvida-*` | `swe-rebench/chatcmpl-831fa55b…` (96 passos, PASS) | 8 ciclos edit→test (4 terminaram em pass), 6 erros, 1 loop |
-| `03-swe-rebench-nao-resolvida-*` | `swe-rebench/chatcmpl-dd059e8e…` (56 passos, FAIL) | 2 loops, 6 ciclos (4 test_fail) |
-| `04-swe-smith-*` | `swe-smith/ticks/john-kurkowski__tldextract…` (76 passos) | 1 loop, 6 ciclos, 11 repetidos/sem informação nova; "resolved não validado" |
-| `05-ctb-gabarito-loop-*` | `codetracebench/terminus2-…fix-ocaml-gc…` (141 passos, FAIL) | 26 passos anotados no gabarito + loop; modo compacto |
+| `02-swe-rebench-resolvida-*` | `swe-rebench/chatcmpl-831fa55b…` (96 passos, PASS) | 8 ciclos edit→test (4 terminaram em pass), 6 erros |
+| `03-swe-rebench-nao-resolvida-*` | `swe-rebench/chatcmpl-dd059e8e…` (56 passos, FAIL) | 1 loop, 6 ciclos (3 terminaram em test_fail) |
+| `04-swe-smith-*` | `swe-smith/ticks/john-kurkowski__tldextract…` (76 passos) | 6 ciclos, 9 repetidos/sem informação nova; "resolved não validado" |
+| `05-ctb-gabarito-loop-*` | `codetracebench/terminus2-…fix-ocaml-gc…` (141 passos, FAIL) | 26 passos anotados no gabarito; modo compacto (o `loop` corrigido não marca esta trajetória) |
 
 Cada trajetória tem `-grafo`, `-dashboard` (topo) e `-dashboard-completo` (viewport alto).
 

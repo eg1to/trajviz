@@ -84,9 +84,11 @@ def main() -> None:
         N.append(f"**Resolvidas × não resolvidas (SWE-rebench, 2.000 trajetórias):** {r['label']} é {sign} nas resolvidas (mediana {val(r, 'med_res')} × {val(r, 'med_non')}; δ de Cliff {pt(r['delta'], 2)}; p corrigido por Holm {('< 0,001' if r['p_holm'] < 0.001 else pt(r['p_holm'], 4))}). Fonte: {line('results/batch_stats.md', r['label'])}.")
     N.append("**A 1ª versão do detector `no_new_info` errava em 80% dos casos** (16 de 20 auditados no SWE-smith); depois da correção, 0 de 20 e a taxa de marcação caiu de 12,6% para 2,8% dos passos. Fonte: "
              f"{line('results/audit_no_new_info.md', 'Rodada 1')}.")
-    af = (RESULTS / "audit_flags.md").read_text()
-    N.append("**Auditoria leve dos outros detectores (20 casos cada, pré-avaliação do assistente — revisar):** `error` 90% corretos, `repeated` 75% (+25% duvidosos), `test_fail` 50% (+50% duvidosos, quase todos códigos de saída do pytest que não significam falha), `loop` só 25%. "
-             f"Fonte: {line('results/audit_flags.md', '| `error` |')}.")
+    lp, lb = res("incorrect × loop"), next(r for r in json.loads((RESULTS / "eval_detectors_before.json").read_text())["results"] if r["task"] == "incorrect × loop" and r["slice"] == "todos")
+    N.append(f"**Depois de corrigir `loop` (só a mesma ação normalizada ou o ciclo edit → test_fail com o mesmo erro) o detector ficou muito mais preciso e muito menos sensível:** {lp['n_pred']} passos marcados no CodeTraceBench (antes {lb['n_pred']}), revocação {pt(100 * lp['recall'])}% — lift de {pt(lp['lift_f1'], 2)}×, mas com IC {pt(lp['lift_ci'][0], 2)}–{pt(lp['lift_ci'][1], 2)} (inconclusivo). Fonte: {line('results/eval_detectors.md', '## incorrect × loop')}.")
+    N.append("**Auditoria leve dos detectores (20 casos cada, pré-avaliação do assistente — revisar):** `error` 90% corretos e `repeated` 75% (+25% duvidosos) na rodada 1; "
+             "`test_fail` foi de **50% para 80% corretos** (duvidosos de 50% para 15%) depois de seguir os códigos de saída do pytest, e `loop` de **25% para 100%** na amostra nova (11 trajetórias; ver ressalva de revocação). "
+             f"Fonte: {line('results/audit_flags.md', '| `test_fail` | **2')}.")
     N.append(f"**O gabarito do CodeTraceBench tem 3.316 trajetórias únicas, não 4.316** (o `verified` está contido no `full`), e **{pt(100 * ed['gold_hypothesis_share'], 0)}% dos passos anotados só se alinham aos passos reais por hipótese** (o `step_id` tem unidade diferente por agente). Fonte: `docs/formats.md` §0/§4.5 e {line('results/eval_detectors.md', 'alinhados por **hipótese**')}.")
     for i, n in enumerate(N, 1):
         lines.append(f"{i}. {n}")

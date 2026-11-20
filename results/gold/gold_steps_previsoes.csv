@@ -1,0 +1,211 @@
+id,dataset,agent,traj_id,idx,pred_category,pred_subcategory,label_source,confidence
+chatcmpl-44ff7710ba58a9b923e65bd89ae~cfdd1d#15,SWE-rebench,OpenHands,chatcmpl-44ff7710ba58a9b923e65bd89ae9b461,15,search,find -exec grep,rule,0.9
+chatcmpl-2af941fa3c254e67a6deecc061e~7a8eac#4,SWE-rebench,OpenHands,chatcmpl-2af941fa3c254e67a6deecc061e83313,4,read,view,rule,1.0
+chatcmpl-44ff7710ba58a9b923e65bd89ae~cfdd1d#46,SWE-rebench,OpenHands,chatcmpl-44ff7710ba58a9b923e65bd89ae9b461,46,test,python -m pytest,rule,0.9
+chatcmpl-d58d8109eba657fa11ce3bd3317~869a98#24,SWE-rebench,OpenHands,chatcmpl-d58d8109eba657fa11ce3bd331758c66,24,test,python -m pytest,rule,0.9
+chatcmpl-9582ca86f1c4eaf77aa35bb7481~b03c45#39,SWE-rebench,OpenHands,chatcmpl-9582ca86f1c4eaf77aa35bb748180739,39,test,python -m pytest,rule,0.9
+chatcmpl-108c4bbe1d8726839b7e8e7fd2a~40f92d#30,SWE-rebench,OpenHands,chatcmpl-108c4bbe1d8726839b7e8e7fd2a8a888,30,edit,create,rule,1.0
+chatcmpl-5bb9d91b8804c754faf58a0be87~969116#70,SWE-rebench,OpenHands,chatcmpl-5bb9d91b8804c754faf58a0be870e538,70,reproduce,python -c,rule,0.9
+chatcmpl-10f2e1b0e208ec291229b1e0f9d~e30df1#37,SWE-rebench,OpenHands,chatcmpl-10f2e1b0e208ec291229b1e0f9df3670,37,reproduce,python comprehensive_test.py,rule,0.9
+chatcmpl-fde746bb32f2beafdd192c223f4~634b50#15,SWE-rebench,OpenHands,chatcmpl-fde746bb32f2beafdd192c223f4f7a7a,15,search,grep,rule,0.9
+chatcmpl-269c21ab1a0862e01eafc61ecd5~c69c33#24,SWE-rebench,OpenHands,chatcmpl-269c21ab1a0862e01eafc61ecd5ed6dd,24,read,view,rule,1.0
+chatcmpl-1af3d7baf126ec5fb5d296929a7~61ed27#44,SWE-rebench,OpenHands,chatcmpl-1af3d7baf126ec5fb5d296929a7c9849,44,reproduce,python reproduce_issue.py,rule,0.9
+chatcmpl-370db8295fdf49e53adf7ec5b3a~5a7e36#14,SWE-rebench,OpenHands,chatcmpl-370db8295fdf49e53adf7ec5b3a2a929,14,search,grep,rule,0.9
+chatcmpl-b05b7a1974412296ce819036f31~008af6#61,SWE-rebench,OpenHands,chatcmpl-b05b7a1974412296ce819036f312dd22,61,reproduce,python comprehensive_test.py,rule,0.9
+chatcmpl-057ac2d879d36dfbab5dd343fb6~a66535#18,SWE-rebench,OpenHands,chatcmpl-057ac2d879d36dfbab5dd343fb60a126,18,vcs,git show,rule,0.9
+chatcmpl-0816693556da2f3f493d506e1c5~5b096e#50,SWE-rebench,OpenHands,chatcmpl-0816693556da2f3f493d506e1c57978d,50,search,grep,rule,0.9
+chatcmpl-34a95b788e673e2bb650a6951f1~e59f17#12,SWE-rebench,OpenHands,chatcmpl-34a95b788e673e2bb650a6951f1849e9,12,read,view,rule,1.0
+chatcmpl-dd059e8e169114015e62f521024~c330d4#18,SWE-rebench,OpenHands,chatcmpl-dd059e8e169114015e62f521024377e5,18,reproduce,python -c,rule,0.9
+chatcmpl-0cfad1431a4e4f1359c3b11d542~85cdfc#46,SWE-rebench,OpenHands,chatcmpl-0cfad1431a4e4f1359c3b11d542e5f45,46,edit,create,rule,1.0
+chatcmpl-5eabce4805ad12b51979c19c83d~5034db#21,SWE-rebench,OpenHands,chatcmpl-5eabce4805ad12b51979c19c83d9ed18,21,read,view,rule,1.0
+chatcmpl-ab91ccd4ebe3275bb88e0df5ef0~633088#31,SWE-rebench,OpenHands,chatcmpl-ab91ccd4ebe3275bb88e0df5ef04ef68,31,edit,str_replace,rule,1.0
+chatcmpl-793fd2a87cc50c5ece12f789cbb~01ab13#66,SWE-rebench,OpenHands,chatcmpl-793fd2a87cc50c5ece12f789cbb29d61,66,edit,create,rule,1.0
+chatcmpl-4b150a8bd11ba318606b24a536e~29b02a#41,SWE-rebench,OpenHands,chatcmpl-4b150a8bd11ba318606b24a536edfd05,41,reproduce,python check_harvard.py,rule,0.9
+chatcmpl-e9edbbc016aadaa0e9e14558458~fce63c#52,SWE-rebench,OpenHands,chatcmpl-e9edbbc016aadaa0e9e1455845881740,52,reproduce,python final_debug.py,rule,0.9
+chatcmpl-ab91ccd4ebe3275bb88e0df5ef0~633088#71,SWE-rebench,OpenHands,chatcmpl-ab91ccd4ebe3275bb88e0df5ef04ef68,71,vcs,git stash,rule,0.9
+chatcmpl-61ca8c1656b85b809c6b6fbdb24~a86c5d#18,SWE-rebench,OpenHands,chatcmpl-61ca8c1656b85b809c6b6fbdb2440b24,18,explore,view_dir,rule,1.0
+chatcmpl-ab91ccd4ebe3275bb88e0df5ef0~633088#17,SWE-rebench,OpenHands,chatcmpl-ab91ccd4ebe3275bb88e0df5ef04ef68,17,reproduce,python -c,rule,0.9
+chatcmpl-370db8295fdf49e53adf7ec5b3a~5a7e36#22,SWE-rebench,OpenHands,chatcmpl-370db8295fdf49e53adf7ec5b3a2a929,22,read,view,rule,1.0
+chatcmpl-3875b4e4ea64014ecb220ae040a~8fffe9#39,SWE-rebench,OpenHands,chatcmpl-3875b4e4ea64014ecb220ae040a08adc,39,reproduce,python test_operation_names.py,rule,0.9
+chatcmpl-44ff7710ba58a9b923e65bd89ae~cfdd1d#10,SWE-rebench,OpenHands,chatcmpl-44ff7710ba58a9b923e65bd89ae9b461,10,explore,view_dir,rule,1.0
+chatcmpl-61ca8c1656b85b809c6b6fbdb24~a86c5d#34,SWE-rebench,OpenHands,chatcmpl-61ca8c1656b85b809c6b6fbdb2440b24,34,edit,create,rule,1.0
+chatcmpl-e97a553c753e2d6bce32888acba~95c14e#46,SWE-rebench,OpenHands,chatcmpl-e97a553c753e2d6bce32888acba5b834,46,read,view,rule,1.0
+chatcmpl-884a84915fdba111c71ae824cb3~0f99ee#16,SWE-rebench,OpenHands,chatcmpl-884a84915fdba111c71ae824cb3ffa1b,16,read,view,rule,1.0
+chatcmpl-68e764c2a614c898bb164a76dc8~d0282b#21,SWE-rebench,OpenHands,chatcmpl-68e764c2a614c898bb164a76dc81990f,21,search,grep,rule,0.9
+chatcmpl-c9e598379b6ce3758725123e1cb~89b64d#20,SWE-rebench,OpenHands,chatcmpl-c9e598379b6ce3758725123e1cbfa2ad,20,reproduce,python -c,rule,0.9
+chatcmpl-d4e3d2ce71e50c2b73628265c35~12f0cf#32,SWE-rebench,OpenHands,chatcmpl-d4e3d2ce71e50c2b73628265c3568111,32,edit,create,rule,1.0
+chatcmpl-d58d8109eba657fa11ce3bd3317~869a98#19,SWE-rebench,OpenHands,chatcmpl-d58d8109eba657fa11ce3bd331758c66,19,edit,str_replace,rule,1.0
+chatcmpl-fde746bb32f2beafdd192c223f4~634b50#19,SWE-rebench,OpenHands,chatcmpl-fde746bb32f2beafdd192c223f4f7a7a,19,read,view,rule,1.0
+chatcmpl-793fd2a87cc50c5ece12f789cbb~01ab13#48,SWE-rebench,OpenHands,chatcmpl-793fd2a87cc50c5ece12f789cbb29d61,48,vcs,git log,rule,0.9
+chatcmpl-2af941fa3c254e67a6deecc061e~7a8eac#20,SWE-rebench,OpenHands,chatcmpl-2af941fa3c254e67a6deecc061e83313,20,search,grep,rule,0.9
+chatcmpl-27296cb182dc8b1f151727ddd5a~b1f8e2#61,SWE-rebench,OpenHands,chatcmpl-27296cb182dc8b1f151727ddd5ac75ea,61,reproduce,python test_remote_integration.py,rule,0.9
+chatcmpl-5eabce4805ad12b51979c19c83d~5034db#36,SWE-rebench,OpenHands,chatcmpl-5eabce4805ad12b51979c19c83d9ed18,36,vcs,git status,rule,0.9
+chatcmpl-10f2e1b0e208ec291229b1e0f9d~e30df1#10,SWE-rebench,OpenHands,chatcmpl-10f2e1b0e208ec291229b1e0f9df3670,10,search,grep,rule,0.9
+chatcmpl-b05b7a1974412296ce819036f31~008af6#48,SWE-rebench,OpenHands,chatcmpl-b05b7a1974412296ce819036f312dd22,48,search,grep,rule,0.9
+chatcmpl-9070e1cf8110749e3c6d9eb8cc1~071485#23,SWE-rebench,OpenHands,chatcmpl-9070e1cf8110749e3c6d9eb8cc146da0,23,edit,str_replace,rule,1.0
+chatcmpl-68e764c2a614c898bb164a76dc8~d0282b#43,SWE-rebench,OpenHands,chatcmpl-68e764c2a614c898bb164a76dc81990f,43,think,,rule,1.0
+chatcmpl-793fd2a87cc50c5ece12f789cbb~01ab13#67,SWE-rebench,OpenHands,chatcmpl-793fd2a87cc50c5ece12f789cbb29d61,67,reproduce,python test_backward_compat.py,rule,0.9
+chatcmpl-27296cb182dc8b1f151727ddd5a~b1f8e2#36,SWE-rebench,OpenHands,chatcmpl-27296cb182dc8b1f151727ddd5ac75ea,36,reproduce,python test_ipv6_reproduction.py,rule,0.9
+chatcmpl-5eabce4805ad12b51979c19c83d~5034db#14,SWE-rebench,OpenHands,chatcmpl-5eabce4805ad12b51979c19c83d9ed18,14,test,python -m pytest,rule,0.9
+chatcmpl-6b7893c827a1840c1f83dcd3074~28693d#13,SWE-rebench,OpenHands,chatcmpl-6b7893c827a1840c1f83dcd3074bc4ab,13,reproduce,python -c,rule,0.9
+chatcmpl-68e764c2a614c898bb164a76dc8~d0282b#50,SWE-rebench,OpenHands,chatcmpl-68e764c2a614c898bb164a76dc81990f,50,read,view,rule,1.0
+chatcmpl-76a16b30a742649fc4629bf37b6~71091d#25,SWE-rebench,OpenHands,chatcmpl-76a16b30a742649fc4629bf37b6b7a9f,25,search,grep,rule,0.9
+chatcmpl-5bb9d91b8804c754faf58a0be87~969116#27,SWE-rebench,OpenHands,chatcmpl-5bb9d91b8804c754faf58a0be870e538,27,read,view,rule,1.0
+chatcmpl-2af941fa3c254e67a6deecc061e~7a8eac#31,SWE-rebench,OpenHands,chatcmpl-2af941fa3c254e67a6deecc061e83313,31,reproduce,python reproduce_issue.py,rule,0.9
+chatcmpl-793fd2a87cc50c5ece12f789cbb~01ab13#31,SWE-rebench,OpenHands,chatcmpl-793fd2a87cc50c5ece12f789cbb29d61,31,read,view,rule,1.0
+chatcmpl-6b7893c827a1840c1f83dcd3074~28693d#30,SWE-rebench,OpenHands,chatcmpl-6b7893c827a1840c1f83dcd3074bc4ab,30,edit,str_replace,rule,1.0
+chatcmpl-27296cb182dc8b1f151727ddd5a~b1f8e2#83,SWE-rebench,OpenHands,chatcmpl-27296cb182dc8b1f151727ddd5ac75ea,83,edit,create,rule,1.0
+chatcmpl-dd059e8e169114015e62f521024~c330d4#13,SWE-rebench,OpenHands,chatcmpl-dd059e8e169114015e62f521024377e5,13,think,,rule,1.0
+chatcmpl-3875b4e4ea64014ecb220ae040a~8fffe9#56,SWE-rebench,OpenHands,chatcmpl-3875b4e4ea64014ecb220ae040a08adc,56,test,pytest,rule,0.9
+chatcmpl-52c741693340ed5929ed1e0882c~e47f51#6,SWE-rebench,OpenHands,chatcmpl-52c741693340ed5929ed1e0882c08d05,6,explore,view_dir,rule,1.0
+chatcmpl-793fd2a87cc50c5ece12f789cbb~01ab13#64,SWE-rebench,OpenHands,chatcmpl-793fd2a87cc50c5ece12f789cbb29d61,64,read,view,rule,1.0
+chatcmpl-c9d6a6b8918746f1aa49fbb729b~5339de#21,SWE-rebench,OpenHands,chatcmpl-c9d6a6b8918746f1aa49fbb729b89914,21,read,view,rule,1.0
+chatcmpl-0cfad1431a4e4f1359c3b11d542~85cdfc#1,SWE-rebench,OpenHands,chatcmpl-0cfad1431a4e4f1359c3b11d542e5f45,1,explore,view_dir,rule,1.0
+chatcmpl-3d12239522eece4cee80b0757df~8e7867#20,SWE-rebench,OpenHands,chatcmpl-3d12239522eece4cee80b0757dfff9bd,20,edit,create,rule,1.0
+chatcmpl-5bb9d91b8804c754faf58a0be87~969116#6,SWE-rebench,OpenHands,chatcmpl-5bb9d91b8804c754faf58a0be870e538,6,search,grep,rule,0.9
+chatcmpl-34a95b788e673e2bb650a6951f1~e59f17#17,SWE-rebench,OpenHands,chatcmpl-34a95b788e673e2bb650a6951f1849e9,17,read,view,rule,1.0
+chatcmpl-108c4bbe1d8726839b7e8e7fd2a~40f92d#73,SWE-rebench,OpenHands,chatcmpl-108c4bbe1d8726839b7e8e7fd2a8a888,73,think,,rule,1.0
+chatcmpl-831fa55b3ab429d20cf66336189~766264#77,SWE-rebench,OpenHands,chatcmpl-831fa55b3ab429d20cf66336189bc3b1,77,test,python -m pytest,rule,0.9
+chatcmpl-254fecf9eb276811886c563b3c8~315d1a#3,SWE-rebench,OpenHands,chatcmpl-254fecf9eb276811886c563b3c880b0a,3,read,view,rule,1.0
+chatcmpl-b05b7a1974412296ce819036f31~008af6#45,SWE-rebench,OpenHands,chatcmpl-b05b7a1974412296ce819036f312dd22,45,search,grep,rule,0.9
+chatcmpl-ab91ccd4ebe3275bb88e0df5ef0~633088#13,SWE-rebench,OpenHands,chatcmpl-ab91ccd4ebe3275bb88e0df5ef04ef68,13,read,view,rule,1.0
+pallets__jinja.ada0a9a6.func_pm_clas~a0c793#10,SWE-smith,SWE-agent,pallets__jinja.ada0a9a6.func_pm_class_shuffle_funcs__sxsrsgw9.r5bzti1y,10,edit,create,rule,1.0
+spulec__freezegun.5f171db0.77.zrfil5~15e5de#5,SWE-smith,SWE-agent,spulec__freezegun.5f171db0.77.zrfil5kb,5,reproduce,python reproduce.py,rule,0.9
+HIPS__autograd.ac044f0d.lm_rewrite__~8f1d88#0,SWE-smith,SWE-agent,HIPS__autograd.ac044f0d.lm_rewrite__ha6ddk9p.bp40fug0,0,search,find -name,rule,0.9
+cantools__cantools.0c6a7871.combine_~55b8ec#2,SWE-smith,SWE-agent,cantools__cantools.0c6a7871.combine_file__xh7eoeg0.ksbj6td4,2,read,view,rule,1.0
+scanny__python-pptx.278b47b1.lm_rewr~a36237#7,SWE-smith,SWE-agent,scanny__python-pptx.278b47b1.lm_rewrite__q5485mdw.mvaf8e48,7,read,view,rule,1.0
+sqlfluff__sqlfluff.50a1c4b6.func_pm_~d8ca06#2,SWE-smith,SWE-agent,sqlfluff__sqlfluff.50a1c4b6.func_pm_remove_cond__lwraxuys.91hmylr4,2,search,grep,rule,0.9
+facebookresearch__hydra.0f03eb60.pr_~ecb585#4,SWE-smith,SWE-agent,facebookresearch__hydra.0f03eb60.pr_1560.gb64eyg9,4,read,view,rule,1.0
+tkrajina__gpxpy.09fc46b3.func_pm_op_~4f72cf#66,SWE-smith,SWE-agent,tkrajina__gpxpy.09fc46b3.func_pm_op_change__9ouu0ol3.q1m8bwvq,66,reproduce,python debug_extremes.py,rule,0.9
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#33,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,33,read,view,rule,1.0
+r1chardj0n3s__parse.30da9e4f.lm_rewr~faeb4b#25,SWE-smith,SWE-agent,r1chardj0n3s__parse.30da9e4f.lm_rewrite__c7o7ez5s.bgtr1a50,25,read,view,rule,1.0
+encode__starlette.db5063c2.pr_2812.1~665bcb#6,SWE-smith,SWE-agent,encode__starlette.db5063c2.pr_2812.1cm1w3ln,6,reproduce,python reproduce_error.py,rule,0.9
+Project-MONAI__MONAI.a09c1f08.pr_732~b92ef7#6,SWE-smith,SWE-agent,Project-MONAI__MONAI.a09c1f08.pr_7321.40o1rcbf,6,read,view,rule,1.0
+encode__starlette.db5063c2.combine_f~4dff72#9,SWE-smith,SWE-agent,encode__starlette.db5063c2.combine_file__rbrfbzjk.l8k5pe92,9,reproduce,python reproduce_cors_issue.py|sleep|python test_cors_request.py|pkill,rule,0.9
+google__textfsm.c31b6007.lm_rewrite_~6227aa#25,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.4xi4zdh3,25,reproduce,python test_filldown_clear.py,rule,0.9
+sqlfluff__sqlfluff.50a1c4b6.pr_6293.~fb55b5#1,SWE-smith,SWE-agent,sqlfluff__sqlfluff.50a1c4b6.pr_6293.5tnirowd,1,read,view,rule,1.0
+seperman__deepdiff.ed252022.lm_rewri~1c5367#46,SWE-smith,SWE-agent,seperman__deepdiff.ed252022.lm_rewrite__i9qyky1w.kwq24oxt,46,reproduce,python reproduce_issue.py,rule,0.9
+HIPS__autograd.ac044f0d.lm_rewrite__~8f1d88#2,SWE-smith,SWE-agent,HIPS__autograd.ac044f0d.lm_rewrite__ha6ddk9p.bp40fug0,2,search,grep,rule,0.9
+encode__starlette.db5063c2.combine_f~4dff72#21,SWE-smith,SWE-agent,encode__starlette.db5063c2.combine_file__rbrfbzjk.l8k5pe92,21,edit,str_replace,rule,1.0
+sqlfluff__sqlfluff.50a1c4b6.func_pm_~d8ca06#14,SWE-smith,SWE-agent,sqlfluff__sqlfluff.50a1c4b6.func_pm_remove_cond__lwraxuys.91hmylr4,14,reproduce,python reproduce_error.py,rule,0.9
+r1chardj0n3s__parse.30da9e4f.lm_rewr~faeb4b#72,SWE-smith,SWE-agent,r1chardj0n3s__parse.30da9e4f.lm_rewrite__c7o7ez5s.bgtr1a50,72,reproduce,python test_special_chars.py,rule,0.9
+pallets__jinja.ada0a9a6.func_pm_clas~a0c793#29,SWE-smith,SWE-agent,pallets__jinja.ada0a9a6.func_pm_class_shuffle_funcs__sxsrsgw9.r5bzti1y,29,reproduce,python reproduce_error_multiple_elif.py,rule,0.9
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#35,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,35,reproduce,python reproduce_issues.py,rule,0.9
+sunpy__sunpy.f8edfd5c.lm_rewrite__5z~af50a8#21,SWE-smith,SWE-agent,sunpy__sunpy.f8edfd5c.lm_rewrite__5zz2yrx6.40o1rcbf,21,read,view,rule,1.0
+rustedpy__result.0b855e1e.53.ppyo1nm~6e343b#3,SWE-smith,SWE-agent,rustedpy__result.0b855e1e.53.ppyo1nmw,3,search,grep,rule,0.9
+google__textfsm.c31b6007.lm_rewrite_~6227aa#47,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.4xi4zdh3,47,reproduce,python debug_clear_command.py,rule,0.9
+john-kurkowski__tldextract.3d1bf184.~d7f6a5#38,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.pr_300.j2lokqk2,38,edit,str_replace,rule,1.0
+pdfminer__pdfminer.six.1a8bd2f7.lm_r~1878c1#15,SWE-smith,SWE-agent,pdfminer__pdfminer.six.1a8bd2f7.lm_rewrite__l6huv6dl.3qdud4nz,15,edit,str_replace,rule,1.0
+john-kurkowski__tldextract.3d1bf184.~80305f#23,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.lm_rewrite__s1hee5zl.tdpm8gqo,23,reproduce,python fix_ipv6.py,rule,0.9
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#13,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,13,read,view,rule,1.0
+HIPS__autograd.ac044f0d.lm_rewrite__~8f1d88#38,SWE-smith,SWE-agent,HIPS__autograd.ac044f0d.lm_rewrite__ha6ddk9p.bp40fug0,38,reproduce,python test_edge_cases.py,rule,0.9
+pyca__pyopenssl.04766a49.lm_rewrite_~dfa031#17,SWE-smith,SWE-agent,pyca__pyopenssl.04766a49.lm_rewrite__v9npv9ry.qmueq5ml,17,edit,create,rule,1.0
+john-kurkowski__tldextract.3d1bf184.~80305f#36,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.lm_rewrite__s1hee5zl.tdpm8gqo,36,setup,rm,rule,0.9
+google__textfsm.c31b6007.lm_rewrite_~6227aa#41,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.4xi4zdh3,41,edit,str_replace,rule,1.0
+tweepy__tweepy.91a41c6e.lm_rewrite__~9fb85d#12,SWE-smith,SWE-agent,tweepy__tweepy.91a41c6e.lm_rewrite__d7fgi1ci.cx69kkji,12,read,view,rule,1.0
+pallets__click.fde47b4b.pr_2604.6hiv~ffcb12#3,SWE-smith,SWE-agent,pallets__click.fde47b4b.pr_2604.6hivjo9v,3,read,view,rule,1.0
+pytest-dev__iniconfig.16793ead.func_~c48369#15,SWE-smith,SWE-agent,pytest-dev__iniconfig.16793ead.func_pm_remove_cond__czz1d3wp.2oedft5k,15,submit,submit,rule,1.0
+tobymao__sqlglot.036601ba.func_pm_ct~db3587#19,SWE-smith,SWE-agent,tobymao__sqlglot.036601ba.func_pm_ctrl_invert_if__wnqonoid.91hmylr4,19,edit,str_replace,rule,1.0
+john-kurkowski__tldextract.3d1bf184.~d7f6a5#46,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.pr_300.j2lokqk2,46,reproduce,python -m tldextract.cli,rule,0.6
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#16,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,16,read,view,rule,1.0
+scanny__python-pptx.278b47b1.lm_rewr~5f10d2#10,SWE-smith,SWE-agent,scanny__python-pptx.278b47b1.lm_rewrite__q5485mdw.40o1rcbf,10,edit,create,rule,1.0
+iterative__dvc.1d6ea681.pr_9712.4tw4~ae390b#25,SWE-smith,SWE-agent,iterative__dvc.1d6ea681.pr_9712.4tw4cp8h,25,submit,submit,rule,1.0
+facebookresearch__hydra.0f03eb60.pr_~ecb585#14,SWE-smith,SWE-agent,facebookresearch__hydra.0f03eb60.pr_1560.gb64eyg9,14,edit,str_replace,rule,1.0
+tkrajina__gpxpy.09fc46b3.func_pm_op_~4f72cf#26,SWE-smith,SWE-agent,tkrajina__gpxpy.09fc46b3.func_pm_op_change__9ouu0ol3.q1m8bwvq,26,edit,create,rule,1.0
+google__textfsm.c31b6007.lm_rewrite_~6227aa#48,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.4xi4zdh3,48,reproduce,python test_clear_command.py,rule,0.9
+Knio__dominate.9082227e.combine_file~4d0a50#6,SWE-smith,SWE-agent,Knio__dominate.9082227e.combine_file__n1qm27ke.zc2fidet,6,edit,str_replace,rule,1.0
+pyca__pyopenssl.04766a49.lm_rewrite_~dfa031#18,SWE-smith,SWE-agent,pyca__pyopenssl.04766a49.lm_rewrite__v9npv9ry.qmueq5ml,18,reproduce,python test_fix2.py,rule,0.9
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#32,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,32,read,view,rule,1.0
+rustedpy__result.0b855e1e.53.ppyo1nm~6e343b#9,SWE-smith,SWE-agent,rustedpy__result.0b855e1e.53.ppyo1nmw,9,submit,submit,rule,1.0
+oauthlib__oauthlib.1fd52536.func_pm_~5f7bbc#17,SWE-smith,SWE-agent,oauthlib__oauthlib.1fd52536.func_pm_remove_assign__w945anr8.91hmylr4,17,reproduce,python test_edge_cases.py,rule,0.9
+conan-io__conan.86f29e13.pr_15172.sc~6df43d#2,SWE-smith,SWE-agent,conan-io__conan.86f29e13.pr_15172.scxr3w5m,2,search,grep,rule,0.9
+google__textfsm.c31b6007.lm_rewrite_~13b6e0#50,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.40o1rcbf,50,reproduce,python test_clear_command.py,rule,0.9
+john-kurkowski__tldextract.3d1bf184.~80305f#8,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.lm_rewrite__s1hee5zl.tdpm8gqo,8,edit,str_replace,rule,1.0
+r1chardj0n3s__parse.30da9e4f.lm_rewr~faeb4b#33,SWE-smith,SWE-agent,r1chardj0n3s__parse.30da9e4f.lm_rewrite__c7o7ez5s.bgtr1a50,33,edit,str_replace,rule,1.0
+tkrajina__gpxpy.09fc46b3.func_pm_op_~4f72cf#54,SWE-smith,SWE-agent,tkrajina__gpxpy.09fc46b3.func_pm_op_change__9ouu0ol3.q1m8bwvq,54,reproduce,python debug_extremes.py,rule,0.9
+seatgeek__thefuzz.8a05a3ee.combine_f~d04487#3,SWE-smith,SWE-agent,seatgeek__thefuzz.8a05a3ee.combine_file__x1rot2xe.3h2okh6w,3,read,view,rule,1.0
+Project-MONAI__MONAI.a09c1f08.pr_732~b92ef7#22,SWE-smith,SWE-agent,Project-MONAI__MONAI.a09c1f08.pr_7321.40o1rcbf,22,edit,str_replace,rule,1.0
+pydicom__pydicom.7d361b3d.lm_rewrite~cc6176#0,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__okh7h88f.40o1rcbf,0,search,find -name,rule,0.9
+pallets__jinja.ada0a9a6.func_pm_clas~a0c793#5,SWE-smith,SWE-agent,pallets__jinja.ada0a9a6.func_pm_class_shuffle_funcs__sxsrsgw9.r5bzti1y,5,read,view,rule,1.0
+encode__starlette.db5063c2.combine_f~4dff72#37,SWE-smith,SWE-agent,encode__starlette.db5063c2.combine_file__rbrfbzjk.l8k5pe92,37,reproduce,python final_verification.py,rule,0.9
+python-jsonschema__jsonschema.93e0ca~790a5a#10,SWE-smith,SWE-agent,python-jsonschema__jsonschema.93e0caa5.lm_rewrite__risng3gk.4zex701c,10,reproduce,python test_nested.py,rule,0.9
+dask__dask.5f61e423.pr_9240.oosvj10h~25b848#1,SWE-smith,SWE-agent,dask__dask.5f61e423.pr_9240.oosvj10h,1,read,view,rule,1.0
+martinblech__xmltodict.0952f382.func~7aa14e#3,SWE-smith,SWE-agent,martinblech__xmltodict.0952f382.func_pm_remove_cond__qc5atj8q.wlgqq9o7,3,read,view,rule,1.0
+sunpy__sunpy.f8edfd5c.lm_rewrite__5z~af50a8#39,SWE-smith,SWE-agent,sunpy__sunpy.f8edfd5c.lm_rewrite__5zz2yrx6.40o1rcbf,39,edit,str_replace,rule,1.0
+seperman__deepdiff.ed252022.func_pm_~2c8e5d#9,SWE-smith,SWE-agent,seperman__deepdiff.ed252022.func_pm_ctrl_invert_if__u0b1jp8e.vf0gf9rl,9,reproduce,python reproduce_bug.py,rule,0.9
+scanny__python-pptx.278b47b1.lm_rewr~5f10d2#15,SWE-smith,SWE-agent,scanny__python-pptx.278b47b1.lm_rewrite__q5485mdw.40o1rcbf,15,reproduce,python test_edge_cases.py,rule,0.9
+seperman__deepdiff.ed252022.func_pm_~2c8e5d#17,SWE-smith,SWE-agent,seperman__deepdiff.ed252022.func_pm_ctrl_invert_if__u0b1jp8e.vf0gf9rl,17,read,view,rule,1.0
+google__textfsm.c31b6007.lm_rewrite_~13b6e0#40,SWE-smith,SWE-agent,google__textfsm.c31b6007.lm_rewrite__9ikhtnz8.40o1rcbf,40,edit,str_replace,rule,1.0
+seperman__deepdiff.ed252022.lm_rewri~1c5367#43,SWE-smith,SWE-agent,seperman__deepdiff.ed252022.lm_rewrite__i9qyky1w.kwq24oxt,43,edit,str_replace,rule,1.0
+seperman__deepdiff.ed252022.lm_rewri~1c5367#30,SWE-smith,SWE-agent,seperman__deepdiff.ed252022.lm_rewrite__i9qyky1w.kwq24oxt,30,read,view,rule,1.0
+pydantic__pydantic.acb0f10f.pr_8145.~9057da#16,SWE-smith,SWE-agent,pydantic__pydantic.acb0f10f.pr_8145.utj8iwn1,16,reproduce,python test_version_simple.py,rule,0.9
+openhands-OpenAI__GPT-5-huggingface_~9f55db#9,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-huggingface__transformers-21969-9e70f015,9,search,grep,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-fi~76e5c4#13,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-find-official-code-2fd14897,13,other,keys,rule,1.0
+openhands-Anthropic__Claude-Sonnet-4~e921a2#10,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-html-finance-verify-6045e4db,10,search,grep,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#6,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-doom-for-mips-9ce00f74,6,search,grep,rule,0.9
+openhands-OpenAI__GPT-5-astropy__ast~a00eeb#23,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-astropy__astropy-13398-3106f9b1,23,search,grep,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~a2c915#19,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-271f890f,19,reproduce,python -c,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~a2c915#15,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-271f890f,15,setup,python -m pip install,rule,0.9
+miniswe-DeepSeek__DeepSeek-V3.2-fix-~73e7d0#44,CodeTraceBench,mini-SWE-agent,miniswe-DeepSeek__DeepSeek-V3.2-fix-ocaml-gc-2299ab4a,44,read,tail,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~464481#27,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-leelachess0-pytorch-conversion-46d95888,27,reproduce,python -c,rule,0.9
+sweagent-OpenAI__GPT-5-huggingface__~296c8a#16,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-huggingface__transformers-21768-91cf46b0,16,edit,str_replace,rule,1.0
+sweagent-OpenAI__GPT-5-serverless__s~a45e42#44,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-serverless__serverless-2576-80a1d381,44,edit,str_replace,rule,1.0
+sweagent-OpenAI__GPT-5-serverless__s~a45e42#12,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-serverless__serverless-2576-80a1d381,12,edit,insert,rule,1.0
+terminus2-Anthropic__Claude-Sonnet-4~d8d8bd#38,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-2ba0f88d,38,reproduce,python debug_smiles.py,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~ffeeab#48,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-add-benchmark-lm-eval-harness-9f75877e,48,read,view,rule,1.0
+sweagent-OpenAI__GPT-5-serverless__s~a45e42#27,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-serverless__serverless-2576-80a1d381,27,read,view,rule,1.0
+openhands-OpenAI__GPT-5-django__djan~f86931#7,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-12304-cc2965e3,7,explore,ls|true,rule,0.9
+openhands-OpenAI__GPT-5-django__djan~96bc51#21,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-14404-25e14391,21,edit,str_replace,rule,1.0
+openhands-Anthropic__Claude-Sonnet-4~ffeeab#79,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-add-benchmark-lm-eval-harness-9f75877e,79,submit,finish,rule,1.0
+openhands-OpenAI__GPT-5-django__djan~f86931#20,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-12304-cc2965e3,20,vcs,git status,rule,0.9
+openhands-OpenAI__GPT-5-astropy__ast~a00eeb#17,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-astropy__astropy-13398-3106f9b1,17,search,grep,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~d8d8bd#16,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-2ba0f88d,16,reproduce,python -c,rule,0.9
+openhands-OpenAI__GPT-5-mui__materia~5d8435#2,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-mui__material-ui-13534-53934742,2,think,plan,rule,1.0
+openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#73,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-doom-for-mips-9ce00f74,73,other,keys,rule,1.0
+terminus2-Anthropic__Claude-Sonnet-4~f1e61c#4,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-code-from-image-14a45388,4,explore,which,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#64,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-doom-for-mips-9ce00f74,64,edit,cat > test_simple.c|mips-linux-gnu-gcc,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~a89e25#21,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-14835550,21,other,keys,rule,1.0
+openhands-OpenAI__GPT-5-huggingface_~0693fb#19,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-huggingface__transformers-13989-6ebe445f,19,search,grep,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~899ce4#44,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pov-ray-aa2667f5,44,explore,ln|ls,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~ba166d#27,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-swe-bench-fsspec-db93a185,27,read,echo|tail,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-fe~f01943#21,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-feal-differential-cryptanalysis-88fe47dc,21,edit,cat > attack.py|python test_attack.py,rule,0.9
+miniswe-DeepSeek__DeepSeek-V3.2-quer~29bc61#19,CodeTraceBench,mini-SWE-agent,miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297,19,read,sqlite3,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~953adf#22,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-mteb-retrieve-c75bcebb,22,reproduce,python similarity_search.py,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~899ce4#5,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pov-ray-aa2667f5,5,explore,which,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~ffeeab#15,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-add-benchmark-lm-eval-harness-9f75877e,15,setup,apt-get,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-fi~76e5c4#26,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-find-official-code-2fd14897,26,edit,cd|cat > search.sh|chmod|search.sh,rule,0.9
+sweagent-OpenAI__GPT-5-instance_futu~fe32db#2,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-instance_future-architect__vuls-b8db2e0b74f60cb7d45f710f255e061f054b6afc-e3bc6a2f,2,read,view,rule,1.0
+miniswe-DeepSeek__DeepSeek-V3.2-anci~960a54#2,CodeTraceBench,mini-SWE-agent,miniswe-DeepSeek__DeepSeek-V3.2-ancient-puzzle-c925a84b,2,read,cat,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~a89e25#37,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-14835550,37,explore,ls,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#68,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-doom-for-mips-9ce00f74,68,edit,cp|true,fallback,0.5
+openhands-DeepSeek__DeepSeek-V3.2-ll~69bef3#39,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-llm-spec-decoding-d2946505,39,edit,str_replace,rule,1.0
+openhands-DeepSeek__DeepSeek-V3.2-ll~69bef3#12,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-llm-spec-decoding-d2946505,12,setup,python -m pip install,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~614f53#26,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-25f19d60,26,explore,nginx|ps,rule,0.6
+terminus2-Anthropic__Claude-Sonnet-4~1df1da#33,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-fix-ocaml-gc-5784d704,33,reproduce,gen_primitives.sh|ls,fallback,0.5
+openhands-OpenAI__GPT-5-sympy__sympy~f17b81#13,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-sympy__sympy-17630-fbbfeb9e,13,test,pytest,rule,0.9
+openhands-OpenAI__GPT-5-instance_ans~279e58#1,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-instance_ansible__ansible-fb144c44144f8bd3542e71f5db62b6d322c7bd85-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5-57b35ea6,1,think,plan,rule,1.0
+terminus2-Anthropic__Claude-Sonnet-4~ba166d#20,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-swe-bench-fsspec-db93a185,20,search,grep,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~a89e25#19,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-14835550,19,edit,cp,fallback,0.5
+openhands-OpenAI__GPT-5-huggingface_~0693fb#28,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-huggingface__transformers-13989-6ebe445f,28,think,plan,rule,1.0
+openhands-OpenAI__GPT-5-instance_ans~279e58#20,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-instance_ansible__ansible-fb144c44144f8bd3542e71f5db62b6d322c7bd85-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5-57b35ea6,20,search,grep,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ll~69bef3#17,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-llm-spec-decoding-d2946505,17,setup,pip install,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~67d53f#7,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flink-5f12417a,7,read,view,rule,1.0
+sweagent-OpenAI__GPT-5-expressjs__ex~ba0b3b#12,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-expressjs__express-3870-7594bfc0,12,search,search_file,rule,1.0
+terminus2-Anthropic__Claude-Sonnet-4~d8d8bd#58,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-2ba0f88d,58,reproduce,python -c,rule,0.9
+sweagent-OpenAI__GPT-5-keras-team__k~102635#4,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-keras-team__keras-19838-040f1c90,4,search,grep,rule,0.9
+miniswe-DeepSeek__DeepSeek-V3.2-fix-~73e7d0#66,CodeTraceBench,mini-SWE-agent,miniswe-DeepSeek__DeepSeek-V3.2-fix-ocaml-gc-2299ab4a,66,edit,make runtime > simple_build.log|echo,rule,0.9
+openhands-OpenAI__GPT-5-django__djan~f86931#25,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-12304-cc2965e3,25,test,python runtests.py,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-fi~76e5c4#9,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-find-official-code-2fd14897,9,read,which|pdftotext|head,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~7e6e7e#31,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-solana-data-11b5885e,31,other,keys,rule,1.0
+openhands-DeepSeek__DeepSeek-V3.2-mo~cfdccc#32,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-movie-helper-cfd11baf,32,reproduce,ipython,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~e921a2#14,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-html-finance-verify-6045e4db,14,search,grep,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ma~37da3d#37,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-doom-for-mips-9ce00f74,37,edit,cp,fallback,0.5
+miniswe-OpenAI__GPT-5-keras-team__ke~2f5c5c#4,CodeTraceBench,mini-SWE-agent,miniswe-OpenAI__GPT-5-keras-team__keras-19636-0123c279,4,read,nl,rule,0.9
+miniswe-DeepSeek__DeepSeek-V3.2-fix-~73e7d0#46,CodeTraceBench,mini-SWE-agent,miniswe-DeepSeek__DeepSeek-V3.2-fix-ocaml-gc-2299ab4a,46,read,diff|echo,rule,0.6
+terminus2-Anthropic__Claude-Sonnet-4~d8d8bd#41,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-2ba0f88d,41,other,keys,rule,1.0
+openhands-Anthropic__Claude-Sonnet-4~a2c915#48,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-chem-rf-271f890f,48,edit,str_replace,rule,1.0
+openhands-OpenAI__GPT-5-instance_ans~279e58#10,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-instance_ansible__ansible-fb144c44144f8bd3542e71f5db62b6d322c7bd85-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5-57b35ea6,10,search,grep,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~ffeeab#28,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-add-benchmark-lm-eval-harness-9f75877e,28,vcs,git clone,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~953adf#24,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-mteb-retrieve-c75bcebb,24,submit,finish,rule,1.0
+openhands-OpenAI__GPT-5-mui__materia~5d8435#24,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-mui__material-ui-13534-53934742,24,think,plan,rule,1.0
+sweagent-OpenAI__GPT-5-expressjs__ex~ba0b3b#4,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-expressjs__express-3870-7594bfc0,4,read,open,rule,1.0

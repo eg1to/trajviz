@@ -1,0 +1,162 @@
+{
+ "test_fail-1": {
+  "verdict": "correto",
+  "why": "`sqlfluff lint` encontrou violações (exit 1): o linter falhou"
+ },
+ "test_fail-2": {
+  "verdict": "correto",
+  "why": "unittest exit 1 (regra mantida fora do pytest)"
+ },
+ "test_fail-3": {
+  "verdict": "duvidoso",
+  "why": "unittest nem importou o módulo (ModuleNotFoundError): é erro de invocação, não teste falhando"
+ },
+ "test_fail-4": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-5": {
+  "verdict": "falso_positivo",
+  "why": "o exit 1 vem do `grep` no fim do pipe (`unittest … | grep \"Ran.*tests\"`), não dos testes: o detector usa o exit do pipeline"
+ },
+ "test_fail-6": {
+  "verdict": "correto",
+  "why": "2 failed, 4 passed"
+ },
+ "test_fail-7": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-8": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-9": {
+  "verdict": "correto",
+  "why": "1 failed, 10 passed"
+ },
+ "test_fail-10": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-11": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-12": {
+  "verdict": "duvidoso",
+  "why": "`pytest … | head -20` termina com exit 0; o padrão `ERRORS` casou no texto cortado — provável erro de coleta, incerto"
+ },
+ "test_fail-13": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-14": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-15": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-16": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-17": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "test_fail-18": {
+  "verdict": "duvidoso",
+  "why": "`tox --sdistonly` só empacota (exit 2): não executa testes, mas a regra de executores não-pytest marca test_fail"
+ },
+ "test_fail-19": {
+  "verdict": "correto",
+  "why": "traceback de teste (linhas `E …`) no texto, apesar do exit 0 do `head`"
+ },
+ "test_fail-20": {
+  "verdict": "correto",
+  "why": "pytest exit 1"
+ },
+ "loop-1": {
+  "verdict": "correto",
+  "why": "edit ↔ rodar o script alternando duas edições (A→B, B→A) 8×: vai e volta real"
+ },
+ "loop-2": {
+  "verdict": "correto",
+  "why": "a MESMA str_replace recusada (\"Multiple occurrences\") repetida 76 vezes: laço real"
+ },
+ "loop-3": {
+  "verdict": "correto",
+  "why": "mesmo AssertionError em 11 ciclos edit → test_fail no mesmo arquivo: sem progresso"
+ },
+ "loop-4": {
+  "verdict": "correto",
+  "why": "os mesmos testes falhando em 3 ciclos após editar pyquery.py"
+ },
+ "loop-5": {
+  "verdict": "correto",
+  "why": "o mesmo conjunto de testes falhando em 3 ciclos após editar structure.py"
+ },
+ "loop-6": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 1"
+ },
+ "loop-7": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 2 (str_replace idêntica recusada 38×)"
+ },
+ "loop-8": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 3"
+ },
+ "loop-9": {
+  "verdict": "correto",
+  "why": "[edit, edit, view do mesmo intervalo] ×3 com edições idênticas recusadas (\"did not appear verbatim\")"
+ },
+ "loop-10": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 5"
+ },
+ "loop-11": {
+  "verdict": "correto",
+  "why": "o mesmo teste (test_block_spoiler_005) falhando em 5 ciclos"
+ },
+ "loop-12": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 3"
+ },
+ "loop-13": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 3"
+ },
+ "loop-14": {
+  "verdict": "correto",
+  "why": "a mesma edição recusada 8× seguidas"
+ },
+ "loop-15": {
+  "verdict": "correto",
+  "why": "o mesmo teste falhando em 3 ciclos"
+ },
+ "loop-16": {
+  "verdict": "correto",
+  "why": "o mesmo teste (test_timing) falhando em 3 ciclos"
+ },
+ "loop-17": {
+  "verdict": "correto",
+  "why": "a mesma edição recusada 5× seguidas"
+ },
+ "loop-18": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 16"
+ },
+ "loop-19": {
+  "verdict": "correto",
+  "why": "o mesmo teste falhando em 3 ciclos"
+ },
+ "loop-20": {
+  "verdict": "correto",
+  "why": "mesmo trecho do caso 4"
+ }
+}

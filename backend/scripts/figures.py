@@ -96,7 +96,9 @@ def fig_detectors() -> None:
     tasks = ["unuseful × repeated ∪ no_new_info", "incorrect × error ∪ test_fail", "incorrect × loop", "estágio incorreto × ≥ 1 flag"]
     names = ["inútil × repeated ∪\nno_new_info (passo)", "incorreto × error ∪\ntest_fail (passo)", "incorreto × loop\n(passo)", "estágio incorreto ×\n≥ 1 flag (estágio)"]
     rs = [next(r for r in o["results"] if r["task"] == t and r["slice"] == "todos") for t in tasks]
-    fig, ax = plt.subplots(figsize=(8.4, 4.4))
+    bj = json.loads((RESULTS / "eval_detectors_before.json").read_text())  # antes da correção de test_fail/loop
+    bs_ = [next(r for r in bj["results"] if r["task"] == t and r["slice"] == "todos") for t in tasks]
+    fig, ax = plt.subplots(figsize=(9.4, 4.4))
     x = np.arange(len(rs))
     w = 0.34
     for off, key, label, color in ((-w / 2 - 0.02, "precision", "precisão", "#0072B2"), (w / 2 + 0.02, "recall", "revocação", "#E69F00")):
@@ -109,13 +111,13 @@ def fig_detectors() -> None:
         for xi, vi in zip(x + off, v):
             ax.text(xi, vi * 100 + 1.5, f"{vi * 100:.1f}", ha="center", fontsize=7)
     ax.plot([], [], color="black", lw=2, label="linha de base aleatória (mesma nº de flags)")
-    for xi, r in zip(x, rs):
-        ax.text(xi, 62, f"lift F1 = {r['lift_f1']:.2f}×\nIC [{r['lift_ci'][0]:.2f}; {r['lift_ci'][1]:.2f}]", ha="center", va="top", fontsize=7.5, fontweight="bold",
+    for xi, r, b in zip(x, rs, bs_):
+        ax.text(xi, 62, f"lift F1 = {r['lift_f1']:.2f}× (antes {b['lift_f1']:.2f}×)\nIC [{r['lift_ci'][0]:.2f}; {r['lift_ci'][1]:.2f}] · {r['n_pred']} marcados (antes {b['n_pred']})", ha="center", va="top", fontsize=7, fontweight="bold",
                 color="#009E73" if r["lift_ci"][0] > 1 else "#D55E00" if r["lift_ci"][1] < 1 else "#555")
     ax.set_xticks(x); ax.set_xticklabels(names, fontsize=8)
     ax.set_ylabel("%"); ax.set_ylim(0, 65)
     ax.legend(frameon=False, fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1.0))
-    ax.set_title(f"Detectores × gabarito do CodeTraceBench (n = {o['n_evaluated']} trajetórias; IC 95% bootstrap)", loc="left")
+    ax.set_title(f"Detectores × gabarito do CodeTraceBench, depois da correção de test_fail e loop (n = {o['n_evaluated']}; IC 95% bootstrap)", loc="left", fontsize=9)
     ax.grid(axis="x", visible=False)
     save(fig, "detectores_vs_gabarito")
 

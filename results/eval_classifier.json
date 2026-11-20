@@ -5,29 +5,29 @@
   "enabled": true,
   "model": "claude-haiku-5-5",
   "budget_usd": 0.05,
-  "cost_usd": 0.019869200000000004,
-  "requests": 112,
-  "labeled": 209,
-  "from_cache": 0,
+  "cost_usd": 0.0003137,
+  "requests": 1,
+  "labeled": 210,
+  "from_cache": 209,
   "errors": [],
   "tokens": {
-   "in": 95740,
-   "out": 16836,
-   "cache_read": 168720,
+   "in": 772,
+   "out": 93,
+   "cache_read": 0,
    "cache_write": 1520
   }
  },
  "rule_vs_llm": {
-  "n": 209,
-  "agreement": 0.8947368421052632,
-  "kappa": 0.8744299096048282,
+  "n": 210,
+  "agreement": 0.8952380952380953,
+  "kappa": 0.875,
   "agreement_ci": [
-   0.8516746411483254,
-   0.9330143540669856
+   0.8523809523809524,
+   0.9333333333333333
   ],
   "kappa_ci": [
-   0.8228801047408777,
-   0.9203304396685666
+   0.8230579093271926,
+   0.92019532935924
   ]
  },
  "figures": []

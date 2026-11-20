@@ -85,8 +85,8 @@ def test_error_ignores_keys_and_harness_and_missing_obs():
     ("=== 3 failed, 2 passed in 1.2s ===", None, "test_fail"), ("FAILED tests/test_a.py::test_x - assert 1 == 2", None, "test_fail"),
     ("=== 5 passed in 0.5s ===", None, "test_pass"), ("=== 5 passed, 0 failed in 0.5s ===", None, "test_pass"),
     ("Ran 3 tests in 0.1s\n\nOK", None, "test_pass"), ("Ran 3 tests in 0.1s\n\nFAILED (failures=1)", None, "test_fail"),
-    ("ERROR collecting tests/test_a.py\nImportError", None, "test_fail"), ("collected 0 items\n\nno tests ran in 0.01s", None, "test_fail"),
-    ("whatever", 0, "test_pass"), ("whatever", 1, "test_fail"), ("whatever", 5, "test_fail"), ("whatever", None, None),
+    ("ERROR collecting tests/test_a.py\nImportError", None, "test_fail"), ("collected 0 items\n\nno tests ran in 0.01s", None, None),
+    ("whatever", 0, "test_pass"), ("whatever", 1, "test_fail"), ("whatever", 5, None), ("whatever", None, None),
     ("E   AssertionError: x", None, "test_fail"), ("running", -1, None),
 ])
 def test_test_flags(obs, code, expected):
@@ -96,8 +96,39 @@ def test_test_flags(obs, code, expected):
 
 
 def test_failing_test_is_not_a_command_error_but_missing_runner_is():
-    t = run_detectors(T(S(0, "test", cmd="pytest", obs="1 failed", code=1), S(1, "test", cmd="pytest", obs="bash: pytest: command not found", code=127)))
-    assert flags(t, 0) == {"test_fail"} and {"error", "test_fail"} <= flags(t, 1)
+    t = run_detectors(T(S(0, "test", cmd="pytest", obs="1 failed", code=1), S(1, "test", cmd="pytest -x", obs="bash: pytest: command not found", code=127)))
+    assert flags(t, 0) == {"test_fail"} and "error" in flags(t, 1) and "test_fail" not in flags(t, 1)
+
+
+# ----------------------------------------------------------------------------- pytest: códigos de saída
+@pytest.mark.parametrize("code,expected", [(0, {"test_pass"}), (1, {"test_fail"}), (2, {"error"}), (3, {"error"}), (4, {"error"}), (5, set()),
+                                           (6, {"error"}), (124, {"error"}), (127, {"error"})])
+@pytest.mark.parametrize("cmd", ["python -m pytest tests/test_a.py -v", "cd /testbed && pytest -x -q", "py.test tests/"])
+def test_pytest_exit_codes(cmd, code, expected):
+    """1 = test_fail · 2 (interrompido) e 4 (uso/coleta) = error · 5 (nada coletado) = sem flag · 0 = test_pass."""
+    t = run_detectors(T(S(0, "test", cmd=cmd, obs="saída qualquer do pytest", code=code)))
+    assert flags(t, 0) & {"test_fail", "test_pass", "error"} == expected
+    if code in (2, 4):
+        assert "pytest exit code" in t.steps[0].flag_details["error"]
+
+
+@pytest.mark.parametrize("cmd", ["python -m unittest discover", "tox -e py39", "make test", "./runtests.sh", "python setup.py test"])
+@pytest.mark.parametrize("code", [1, 2, 4, 5])
+def test_other_runners_keep_the_old_rule(cmd, code):
+    t = run_detectors(T(S(0, "test", cmd=cmd, obs="saída", code=code)))
+    assert flags(t, 0) == {"test_fail"}  # qualquer exit ≠ 0 continua sendo test_fail fora do pytest
+
+
+@pytest.mark.parametrize("obs,expected", [
+    ("ERROR: usage: __main__.py [options]\n__main__.py: error: unrecognized arguments: --foo", {"error"}),
+    ("ERROR: file or directory not found: tests/x.py", {"error"}),
+    ("!!!! Interrupted: 1 error during collection !!!!\n=== 1 error in 0.1s ===", {"error"}),
+    ("collected 0 items\n\n======= no tests ran in 0.01s =======", set()),
+    ("=== 2 failed, 3 passed in 1.2s ===", {"test_fail"}), ("=== 5 passed in 0.5s ===", {"test_pass"}),
+])
+def test_pytest_without_exit_code_follows_the_same_meaning(obs, expected):
+    t = run_detectors(T(S(0, "test", cmd="python -m pytest tests/", obs=obs)))
+    assert flags(t, 0) & {"test_fail", "test_pass", "error"} == expected
 
 
 # ----------------------------------------------------------------------------- repeated
@@ -228,6 +259,61 @@ def test_loop_excludes_message_steps():
     b = lambda i: S(i, "search", cmd="grep x a.py", files=[("a.py", "read")], obs="p" * 25 + str(i))  # noqa: E731
     t = run_detectors(T(a(0), b(1), S(2, "think", tool="message"), a(3), b(4), S(5, "think", tool="message"), a(6), b(7)))
     assert t.meta["loops"][0]["range"] == [0, 7] and "loop" not in t.steps[2].flags  # mensagens entre os ciclos não quebram nem entram
+
+
+def test_loop_ignores_steps_without_a_target_think_and_task_tracker():
+    tt = lambda i, cmd: S(i, "think", tool="task_tracker", cmd=cmd, obs="Task list updated", native="task_tracker")  # noqa: E731
+    t = run_detectors(T(*[tt(i, "plan" if i % 3 == 0 else "view") for i in range(12)]))
+    assert not any("loop" in s.flags for s in t.steps) and "loops" not in t.meta
+    t = run_detectors(T(*[S(i, "think", tool="think", obs="Your thought has been logged.") for i in range(12)]))
+    assert "loops" not in t.meta
+    a = lambda i: S(i, "read", cmd="cat a.py", files=[("a.py", "read")], obs="o" * 25 + str(i))  # noqa: E731
+    t = run_detectors(T(a(0), S(1, "think", tool="think"), a(2), S(3, "think", tool="think"), a(4), S(5, "think", tool="think"), a(6), a(7), a(8)))  # think no meio não quebra o laço real
+    assert t.meta["loops"][0]["kind"] == "ngram"
+
+
+def test_loop_does_not_count_edits_to_different_regions_of_the_same_file():
+    ed = lambda i, old: S(i, "edit", tool="editor", cmd="str_replace", files=[("a.py", "edit")], args={"command": "str_replace", "path": "a.py", "old_str": old, "new_str": old + "!"}, obs="edited")  # noqa: E731
+    t = run_detectors(T(*[ed(i, f"trecho {i}") for i in range(8)]))
+    assert not any("loop" in s.flags for s in t.steps) and "loops" not in t.meta
+    t = run_detectors(T(*[ed(i, "mesmo trecho") for i in range(8)]))  # a MESMA edição repetida: aí é laço
+    assert t.meta["loops"][0]["kind"] == "ngram"
+
+
+def test_loop_does_not_count_reads_of_different_ranges_but_counts_the_same_range():
+    rd = lambda i, rg: S(i, "read", tool="editor", cmd="view", args={"command": "view", "path": "/testbed/a.py", "view_range": rg}, files=[("a.py", "read")], obs="x" * 25 + str(i))  # noqa: E731
+    t = run_detectors(T(*[rd(i, [i * 10, i * 10 + 9]) for i in range(10)]))
+    assert not any("loop" in s.flags for s in t.steps)
+    t = run_detectors(T(*[rd(i, [1, 10]) for i in range(8)]))
+    assert t.meta["loops"][0]["range"] == [0, 7]
+
+
+def _edit_fail_cycles(errors):
+    steps = []
+    for k, err in enumerate(errors):
+        steps.append(S(len(steps), "edit", tool="editor", cmd="str_replace", args={"command": "str_replace", "path": "a.py", "new_str": str(k)}, files=[("a.py", "edit")], obs="ok"))
+        steps.append(S(len(steps), "read", cmd=f"cat o{k}.py", files=[(f"o{k}.py", "read")], obs="z" * 30 + str(k)))
+        steps.append(S(len(steps), "test", cmd="pytest", obs=f"FAILED tests/test_a.py::{err} - boom\n1 failed", code=1))
+    return T(*steps)
+
+
+def test_error_signature_for_pytest_and_unittest():
+    from app.analysis.detectors import error_signature
+    py = S(0, "test", cmd="pytest", obs="FAILED tests/a.py::test_x - boom\nFAILED tests/a.py::test_y - boom\n2 failed", code=1)
+    ut = S(1, "test", cmd="python -m unittest", obs="FAIL: test_sub (test_calc.TestCalc)\nERROR: test_add (test_calc.TestCalc)\nRan 2 tests\nFAILED (failures=1, errors=1)", code=1)
+    assert error_signature(py) == "ids:tests/a.py::test_x,tests/a.py::test_y"
+    assert error_signature(ut) == "ids:test_add (test_calc.TestCalc),test_sub (test_calc.TestCalc)"
+    other = S(2, "test", cmd="python -m unittest", obs="FAIL: test_mul (test_calc.TestCalc)\nFAILED (failures=1)", code=1)
+    assert error_signature(other) != error_signature(ut)
+
+
+def test_loop_edit_test_fail_requires_the_same_error():
+    same = run_detectors(_edit_fail_cycles(["test_x", "test_x", "test_x"]))
+    assert any(x["kind"] == "edit_test_fail" and x["cycles"] == 3 for x in same.meta["loops"])
+    different = run_detectors(_edit_fail_cycles(["test_x", "test_y", "test_z"]))  # progresso: o erro muda a cada ciclo
+    assert not any(x["kind"] == "edit_test_fail" for x in different.meta.get("loops", []))
+    mixed = run_detectors(_edit_fail_cycles(["test_x", "test_x", "test_y", "test_x"]))  # 3 vezes o mesmo erro entre 4 ciclos
+    assert [x["cycles"] for x in mixed.meta["loops"] if x["kind"] == "edit_test_fail"] == [3]
 
 
 def test_loop_edit_test_fail_cycle_three_times_same_file():

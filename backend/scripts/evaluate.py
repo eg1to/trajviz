@@ -30,12 +30,15 @@ MIN_ROWS = 70
 
 
 def load_gold() -> tuple[list[dict], Path]:
-    path = next((p for p in (GOLD_DIR / "gold_steps_pedro.csv", GOLD_DIR / "gold_steps.csv") if p.exists()), GOLD_DIR / "gold_steps.csv")
-    rows = list(csv.DictReader(path.open()))
+    """Junta o CSV CEGO preenchido (results/gold/gold_steps_cego.csv: contexto + gold_category) com as previsões
+    (gold_steps_previsoes.csv, que o rotulador NÃO deve abrir), pelo `id`. O cego nunca contém rótulos da regra nem do LLM."""
+    blind = GOLD_DIR / "gold_steps_cego.csv"
+    gold = {r["id"]: (r.get("gold_category") or "").strip().lower() for r in csv.DictReader(blind.open())}
+    rows = list(csv.DictReader((GOLD_DIR / "gold_steps_previsoes.csv").open()))
     for r in rows:
         r["idx"] = int(r["idx"])
-        r["gold"] = (r.get("gold_category") or "").strip().lower()
-    return rows, path
+        r["gold"] = gold.get(r["id"], "")
+    return rows, blind
 
 
 def index_trajectories(ids: set[str]) -> dict:
@@ -171,7 +174,7 @@ def main() -> None:
     for r in rows:
         r["llm"] = llm_map.get((r["traj_id"], r["idx"]), "")
     L = ["# Acurácia do classificador de categorias", "",
-         f"`backend/scripts/evaluate.py` · gold: `{path.relative_to(ROOT)}` · semente {SEED} · IC 95% por bootstrap sobre passos (B={B}).", ""]
+         f"`backend/scripts/evaluate.py` · gold: `{path.relative_to(ROOT)}` (CSV cego, sem rótulos de regra/LLM; as previsões ficam em `gold_steps_previsoes.csv`) · semente {SEED} · IC 95% por bootstrap sobre passos (B={B}).", ""]
     if len(filled) < MIN_ROWS:
         L += [f"> ⚠️ **AMOSTRA PEQUENA / SEM GOLD**: apenas **{len(filled)}** de {len(rows)} linhas têm `gold_category` preenchida (mínimo recomendado: {MIN_ROWS}). "
               + ("Acurácia, F1 e matriz de confusão **não puderam ser calculados**; o relatório abaixo traz só a comparação regra × LLM (que não depende do gold). " if not filled else
@@ -182,7 +185,7 @@ def main() -> None:
     # ---- LLM
     L += ["## Execução do LLM em todos os passos do gold (ignorando as regras)", "",
           f"Modelo `{info['model']}` · orçamento máximo US$ {BUDGET:.2f} · passos rotulados: {info['labeled']}/{len(rows)} (do cache: {info['from_cache']}) · requisições: {info['requests']} · "
-          f"**custo desta execução: US$ {info['cost_usd']:.4f}**" + (f" · tokens {info.get('tokens')}" if info.get("tokens") else "") + (f" · avisos: {info['errors']}" if info["errors"] else ""), ""]
+          f"**custo desta execução: US$ {info['cost_usd']:.4f}** (acumulado do projeto em `.cache/llm_usage.json`: US$ {json.loads((ROOT / 'backend' / '.cache' / 'llm_usage.json').read_text())['cost_usd']:.4f}; a 1ª execução pagou US$ 0,0199 e as seguintes reaproveitam o cache)" + (f" · tokens {info.get('tokens')}" if info.get("tokens") else "") + (f" · avisos: {info['errors']}" if info["errors"] else ""), ""]
     both = [r for r in rows if r["llm"]]
     rule_vs_llm = {}
     if both:
@@ -239,7 +242,7 @@ def main() -> None:
     L += [f"| {c} | {cr[c]} | {cl[c]} |" for c in CATS]
     (RESULTS / "eval_classifier.md").write_text("\n".join(L) + "\n")
     (RESULTS / "eval_classifier.json").write_text(json.dumps({**summary, "figures": figs}, indent=1, ensure_ascii=False, default=float))
-    with (GOLD_DIR / "llm_labels.csv").open("w", newline="") as f:  # rótulos do LLM por passo, para você comparar ao preencher o gold
+    with (RESULTS / "eval_classifier_llm_labels.csv").open("w", newline="") as f:  # fora de results/gold/: o rotulador não deve vê-los antes de terminar
         w = csv.writer(f); w.writerow(["id", "llm_category"]); [w.writerow([r["id"], r["llm"]]) for r in rows if r["llm"]]
     print("\n".join(L))
 

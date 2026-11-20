@@ -77,6 +77,24 @@ SHELL_ERR_LINE = re.compile(r"^(?:[\w./-]+: (?:.*)(?:No such file or directory|P
 CMD_NOT_FOUND = re.compile(r"command not found|No such file or directory|file or directory not found")
 
 
+# ----------------------------------------------------------------------------- pytest: códigos de saída
+PYTEST_CMD = re.compile(r"(?:^|[\s/;&|(])(?:py\.test|pytest)\b|-m\s+pytest\b")
+PYTEST_USAGE_TXT = re.compile(r"(?m)^ERROR: (?:usage:|file or directory not found|not found:)|unrecognized arguments|Interrupted: \d+ errors? during collection")
+PYTEST_NO_TESTS = re.compile(r"no tests ran|collected 0 items")
+PYTEST_EXIT = {2: "execução interrompida (ex.: erro de coleta)", 3: "erro interno do pytest", 4: "erro de uso/coleta"}
+
+
+def is_pytest(s: Step) -> bool:
+    a = s.action
+    cmd = " ".join(c.get("keystrokes", "") for c in a.args["commands"]) if a.tool == "keys" and a.args.get("commands") else (a.command or a.raw or "")
+    return bool(PYTEST_CMD.search(cmd))
+
+
+def pytest_verdict(code: int) -> str:
+    """Códigos do pytest: 0 passou · 1 testes falharam · 5 nenhum teste coletado · 2/3/4 (e qualquer outro) = a execução em si falhou."""
+    return {0: "pass", 1: "fail", 5: "none"}.get(code, "error")
+
+
 def _first_line(text: str) -> str:
     for ln in text.splitlines():
         if ln.strip():
@@ -97,6 +115,8 @@ def detect_error(traj: Trajectory) -> Trajectory:
             if cat == "test":
                 if code in (126, 127) or CMD_NOT_FOUND.search(text[:500]):
                     add_flag(s, "error", f"exit code {code}" if code else "comando de teste não executou")
+                elif is_pytest(s) and pytest_verdict(code) == "error":  # a execução do pytest falhou: não é "teste falhou"
+                    add_flag(s, "error", f"pytest exit code {code}: {PYTEST_EXIT.get(code, 'saída anormal')}")
                 continue
             if code == 0:
                 continue
@@ -120,6 +140,8 @@ def detect_error(traj: Trajectory) -> Trajectory:
         if cat == "test":
             if CMD_NOT_FOUND.search(text[:500]):
                 add_flag(s, "error", "comando de teste não executou")
+            elif is_pytest(s) and PYTEST_USAGE_TXT.search(text):
+                add_flag(s, "error", "pytest: erro de uso/coleta (equivale a exit 2/4)")
             continue
         if cat in ("read", "search", "explore", "vcs"):  # a saída é conteúdo: só vale erro no estilo `ferramenta: …` na 1ª linha
             line = _first_line(text)
@@ -149,6 +171,8 @@ PASS_RX = [re.compile(r"\b(\d+) passed\b"), re.compile(r"(?m)^OK(?: \(.*\))?$"),
 
 
 def detect_test_result(traj: Trajectory) -> Trajectory:
+    """pytest segue seus códigos de saída: 1 = test_fail · 0 = test_pass · 5 = sem flag · 2/3/4/outros = `error` (ver detect_error).
+    unittest, tox e demais executores: qualquer exit ≠ 0 = test_fail (regra anterior)."""
     for s in traj.steps:
         if ignored(s) or s.category != "test" or s.observation is None:
             continue
@@ -157,8 +181,16 @@ def detect_test_result(traj: Trajectory) -> Trajectory:
         code = o.exit_code
         if code in NOEXIT_CODES:
             continue
+        py = is_pytest(s)
         why = None
-        if code not in (None, 0):
+        if py and code not in (None, 0):
+            if pytest_verdict(code) == "fail":
+                why = f"pytest exit code {code}"
+            else:
+                continue  # 5 = nada coletado (sem flag); 2/3/4/outros = error
+        elif py and code is None and (PYTEST_NO_TESTS.search(text) or PYTEST_USAGE_TXT.search(text)):
+            continue  # sem exit code: "no tests ran" (= exit 5) e erro de uso/coleta (= exit 2/4) não são "teste falhou"
+        elif code not in (None, 0):
             why = f"exit code {code}"
         else:
             for rx, name in FAIL_RX:
@@ -303,15 +335,45 @@ def detect_no_new_info(traj: Trajectory) -> Trajectory:
 
 
 # ----------------------------------------------------------------------------- loop
-def _target(s: Step) -> str:
-    if s.files:
-        return s.files[0].path
-    return (s.subcategory or s.action.tool_native or s.action.tool or "")[:30]
+FAILED_ID = re.compile(r"(?m)^(?:FAILED|ERROR|FAIL)[:\s]+(?!\()(\S+(?: \([^)\n]+\))?)")  # pytest `FAILED t::x` e unittest `FAIL: test_x (mod.Class)`
+E_LINE = re.compile(r"(?m)^E\s+(.+)$")
+
+
+def error_signature(s: Step) -> str:
+    """Assinatura do erro de um passo test_fail: ids dos testes que falharam; senão as linhas `E …`; senão o fim da saída (sem números)."""
+    t = s.observation.content if s.observation else ""
+    ids = sorted(set(FAILED_ID.findall(t)))
+    if ids:
+        return "ids:" + ",".join(ids)
+    es = E_LINE.findall(t)[:3]
+    if es:
+        return "E:" + "|".join(re.sub(r"\d+", "#", e)[:80] for e in es)
+    return "fim:" + re.sub(r"\d+", "#", norm_obs(t)[-160:])
+
+
+def _loop_token(s: Step):
+    """Alvo normalizado: a AÇÃO normalizada (ferramenta + comando + arquivo + intervalo + trecho editado). Trechos/intervalos diferentes do
+    mesmo arquivo são alvos diferentes; só a repetição da mesma ação conta."""
+    k = action_key(s)
+    return (s.category, k if k is not None else s.action.tool)
+
+
+def _loop_label(s: Step) -> str:
+    a = s.action
+    if a.tool == "editor":
+        vr = a.args.get("view_range")
+        return f"{a.command} {os.path.basename(str(a.args.get('path', '')))}" + (f" {vr}" if vr else "")
+    return (s.summary or a.command or a.raw or a.tool).split("\n")[0][:40]
 
 
 def detect_loop(traj: Trajectory) -> Trajectory:
+    """(1) n-grama (n = 2..4) de AÇÕES NORMALIZADAS idênticas repetido ≥ 3 vezes seguidas;
+    (2) ciclo edit → test_fail no mesmo arquivo ≥ 3 vezes COM O MESMO ERRO (mesma assinatura de falha)."""
     loops: list[dict] = []
-    seq = [(s.idx, (s.category, _target(s))) for s in traj.steps if not ignored(s) and s.action.tool != "message"]  # message: como keys/harness, fora do loop
+    # sem alvo normalizado não há laço: message/think/task_tracker/submit ficam fora (como keys/harness)
+    live = [s for s in traj.steps if not ignored(s) and s.action.tool not in SKIP_ACTIONS]
+    seq = [(s.idx, _loop_token(s)) for s in live]
+    labels = {s.idx: f"{s.category}:{_loop_label(s)}" for s in live}
     i = 0
     while i + 6 <= len(seq):
         for n in (2, 3, 4):
@@ -323,38 +385,35 @@ def detect_loop(traj: Trajectory) -> Trajectory:
                 reps += 1
                 j += n
             if reps >= 3:
-                loops.append({"kind": "ngram", "n": n, "reps": reps, "range": [seq[i][0], seq[j - 1][0]],
-                              "pattern": [f"{c}:{t}" for c, t in pat]})
+                loops.append({"kind": "ngram", "n": n, "reps": reps, "range": [seq[i][0], seq[j - 1][0]], "pattern": [labels[x] for x, _ in seq[i:i + n]]})
                 i = j - 1
                 break
         i += 1
-    # ciclo edit → test_fail no mesmo arquivo ≥ 3 vezes
-    edited_since_test: set[str] = set()
-    first_edit: dict[str, int] = {}
-    cycles: dict[str, list[int]] = {}
-    for s in traj.steps:
-        if ignored(s):
-            continue
+    # ciclo edit → test_fail no mesmo arquivo, mesmo erro, ≥ 3 vezes
+    edited_since_test: dict[str, int] = {}  # arquivo → 1ª edição desde o último teste
+    cycles: dict[tuple[str, str], list[tuple[int, int]]] = {}
+    for s in live:
         if s.category == "edit":
             for f in s.files:
                 if f.mode == "edit":
-                    edited_since_test.add(f.path)
-                    first_edit.setdefault(f.path, s.idx)
+                    edited_since_test.setdefault(f.path, s.idx)
         elif s.category == "test" and s.observation is not None and "test_fail" in s.flags:
-            for p in edited_since_test:
-                cycles.setdefault(p, []).append(s.idx)
-            edited_since_test = set()
+            sig = error_signature(s)
+            for p, e_idx in edited_since_test.items():
+                cycles.setdefault((p, sig), []).append((e_idx, s.idx))
+            edited_since_test = {}
         elif s.category == "test" and "test_pass" in s.flags:
-            edited_since_test = set()
-    for p, idxs in cycles.items():
-        if len(idxs) >= 3:
-            loops.append({"kind": "edit_test_fail", "file": p, "cycles": len(idxs), "range": [first_edit[p], idxs[-1]]})
+            edited_since_test = {}
+    for (p, sig), cs in cycles.items():
+        if len(cs) >= 3:
+            loops.append({"kind": "edit_test_fail", "file": p, "cycles": len(cs), "range": [min(c[0] for c in cs), max(c[1] for c in cs)],
+                          "signature": sig[:120], "tests": [c[1] for c in cs]})
     for lp in loops:
         a, b = lp["range"]
-        why = (f"ciclo {lp['pattern']} ×{lp['reps']}" if lp["kind"] == "ngram" else f"edit→test_fail ×{lp['cycles']} em {lp['file']}")
-        for s in traj.steps:
-            if a <= s.idx <= b and not ignored(s) and s.action.tool != "message":
-                if lp["kind"] == "edit_test_fail" and s.category not in ("edit", "test"):
+        why = (f"ciclo {lp['pattern']} ×{lp['reps']}" if lp["kind"] == "ngram" else f"edit→test_fail ×{lp['cycles']} em {lp['file']} (mesmo erro)")
+        for s in live:
+            if a <= s.idx <= b:
+                if lp["kind"] == "edit_test_fail" and not (s.idx in lp["tests"] or (s.category == "edit" and any(f.path == lp["file"] for f in s.files))):
                     continue
                 add_flag(s, "loop", f"{why} [{a},{b}]")
     if loops:

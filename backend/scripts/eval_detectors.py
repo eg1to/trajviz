@@ -191,6 +191,7 @@ def render(o: dict) -> str:
          f"- Só **{o['n_traj_with_any_annotation']}** delas têm ao menos um passo incorreto/inútil anotado; as demais entram como \"anotadas sem problemas\" (negativos).",
          f"- {100 * o['gold_hypothesis_share']:.0f}% dos passos anotados foram alinhados por **hipótese** (cauda do `step_id`; docs/formats.md §4.5) — ver a linha \"só alinhamento confirmado\".", "",
          "P/R/F1 são agregados (somando contagens de todas as trajetórias do recorte). **lift** = F1 do detector ÷ F1 do marcador aleatório; IC 95% por bootstrap.", ""]
+    L += before_after(o)
     L += interpretation(o)
     for tname in dict.fromkeys(r["task"] for r in o["results"]):
         L += [f"## {tname}", "", "| recorte | traj. | passos/estágios | positivos | marcados | precisão [IC95] | revocação [IC95] | F1 [IC95] | F1 aleatório | lift [IC95] |",
@@ -202,17 +203,40 @@ def render(o: dict) -> str:
     return "\n".join(L) + "\n"
 
 
+def before_after(o: dict) -> list[str]:
+    """Antes × depois da correção de `test_fail` (códigos de saída do pytest) e de `loop` (mesmo alvo normalizado). Antes = snapshot `eval_detectors_before.json`."""
+    bp = RESULTS / "eval_detectors_before.json"
+    if not bp.exists():
+        return []
+    b = json.loads(bp.read_text())
+    L = ["## Antes × depois da correção de `test_fail` e `loop`", "",
+         "Antes = regras da 1ª avaliação (`eval_detectors_before.json`, `eval_detectors_before.md`); depois = esta execução. Mesmas 976 trajetórias, mesma semente. "
+         "`test_fail`: pytest passou a seguir seus códigos de saída (1 = falha; 2/3/4 = `error`; 5 = sem flag). `loop`: só repetição da mesma ação normalizada "
+         "(arquivo + intervalo/trecho) ou ciclo edit → test_fail com o mesmo erro.", "",
+         "| tarefa (recorte: todos) | marcados antes → depois | precisão antes → depois | revocação antes → depois | F1 antes → depois | lift F1 antes → depois [IC95 depois] |", "|---|---|---|---|---|---|"]
+    for t in dict.fromkeys(r["task"] for r in o["results"]):
+        a = next(r for r in o["results"] if r["task"] == t and r["slice"] == "todos")
+        x = next((r for r in b["results"] if r["task"] == t and r["slice"] == "todos"), None)
+        if x is None:
+            continue
+        L.append(f"| {t} | {x['n_pred']} → {a['n_pred']} | {fmt(x['precision'])} → {fmt(a['precision'])} | {fmt(x['recall'])} → {fmt(a['recall'])} | {fmt(x['f1'])} → {fmt(a['f1'])} | "
+                 f"{fmt(x['lift_f1'], 2)}× → {fmt(a['lift_f1'], 2)}× [{fmt(a['lift_ci'][0], 2)}; {fmt(a['lift_ci'][1], 2)}] |")
+    return L + [""]
+
+
 def interpretation(o: dict) -> list[str]:
     g = lambda task, sl="todos": next(r for r in o["results"] if r["task"] == task and r["slice"] == sl)  # noqa: E731
     u, e, lp = g("unuseful × repeated ∪ no_new_info"), g("incorrect × error ∪ test_fail"), g("incorrect × loop")
     st, st2 = g("estágio incorreto × ≥ 1 flag"), g("estágio incorreto × error ∪ test_fail ∪ loop")
+    bj = json.loads((RESULTS / "eval_detectors_before.json").read_text())
+    bef = lambda task: next(r for r in bj["results"] if r["task"] == task and r["slice"] == "todos")  # noqa: E731
     ec = g("incorrect × error ∪ test_fail", "só alinhamento confirmado")
     mini = g("incorrect × error ∪ test_fail", "agente = mini-SWE-agent")
     pct = lambda x: f"{100 * x:.1f}%"  # noqa: E731
     return ["## Interpretação (5 linhas)", "",
             f"1. **`repeated ∪ no_new_info` não reproduz os passos \"inúteis\" do gabarito**: precisão {pct(u['precision'])}, revocação {pct(u['recall'])}, lift {u['lift_f1']:.2f}× (IC {u['lift_ci'][0]:.2f}–{u['lift_ci'][1]:.2f}, contém 1) — indistinguível de sorteio. O gabarito define \"inútil\" por julgamento do anotador; leitura idêntica a uma anterior capta, no máximo, uma fração mínima disso (hipótese não testada: não auditei os passos anotados).",
             f"2. **`error ∪ test_fail` é fraco, mas acima do acaso** para os passos incorretos: precisão {pct(e['precision'])}, revocação {pct(e['recall'])}, F1 {e['f1']:.3f}, lift {e['lift_f1']:.2f}× (IC {e['lift_ci'][0]:.2f}–{e['lift_ci'][1]:.2f}); no mini-SWE-agent chega a F1 {mini['f1']:.3f} (lift {mini['lift_f1']:.2f}×). Hipótese (não testada): \"incorreto\" no gabarito é ação que muda o estado de forma errada, o que difere de comando que falha.",
-            f"3. **`loop`** tem lift {lp['lift_f1']:.2f}× (IC {lp['lift_ci'][0]:.2f}–{lp['lift_ci'][1]:.2f}) com precisão de {pct(lp['precision'])} e IC largo em vários recortes: sinal marginal.",
+            f"3. **`loop` ficou muito mais conservador depois da correção**: {lp['n_pred']} passos marcados (antes {bef('incorrect × loop')['n_pred']}), precisão {pct(lp['precision'])}, revocação {pct(lp['recall'])}, lift {lp['lift_f1']:.2f}× com IC {lp['lift_ci'][0]:.2f}–{lp['lift_ci'][1]:.2f} (contém 1): com tão poucos acertos o resultado é **inconclusivo** — a correção removeu falsos positivos (ver `audit_flags.md`), mas o detector quase não encontra os passos incorretos do gabarito.",
             f"4. **No nível de estágio a revocação parece boa ({pct(st['recall'])}), mas é efeito da taxa de flags**: {st['n_pred']} de {st['n_universe']} estágios têm ≥ 1 flag, a precisão é {pct(st['precision'])} e o lift é {st['lift_f1']:.2f}× (< 1). Com só `error ∪ test_fail ∪ loop` o lift é {st2['lift_f1']:.2f}×. A linha de base sorteia estágios sem considerar o tamanho do estágio (limitação: estágios longos têm mais chance de ter flag).",
             f"5. **Limitações**: {pct(o['gold_hypothesis_share'])} dos passos anotados foram alinhados por hipótese (cauda do `step_id`); restringir ao alinhamento confirmado muda o lift de `error ∪ test_fail` para {ec['lift_f1']:.2f}× e derruba os positivos de `unuseful` para {g('unuseful × repeated ∪ no_new_info', 'só alinhamento confirmado')['n_pos']}; excluir `harness_protocol` quase não muda nada; {o['n_traj_with_any_annotation']} de {o['n_evaluated']} trajetórias têm alguma anotação (o resto vale como \"sem problemas\", o que pode não ser verdade)."]
 

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-"""Sorteia 210 passos (semente fixa) p/ rotulação manual → results/gold/gold_steps.csv.
+"""Sorteia 210 passos (semente fixa) p/ rotulação manual → results/gold/gold_steps_cego.csv (+ gold_steps_previsoes.csv, que NÃO deve ser aberto).
 
 70 por dataset (SWE-rebench, SWE-smith, CodeTraceBench; no CTB proporcional ao nº de passos de cada agente);
-exclui `harness_protocol` e passos `message` (trivialmente `think`). A coluna `gold_category` fica VAZIA para preenchimento manual (Fase 6).
+exclui `harness_protocol` e passos `message` (trivialmente `think`). A coluna `gold_category` do CSV cego fica VAZIA para preenchimento manual; o cego não traz rótulo previsto, label_source, confiança nem rótulo do LLM.
 O rótulo previsto vem só das regras (sem LLM), para que a avaliação seja reproduzível.
 """
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import random
 import re
@@ -73,22 +74,30 @@ def main() -> None:
             chosen = rng.sample(items, PER_DATASET)
         rng.shuffle(chosen)
         for t, s in chosen:
-            rows.append({
-                "id": f"{t.id[:48]}#{s.idx}", "dataset": ds, "agent": t.agent, "traj_id": t.id, "idx": s.idx,
+            rows.append({  # id único: os prefixos de traj_id do CTB colidem
+
+                "id": f"{t.id[:36]}~{hashlib.sha1(t.id.encode()).hexdigest()[:6]}#{s.idx}", "dataset": ds, "agent": t.agent, "traj_id": t.id, "idx": s.idx,
                 "tool": s.action.tool_native or s.action.tool, "thought": short(s.thought, 200),
                 "action": short(s.action.raw or s.action.command, 350), "observation": short(s.observation.content if s.observation else "", 250),
                 "pred_category": s.category, "pred_subcategory": s.subcategory or "", "label_source": s.label_source,
                 "confidence": s.confidence, "gold_category": ""})
-    out = ROOT / "results" / "gold" / "gold_steps.csv"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+    gold_dir = ROOT / "results" / "gold"
+    gold_dir.mkdir(parents=True, exist_ok=True)
+    # CSV CEGO (o que você preenche): só contexto + gold_category vazio — sem rótulo da regra, do LLM, confiança nem label_source
+    blind_cols = ["id", "dataset", "agent", "traj_id", "idx", "tool", "thought", "action", "observation", "gold_category"]
+    with (gold_dir / "gold_steps_cego.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=blind_cols)
         w.writeheader()
-        w.writerows(rows)
+        w.writerows({k: r[k] for k in blind_cols} for r in rows)
+    # previsões (NÃO abrir antes de rotular): usadas só por scripts/evaluate.py, juntando pelo `id`
+    pred_cols = ["id", "dataset", "agent", "traj_id", "idx", "pred_category", "pred_subcategory", "label_source", "confidence"]
+    with (gold_dir / "gold_steps_previsoes.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=pred_cols)
+        w.writeheader()
+        w.writerows({k: r[k] for k in pred_cols} for r in rows)
     from collections import Counter
-    print(f"{len(rows)} passos → {out}")
+    print(f"{len(rows)} passos → {gold_dir}/gold_steps_cego.csv (preencher) e gold_steps_previsoes.csv (não abrir)")
     print(Counter((r["dataset"], r["agent"]) for r in rows))
-    print(Counter(r["pred_category"] for r in rows))
 
 
 if __name__ == "__main__":
