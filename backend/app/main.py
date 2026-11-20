@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -159,12 +161,17 @@ async def upload(file: UploadFile = File(...), format: str | None = Form(None), 
     return _process(b"".join(chunks), file.filename or "upload", format=format, row=row, use_llm=use_llm)
 
 
+log = logging.getLogger("uvicorn.error")
+
+
 def _process(content: Any, filename: str, **kw: Any) -> UploadResponse:
+    t0 = time.perf_counter()
     try:
         pt = pipeline.process(content, filename, format_hint=kw.get("format"), row=kw.get("row", 0), use_llm=bool(kw.get("use_llm")),  # LLM só sob pedido
                               sample_id=kw.get("sample_id"))
     except PipelineError as e:
         raise http_error(e) from e
+    log.info("processado %s: formato=%s passos=%d tempo=%.0f ms (inclui cache)", filename, pt.format_detected, len(pt.trajectory.steps), (time.perf_counter() - t0) * 1000)
     return upload_response(pt)
 
 

@@ -1,0 +1,68 @@
+{
+ "pytest-5692": {
+  "trajviz": {
+   "acoes_do_usuario": 2,
+   "upload_ate_grafo_ms": 857,
+   "url": "http://localhost:5173/t/90b7a9c28a9c71a3",
+   "rotulacoes_manuais": 0
+  },
+  "traceview": {
+   "nIter": 8,
+   "acoes_total": 8,
+   "relacoes_total": 36,
+   "rotulacoes_feitas": {
+    "acoes": 8,
+    "relacoes": 36,
+    "total": 44
+   },
+   "minimo_exigido": {
+    "acoes": 5,
+    "relacoes": 5
+   },
+   "completo": 44,
+   "interacoes_ate_liberar": 101,
+   "tempo_script_ms": 53800,
+   "overview_botoes": [
+    "Labeling",
+    "Overview",
+    "Analysis",
+    "Guide",
+    "Legend",
+    "Relationship Metrics"
+   ]
+  }
+ },
+ "express-3870": {
+  "trajviz": {
+   "acoes_do_usuario": 2,
+   "upload_ate_grafo_ms": 848,
+   "url": "http://localhost:5173/t/d7e7e321b71bfb10",
+   "rotulacoes_manuais": 0
+  },
+  "traceview": {
+   "nIter": 27,
+   "acoes_total": 27,
+   "relacoes_total": 131,
+   "rotulacoes_feitas": {
+    "acoes": 5,
+    "relacoes": 5,
+    "total": 10
+   },
+   "minimo_exigido": {
+    "acoes": 5,
+    "relacoes": 5
+   },
+   "completo": 158,
+   "interacoes_ate_liberar": 25,
+   "tempo_script_ms": 21550,
+   "overview_botoes": [
+    "Labeling",
+    "Overview",
+    "Analysis",
+    "Guide",
+    "Legend",
+    "Relationship Metrics"
+   ]
+  }
+ }
+}
