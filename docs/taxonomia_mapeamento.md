@@ -16,7 +16,7 @@ Fonte: definições em `traceview_app/labeling/common_ui.py` e `docs/evaluation_
 |---|---|---|---|
 | **Explore** — inspecionar de forma ampla a tarefa, o repositório, o ambiente ou o contexto | `explore` (+ parte de `read`) | 1:1 no nome, **mais amplo** no TraceView | `explore` do trajviz é só listar/navegar estrutura (`ls`, `tree`, `view` de diretório). O "contexto" do TraceView também cobre ler arquivos para se orientar, que no trajviz é `read`. |
 | **Locate** — identificar o arquivo, símbolo, função ou trecho de código a mudar | `search` ou `read` (conforme o comando) | **sem equivalente direto** (categoria de intenção) | Localizar é o *objetivo*; o trajviz só vê o meio (um `grep`/`find -name` vira `search`; abrir o arquivo vira `read`). Não dá para separar "localizar" de "entender" sem inferir a intenção, o que as regras não fazem. |
-| **Search** — busca dirigida por texto, referências, exemplos ou comportamento | `search` | 1:1 | `grep`, `rg`, `find -name`, `git grep`. Na prática o TraceView também rotula como *Search* chamadas de API de busca do AutoCodeRover, que no trajviz só existiriam se um adaptador as mapeasse para `search`. |
+| **Search** — busca dirigida por texto, referências, exemplos ou comportamento | `search` | 1:1 | `grep`, `rg`, `find -name`, `git grep`. |
 | **Reproduce** — rodar comandos/checagens para observar, reproduzir ou isolar o problema | `reproduce` | 1:1 | `python reproduce*.py`, `python -c`, script criado pelo agente. Parte do que o TraceView chamaria de *Reproduce* (ex.: rodar o teste que falha) o trajviz classifica como `test` quando o alvo é um teste do repositório. |
 | **Generate fix** — criar ou editar código para resolver a tarefa | `edit` | 1:1 (com ressalva) | `edit` também cobre criar scripts auxiliares (que, por regra, viram `reproduce` quando o alvo é um script de reprodução). |
 | **Run tests** — rodar testes, linters ou validação após uma mudança | `test` | 1:1 | O trajviz inclui `mypy`/`flake8`/`pylint`/`make test`, de acordo com a definição. Não olha "após uma mudança"; é só o tipo de comando. |
@@ -38,7 +38,7 @@ Fonte: definições em `traceview_app/labeling/common_ui.py` e `docs/evaluation_
 
 ### Por que as diferenças (inferência — não é uma explicação dada pelos autores do TraceView)
 
-1. **Fonte dos dados.** As 40 execuções empacotadas no TraceView são do AutoCodeRover, em que o agente trabalha com chamadas de API de busca e de edição, sem shell livre;
+1. **Fonte dos dados.** As 40 execuções empacotadas no TraceView são do AutoCodeRover, em que, segundo meu conhecimento geral do AutoCodeRover (**não verificado nos arquivos do TraceView**), o agente trabalha com chamadas de API de busca e de edição, sem shell livre;
    o uso real das categorias (acima) se concentra em Search/Locate/Explain/Generate Fix. A taxonomia do trajviz nasceu de logs de agentes com shell (OpenHands, SWE-agent, mini-SWE, Terminus2),
    onde `setup`, `vcs`, `read` e `submit` são frequentes e precisam existir para não inflar `other` (meta da Fase 3: `other` < 15%).
 2. **Classificação automática.** Sem rotulador humano, só se consegue separar o que é visível no comando. Intenção (Locate, Refactor) fica fora; por isso as fusões e a divisão acima.
