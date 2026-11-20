@@ -86,6 +86,13 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
 - `data/raw/` e `data/samples/` grandes não vão para o git (ver `.gitignore`).
 - Commits pequenos, um por fase/tarefa, mensagem descritiva em português.
 
+### Quando parar e perguntar
+Pare e consulte o Pedro antes de:
+- (a) gastar com a API acima do orçamento definido para a tarefa;
+- (b) apagar dados ou arquivos fora do repositório;
+- (c) mudar o schema canônico (`backend/app/schema.py`; o frontend depende dele);
+- (d) pular algum item de um prompt.
+
 ## Comandos
 - `cd backend && uv run pytest`
 - `cd backend && uv run uvicorn app.main:app --reload`
