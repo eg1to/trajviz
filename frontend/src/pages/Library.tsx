@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn, fmtInt } from '@/lib/utils'
 
 const ACCEPT = '.json,.jsonl,.traj,.parquet,.tar.zst,.zip'
-const FORMATS = ['openhands_chat', 'sweagent_smith', 'ctb_sweagent', 'ctb_miniswe', 'ctb_openhands_swe', 'ctb_openhands_events', 'ctb_terminus2', 'generic_chat']
+const FORMATS = ['openhands_chat', 'sweagent_smith', 'ctb_sweagent', 'ctb_miniswe', 'ctb_openhands_swe', 'ctb_openhands_events', 'ctb_terminus2', 'claude_code_session', 'generic_chat']
 const DATASET_LABEL: Record<string, string> = { 'swe-rebench': 'SWE-rebench', 'swe-smith': 'SWE-smith', codetracebench: 'CodeTraceBench' }
 
 export default function Library() {

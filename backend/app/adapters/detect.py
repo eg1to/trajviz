@@ -15,14 +15,14 @@ import zstandard
 
 from app.adapters import (
     codetracebench, ctb_miniswe, ctb_openhands_events, ctb_openhands_swe, ctb_sweagent, ctb_terminus2,
-    generic_chat, openhands_chat, sweagent_smith,
+    claude_code_session, generic_chat, openhands_chat, sweagent_smith,
 )
 from app.adapters.base import UnknownFormat, UnsupportedArtifact
 from app.schema import Trajectory
 
 # ordem = ordem das assinaturas do §5 (desempate); generic_chat por último
 ADAPTERS = [openhands_chat, sweagent_smith, ctb_sweagent, ctb_miniswe, ctb_openhands_swe, ctb_openhands_events,
-            ctb_terminus2, generic_chat]
+            ctb_terminus2, claude_code_session, generic_chat]
 BY_NAME = {m.NAME: m for m in ADAPTERS}
 MIN_CONF = 0.3
 
@@ -74,6 +74,10 @@ def load(src: Any, row: int = 0) -> Any:
     if suf == ".parquet":
         return read_parquet_row(p, row)
     if suf == ".jsonl":
+        with open(p) as fh:
+            first = next((ln for ln in fh if ln.strip()), "")
+        if '"sessionId"' in first or '"parentUuid"' in first or '"file-history-snapshot"' in first:  # sessão do Claude Code: o arquivo inteiro é UMA trajetória
+            return [json.loads(ln) for ln in p.read_text().splitlines() if ln.strip()]
         with open(p) as fh:
             for i, line in enumerate(fh):
                 if i == row:
