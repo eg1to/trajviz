@@ -79,7 +79,7 @@ Detalhes, ressalvas e scripts em [`results/RESULTS.md`](results/RESULTS.md).
 - **Classificador de ações** (gold manual cego, 210 passos, 1 anotador): regras com acurácia **94,3%** [IC95 90,5–97,4] e F1 macro **0,92**; LLM (Haiku 5.5 em todos os passos) 91,4%; `setup` é a categoria fraca. O gold de desenvolvimento saiu das mesmas amostras usadas para escrever as regras, então pode ser otimista: há um gold **held-out** (90 passos de trajetórias fora de `data/samples/`) pronto para ser rotulado (`results/gold/gold_holdout_cego.csv`); ainda sem resultado.
 - **Detectores × CodeTraceBench** (976 trajetórias): `error ∪ test_fail` acima do acaso para passos incorretos (lift 1,62×); `repeated ∪ no_new_info` indistinguível do acaso para passos inúteis; `loop` inconclusivo depois da correção.
 - **Resolvidas × não resolvidas** (SWE-rebench, 2.000 trajetórias): as resolvidas são menores (mediana 56 × 68 passos), com mais passos de teste (12,8% × 10,7%) e menos `no_new_info`; efeitos pequenos a médios e **associativos** (confundidos por tarefa, limite de iterações e agente).
-- **Velocidade**: o pipeline leva mediana de 31 ms por trajetória (p95 92 ms); do upload ao grafo na tela, ~0,9 s.
+- **Velocidade**: o pipeline leva mediana de 34 ms por trajetória (p95 89 ms); do upload ao grafo na tela, ~0,9 s.
 - **Comparação com o TraceView** ([`docs/comparacao_traceview.md`](docs/comparacao_traceview.md)): 0 rótulos manuais no trajviz × 44 (8 passos) a 158 (27 passos) no TraceView para a mesma visualização completa; o TraceView tem relações entre passos, que o trajviz **não** tem.
 
 ## Limitações
