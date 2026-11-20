@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _common import RESULTS, ROOT, SEED, artifact, fmt, run_pipeline  # noqa: E402
+from _common import CTB_DIR, RESULTS, ROOT, SEED, artifact, fmt, run_pipeline  # noqa: E402
 
 from app.config import LLMConfig  # noqa: E402
 from app.labeling.llm import LLMLabeler  # noqa: E402
@@ -43,10 +43,10 @@ def is_doubt(v: str) -> bool:
         return (v or "").strip().lower() in ("x", "sim", "s", "true")
 
 
-def load_gold(path: Path) -> list[dict]:
+def load_gold(path: Path, pred_path: Path | None = None) -> list[dict]:
     """Junta o CSV cego preenchido com as previsões (gold_steps_previsoes.csv, que o rotulador NÃO deve abrir), pelo `id`."""
     blind = {r["id"]: r for r in csv.DictReader(path.open())}
-    rows = list(csv.DictReader((GOLD_DIR / "gold_steps_previsoes.csv").open()))
+    rows = list(csv.DictReader((pred_path or GOLD_DIR / "gold_steps_previsoes.csv").open()))
     for r in rows:
         b = blind.get(r["id"], {})
         r["idx"] = int(r["idx"])
@@ -62,6 +62,9 @@ def index_trajectories(ids: set[str]) -> dict:
     out = {}
     paths = list((SAMPLES / "swe-rebench").glob("chat*.json")) + [p for sp in ("tool", "xml", "ticks") for p in (SAMPLES / "swe-smith" / sp).glob("*.json")]
     paths += [artifact(t) for t in json.loads((SAMPLES / "codetracebench" / "_sample_ids.json").read_text())]
+    # gold held-out: SWE-rebench/SWE-smith salvos em data/holdout/ por make_gold_sample.py --holdout; CTB direto do arquivo bruto
+    paths += list((ROOT / "data" / "holdout").glob("*.json"))
+    paths += [artifact(t) for t in sorted(ids) if (CTB_DIR / "bench_artifacts" / "full" / f"{t}.tar.zst").exists()]
     for p in paths:
         try:
             traj, _, _ = run_pipeline(p)
@@ -223,10 +226,13 @@ def per_class_table(rows, rng, methods: dict[str, str]):
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gold", type=Path, default=None, help="CSV do gold (padrão: gold_steps_cego_pedro.csv se existir, senão gold_steps_cego.csv)")
+    ap.add_argument("--tag", default="", help="sufixo dos resultados (ex.: holdout → eval_classifier_holdout.md; previsões em results/gold_<tag>_previsoes.csv)")
     ap.add_argument("--no-llm", action="store_true", help="não chama o LLM (usa só o cache já pago se houver; sem chave, pula a comparação)")
     args = ap.parse_args()
+    tag = f"_{args.tag}" if args.tag else ""
     path = args.gold or next(p for p in DEFAULT_GOLD if p.exists())
-    rows = load_gold(path)
+    pred_path = RESULTS / f"gold_{args.tag}_previsoes.csv" if args.tag else None
+    rows = load_gold(path, pred_path)
     filled = [r for r in rows if r["gold"] in CATS]
     invalid = [r for r in rows if r["gold"] and r["gold"] not in CATS]
     rng = np.random.default_rng(SEED)
@@ -237,7 +243,7 @@ def main() -> None:
         r["hybrid"] = r["llm"] if (r["label_source"] == "fallback" and r["llm"]) else r["pred_category"]
     rel = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
     L = ["# Acurácia do classificador de categorias", "",
-         f"`backend/scripts/evaluate.py` · gold: `{rel}` (CSV cego: sem rótulos de regra/LLM; as previsões ficam em `gold_steps_previsoes.csv`) · semente {SEED} · "
+         f"`backend/scripts/evaluate.py` · gold: `{rel}` (CSV cego: sem rótulos de regra/LLM; as previsões ficam em `{pred_path.name if pred_path else 'gold_steps_previsoes.csv'}`) · semente {SEED} · "
          f"IC 95% por bootstrap percentil **sobre trajetórias** (B={B}; os passos de uma trajetória não são independentes).", ""]
     if len(filled) < MIN_ROWS:
         L += [f"> ⚠️ **AMOSTRA PEQUENA / SEM GOLD**: apenas **{len(filled)}** de {len(rows)} linhas têm `gold_category` preenchida (mínimo recomendado: {MIN_ROWS}). "
@@ -358,11 +364,44 @@ def main() -> None:
     L += [f"## Distribuição dos rótulos nos {len(rows)} passos do gold", "", "| categoria | gold | regras | LLM |", "|---|---:|---:|---:|"]
     cg, cr, cl = Counter(r["gold"] for r in rows if r["gold"]), Counter(r["pred_category"] for r in rows), Counter(r["llm"] for r in rows if r["llm"])
     L += [f"| {c} | {cg[c]} | {cr[c]} | {cl[c]} |" for c in CATS]
-    (RESULTS / "eval_classifier.md").write_text("\n".join(L) + "\n")
-    (RESULTS / "eval_classifier.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False, default=float))
-    with (RESULTS / "eval_classifier_llm_labels.csv").open("w", newline="") as f:
+    (RESULTS / f"eval_classifier{tag}.md").write_text("\n".join(L) + "\n")
+    (RESULTS / f"eval_classifier{tag}.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False, default=float))
+    with (RESULTS / f"eval_classifier{tag}_llm_labels.csv").open("w", newline="") as f:
         w = csv.writer(f); w.writerow(["id", "llm_category"]); [w.writerow([r["id"], r["llm"]]) for r in rows if r["llm"]]
+    if args.tag and filled:
+        dev_vs_holdout(summary, args.tag)
     print("\n".join(L))
+
+
+def dev_vs_holdout(held: dict, tag: str) -> None:
+    """Escreve/atualiza em results/RESULTS.md a tabela desenvolvimento × held-out (entre marcadores), a partir dos dois JSON."""
+    dev_p = RESULTS / "eval_classifier.json"
+    if not dev_p.exists():
+        return
+    dev = json.loads(dev_p.read_text())
+
+    def cell(sl: dict | None) -> str:
+        if not sl:
+            return "—"
+        f = lambda x: f"{x:.3f}".replace(".", ",")  # noqa: E731
+        return f"{f(sl['acc'])} [{f(sl['acc_ci'][0])}; {f(sl['acc_ci'][1])}] · F1 {f(sl['macro_f1'])} (n={sl['n']})"
+
+    names = ["todos"] + [f"dataset = {d}" for d in ("SWE-rebench", "SWE-smith", "CodeTraceBench")]
+    L = [f"<!-- dev-holdout:{tag} -->", f"## Desenvolvimento × held-out ({tag})", "",
+         "Regras × gold manual (acurácia [IC95 por trajetória] · F1 macro). *Desenvolvimento* = `data/samples/` (usado para escrever as regras); *held-out* = trajetórias de `data/raw/` fora dessa amostra, rotuladas às cegas depois. "
+         "Se a coluna held-out for menor, os números de desenvolvimento eram otimistas.", "",
+         "| recorte | desenvolvimento | held-out |", "|---|---|---|"]
+    for n in names:
+        L.append(f"| {n.replace('dataset = ', '')} | {cell(dev.get('rules_slices', {}).get(n))} | {cell(held.get('rules_slices', {}).get(n))} |")
+    L += ["", f"Detalhes: `eval_classifier.md` (desenvolvimento) e `eval_classifier_{tag}.md` (held-out).", f"<!-- /dev-holdout:{tag} -->"]
+    md = (RESULTS / "RESULTS.md").read_text()
+    a, b = f"<!-- dev-holdout:{tag} -->", f"<!-- /dev-holdout:{tag} -->"
+    block = "\n".join(L)
+    if a in md:
+        md = md[:md.index(a)] + block + md[md.index(b) + len(b):]
+    else:
+        md = md.rstrip("\n") + "\n\n" + block + "\n"
+    (RESULTS / "RESULTS.md").write_text(md)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 # dados
 data/raw/
 data/tmp/
+data/holdout/
 data/samples/**/*.json
 !data/samples/.gitkeep
 

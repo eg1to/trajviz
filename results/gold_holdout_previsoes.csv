@@ -1,0 +1,91 @@
+id,dataset,agent,traj_id,idx,pred_category,pred_subcategory,label_source,confidence
+chatcmpl-e0557c4c848d21a0fec51056ff8~957e8b#82,SWE-rebench,OpenHands,chatcmpl-e0557c4c848d21a0fec51056ff800eb7,82,edit,create,rule,1.0
+sweagent-OpenAI__GPT-5-instance_flip~7d3201#37,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-instance_flipt-io__flipt-3d5a345f94c2adc8a0eaa102c189c08ad4c0f8e8-479591a7,37,edit,str_replace,rule,1.0
+pydicom__pydicom.7d361b3d.lm_rewrite~4592c2#35,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.lm_rewrite__yi8pzj9a.8i8a4tdq,35,edit,create,rule,1.0
+davidhalter__parso.338a5760.lm_rewri~a10cef#21,SWE-smith,SWE-agent,davidhalter__parso.338a5760.lm_rewrite__wk5a7y0i.fpprjzmj,21,search,grep,rule,0.9
+openhands-OpenAI__GPT-5-instance_qut~282661#31,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-instance_qutebrowser__qutebrowser-473a15f7908f2bb6d670b0e908ab34a28d8cf7e2-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d-3f5c4067,31,edit,str_replace,rule,1.0
+chatcmpl-36d529159224e655e555514e548~352492#0,SWE-rebench,OpenHands,chatcmpl-36d529159224e655e555514e548c8704,0,think,,rule,1.0
+sweagent-OpenAI__GPT-5-jqlang__jq-29~a9595d#7,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-jqlang__jq-2919-93f075bf,7,search,grep,rule,0.9
+chatcmpl-e0557c4c848d21a0fec51056ff8~957e8b#10,SWE-rebench,OpenHands,chatcmpl-e0557c4c848d21a0fec51056ff800eb7,10,search,find -name,rule,0.9
+chatcmpl-bd127ddcf508833c6ee68ac5686~d78f7a#2,SWE-rebench,OpenHands,chatcmpl-bd127ddcf508833c6ee68ac5686b9d71,2,think,,rule,1.0
+chatcmpl-ddeca2459172fad4e309b51b1e0~4257b9#17,SWE-rebench,OpenHands,chatcmpl-ddeca2459172fad4e309b51b1e0d40fa,17,think,,rule,1.0
+openhands-OpenAI__GPT-5-instance_qut~5e2eca#37,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-instance_qutebrowser__qutebrowser-f8e7fea0becae25ae20606f1422068137189fe9e-7348b67b,37,test,tox,rule,0.9
+jaraco__inflect.c079a96a.0.ov77tx8t~6c5c43#57,SWE-smith,SWE-agent,jaraco__inflect.c079a96a.0.ov77tx8t,57,reproduce,python reproduce.py,rule,0.9
+iterative__dvc.1d6ea681.pr_9783.1ewb~3076af#7,SWE-smith,SWE-agent,iterative__dvc.1d6ea681.pr_9783.1ewbxh2m,7,edit,create,rule,1.0
+chatcmpl-a132712812d8a239fec4753fea0~ecd4a1#41,SWE-rebench,OpenHands,chatcmpl-a132712812d8a239fec4753fea0baa26,41,read,view,rule,1.0
+pydantic__pydantic.acb0f10f.pr_5617.~3dd0dd#132,SWE-smith,SWE-agent,pydantic__pydantic.acb0f10f.pr_5617.zmjveltb,132,search,grep,rule,0.9
+iterative__dvc.1d6ea681.pr_8364.1ewb~c40626#1,SWE-smith,SWE-agent,iterative__dvc.1d6ea681.pr_8364.1ewbxh2m,1,read,view,rule,1.0
+encode__starlette.db5063c2.lm_rewrit~614bdf#40,SWE-smith,SWE-agent,encode__starlette.db5063c2.lm_rewrite__gekly2e6.6yu7r0wf,40,reproduce,python test_edge_cases.py,rule,0.9
+miniswe-Anthropic__Claude-Sonnet-4-2~b6aa53#15,CodeTraceBench,mini-SWE-agent,miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-broken-python-05edf5bc,15,setup,python -m pip install,rule,0.9
+conan-io__conan.86f29e13.pr_10867.y1~054b21#49,SWE-smith,SWE-agent,conan-io__conan.86f29e13.pr_10867.y1wve1wy,49,reproduce,python conanfile_txt_test.py,rule,0.9
+sweagent-OpenAI__GPT-5-langchain-ai_~21efd2#20,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-langchain-ai__langchain-4009-0a56c80f,20,setup,rm,rule,0.9
+rubik__radon.54b88e58.lm_rewrite__43~98ce4d#16,SWE-smith,SWE-agent,rubik__radon.54b88e58.lm_rewrite__4333tnak.qjjzu0x2,16,reproduce,python reproduce_issue.py,rule,0.9
+terminus2-Anthropic__Claude-Sonnet-4~c60a8c#23,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-cython-ext-a7e47d56,23,reproduce,python -c,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~e22eb3#52,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-play-zork-easy-8fb6fd55,52,other,keys,rule,1.0
+chatcmpl-9f6b4080505f2ad39596d13a107~7a882d#17,SWE-rebench,OpenHands,chatcmpl-9f6b4080505f2ad39596d13a107b0d14,17,search,grep,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~c71955#11,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-8cc10d94,11,read,echo|sed -n|tail,rule,0.9
+openhands-OpenAI__GPT-5-sympy__sympy~15f528#19,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-sympy__sympy-12489-79c94620,19,read,view,rule,1.0
+pandas-dev__pandas.95280573.func_pm_~3a0ed0#35,SWE-smith,SWE-agent,pandas-dev__pandas.95280573.func_pm_remove_cond__6qoz1lyb.9kzxx4zk,35,search,grep,rule,0.9
+openhands-OpenAI__GPT-5-huggingface_~682d03#41,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-huggingface__transformers-28535-2ccf9291,41,vcs,git status,rule,0.9
+chatcmpl-a0dda12e42a30456e361de156ee~57f7a3#58,SWE-rebench,OpenHands,chatcmpl-a0dda12e42a30456e361de156eefe755,58,test,python -m pytest,rule,0.9
+openhands-OpenAI__GPT-5-microsoft__v~a21b17#25,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-microsoft__vscode-177084-3281322c,25,reproduce,cat > /workspace/tmp_test_regex.js (script de reprodução)|node tmp_test_regex.js,rule,0.9
+chatcmpl-107052e342810dddb93d83da499~f3ed2b#47,SWE-rebench,OpenHands,chatcmpl-107052e342810dddb93d83da499c13bc,47,reproduce,python test_final_verification.py,rule,0.9
+chatcmpl-8598ba512a47d9577832efc2fea~0f92cc#30,SWE-rebench,OpenHands,chatcmpl-8598ba512a47d9577832efc2fea165f7,30,reproduce,python debug_w605_v2.py,rule,0.9
+openhands-OpenAI__GPT-5-huggingface_~6c6366#2,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-huggingface__transformers-24238-2d178ce3,2,explore,ls,rule,0.9
+openhands-DeepSeek__DeepSeek-V3.2-ma~dcde94#56,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-mips-interpreter-45083164,56,edit,create,rule,1.0
+terminus2-Anthropic__Claude-Sonnet-4~a331af#72,CodeTraceBench,Terminus2,terminus2-Anthropic__Claude-Sonnet-4-20250514-Thinking-play-zork-c2eb2245,72,other,north,fallback,0.3
+openhands-Anthropic__Claude-Sonnet-4~71a7f4#8,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-blind-maze-explorer-algorithm-b6ce7393,8,other,keys,rule,1.0
+Project-MONAI__MONAI.a09c1f08.func_p~b3399a#10,SWE-smith,SWE-agent,Project-MONAI__MONAI.a09c1f08.func_pm_op_change__4i0j7cem.bpk95uvg,10,reproduce,python reproduce_error_focused.py,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-pa~c4b7d9#21,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-parallel-particle-simulator-5438faec,21,reproduce,make openmp|openmp|serial,fallback,0.5
+chatcmpl-cce62b03b4b5752228a25163c67~e364b7#85,SWE-rebench,OpenHands,chatcmpl-cce62b03b4b5752228a25163c6781662,85,reproduce,python reproduce_issue.py,rule,0.9
+pydantic__pydantic.acb0f10f.func_pm_~20872f#26,SWE-smith,SWE-agent,pydantic__pydantic.acb0f10f.func_pm_remove_cond__dfm4nxbr.w3m6whjp,26,search,grep,rule,0.9
+pandas-dev__pandas.95280573.func_pm_~391ed5#22,SWE-smith,SWE-agent,pandas-dev__pandas.95280573.func_pm_class_rm_funcs__9pwnzdve.z6n5i6s0,22,read,view,rule,1.0
+chatcmpl-07a698ef952237108e166074e3c~0915df#42,SWE-rebench,OpenHands,chatcmpl-07a698ef952237108e166074e3c879fc,42,reproduce,python verify_constructor_fix.py,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-bu~93d100#17,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-build-cython-ext-af034763,17,test,pip install|cd|python -m pytest,rule,0.9
+chatcmpl-4f3065f981a26556f8de6c3d3ec~4823f5#14,SWE-rebench,OpenHands,chatcmpl-4f3065f981a26556f8de6c3d3ec2408a,14,search,grep,rule,0.9
+chatcmpl-5de0d5ec100887986b650f2d20f~e60539#61,SWE-rebench,OpenHands,chatcmpl-5de0d5ec100887986b650f2d20f50131,61,edit,create,rule,1.0
+pydicom__pydicom.7d361b3d.combine_mo~17f865#3,SWE-smith,SWE-agent,pydicom__pydicom.7d361b3d.combine_module__1edssz0a.m8ntljq4,3,read,view,rule,1.0
+facebookresearch__hydra.0f03eb60.lm_~1c1c37#2,SWE-smith,SWE-agent,facebookresearch__hydra.0f03eb60.lm_rewrite__pl3fyb19.4zex701c,2,read,view,rule,1.0
+r1chardj0n3s__parse.30da9e4f.lm_rewr~611ce2#23,SWE-smith,SWE-agent,r1chardj0n3s__parse.30da9e4f.lm_rewrite__ve5fnfx8.vcqo7v72,23,reproduce,python -c,rule,0.9
+chatcmpl-65d0293fffd0c021e84d07366d1~c5488b#23,SWE-rebench,OpenHands,chatcmpl-65d0293fffd0c021e84d07366d18733a,23,edit,str_replace,rule,1.0
+chatcmpl-270b862c32d6f6bf90ded4e234c~50cb7a#25,SWE-rebench,OpenHands,chatcmpl-270b862c32d6f6bf90ded4e234c4197a,25,reproduce,python -c,rule,0.9
+terminus2-DeepSeek__DeepSeek-V3.2-po~eff71d#4,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-portfolio-optimization-50bb4503,4,read,wc|tail|python setup.py build_ext,rule,0.9
+chatcmpl-95302975bd056d29404c3af957e~d9a239#28,SWE-rebench,OpenHands,chatcmpl-95302975bd056d29404c3af957ed1c17,28,edit,str_replace,rule,1.0
+sunpy__sunpy.f8edfd5c.func_pm_ctrl_s~f37365#17,SWE-smith,SWE-agent,sunpy__sunpy.f8edfd5c.func_pm_ctrl_shuffle__45zpnfbj.mbd5l5fj,17,submit,submit,rule,1.0
+chatcmpl-9288d94b0a21716f12997776315~3b97d0#69,SWE-rebench,OpenHands,chatcmpl-9288d94b0a21716f1299777631560880,69,reproduce,python comprehensive_test.py,rule,0.9
+getmoto__moto.694ce1f4.pr_8214.y1wve~1dfa42#13,SWE-smith,SWE-agent,getmoto__moto.694ce1f4.pr_8214.y1wve1wy,13,reproduce,python reproduce_issue.py,rule,0.9
+tox-dev__pipdeptree.c31b6418.lm_rewr~c888d4#12,SWE-smith,SWE-agent,tox-dev__pipdeptree.c31b6418.lm_rewrite__jwct16wl.txcynret,12,edit,str_replace,rule,1.0
+chatcmpl-c483e4bcb9c8f98897886012336~0239f9#1,SWE-rebench,OpenHands,chatcmpl-c483e4bcb9c8f9889788601233672c4c,1,explore,view_dir,rule,1.0
+terminus2-DeepSeek__DeepSeek-V3.2-br~f5587c#6,CodeTraceBench,Terminus2,terminus2-DeepSeek__DeepSeek-V3.2-break-filter-js-from-html-99b435eb,6,reproduce,which|ls|python -c,rule,0.9
+mozilla__bleach.73871d76.lm_rewrite_~be397f#15,SWE-smith,SWE-agent,mozilla__bleach.73871d76.lm_rewrite__gf39cr4o.40o1rcbf,15,edit,str_replace,rule,1.0
+chatcmpl-3571cc9267faa28b7a03169b2e9~92c9f6#18,SWE-rebench,OpenHands,chatcmpl-3571cc9267faa28b7a03169b2e9d12fb,18,edit,create,rule,1.0
+conan-io__conan.86f29e13.pr_16038.r7~66d463#3,SWE-smith,SWE-agent,conan-io__conan.86f29e13.pr_16038.r742rksg,3,reproduce,python reproduce.py,rule,0.9
+chatcmpl-62e9e68a96fad01fdc2ed0458b0~90df2d#36,SWE-rebench,OpenHands,chatcmpl-62e9e68a96fad01fdc2ed0458b0f64ed,36,vcs,git status,rule,0.9
+getmoto__moto.694ce1f4.pr_6802.6wi78~ed26dc#19,SWE-smith,SWE-agent,getmoto__moto.694ce1f4.pr_6802.6wi78a3e,19,read,view,rule,1.0
+getmoto__moto.694ce1f4.pr_7647.f8brn~db718e#1,SWE-smith,SWE-agent,getmoto__moto.694ce1f4.pr_7647.f8brnss0,1,explore,view_dir,rule,1.0
+openhands-OpenAI__GPT-5-django__djan~34b29a#20,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-15957-a39a6ef5,20,search,grep,rule,0.9
+chatcmpl-9f6b4080505f2ad39596d13a107~7a882d#21,SWE-rebench,OpenHands,chatcmpl-9f6b4080505f2ad39596d13a107b0d14,21,edit,str_replace,rule,1.0
+openhands-DeepSeek__DeepSeek-V3.2-ma~dcde94#14,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-make-mips-interpreter-45083164,14,read,view,rule,1.0
+chatcmpl-c2e7841d24d371916e21ec5ae71~37a4d2#34,SWE-rebench,OpenHands,chatcmpl-c2e7841d24d371916e21ec5ae71949f9,34,reproduce,python test_shellpipe_env.py,rule,0.9
+spulec__freezegun.5f171db0.pr_527.y1~7eca63#25,SWE-smith,SWE-agent,spulec__freezegun.5f171db0.pr_527.y1wve1wy,25,read,view,rule,1.0
+r1chardj0n3s__parse.30da9e4f.lm_rewr~ccd77d#9,SWE-smith,SWE-agent,r1chardj0n3s__parse.30da9e4f.lm_rewrite__42oz7l1m.7fbufbnd,9,read,view,rule,1.0
+openhands-DeepSeek__DeepSeek-V3.2-hf~ebe8a1#20,CodeTraceBench,OpenHands,openhands-DeepSeek__DeepSeek-V3.2-hf-model-inference-a01a8182,20,test,curl,fallback,0.5
+chatcmpl-502bb42466cb8fb50bb53977d4a~f2d255#5,SWE-rebench,OpenHands,chatcmpl-502bb42466cb8fb50bb53977d4a4c8eb,5,explore,view_dir,rule,1.0
+bottlepy__bottle.a8dfef30.lm_rewrite~79ff34#1,SWE-smith,SWE-agent,bottlepy__bottle.a8dfef30.lm_rewrite__rd7vzwx3.woa3si3c,1,read,view,rule,1.0
+chatcmpl-1fd31e6b073dc2a438799050244~97e6de#31,SWE-rebench,OpenHands,chatcmpl-1fd31e6b073dc2a438799050244edc68,31,edit,create,rule,1.0
+chatcmpl-cb4fdfb52516c40833499618376~3d2d36#0,SWE-rebench,OpenHands,chatcmpl-cb4fdfb52516c4083349961837611787,0,think,,rule,1.0
+openhands-OpenAI__GPT-5-sympy__sympy~aedc10#21,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-sympy__sympy-22914-bfa0d42d,21,vcs,git config|true,rule,0.9
+chatcmpl-ee3d6566dba954067ced74e2c73~c11dbd#18,SWE-rebench,OpenHands,chatcmpl-ee3d6566dba954067ced74e2c7351999,18,setup,pip install,rule,0.9
+john-kurkowski__tldextract.3d1bf184.~694101#30,SWE-smith,SWE-agent,john-kurkowski__tldextract.3d1bf184.pr_300.4tw4cp8h,30,edit,str_replace,rule,1.0
+encode__starlette.db5063c2.lm_rewrit~614bdf#32,SWE-smith,SWE-agent,encode__starlette.db5063c2.lm_rewrite__gekly2e6.6yu7r0wf,32,reproduce,python test_edge_cases.py,rule,0.9
+chatcmpl-26dede9795b34b1ee4833e39f8b~16f2d9#57,SWE-rebench,OpenHands,chatcmpl-26dede9795b34b1ee4833e39f8bdf442,57,search,grep,rule,0.9
+openhands-Anthropic__Claude-Sonnet-4~71a7f4#19,CodeTraceBench,OpenHands,openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-blind-maze-explorer-algorithm-b6ce7393,19,edit,str_replace,rule,1.0
+python-openxml__python-docx.0cf6d71f~0c9cbf#19,SWE-smith,SWE-agent,python-openxml__python-docx.0cf6d71f.func_pm_ctrl_shuffle__0j341f4l.svjllrhi,19,read,view,rule,1.0
+chatcmpl-7dcd8fe97e1ba6c442047acc194~732a77#10,SWE-rebench,OpenHands,chatcmpl-7dcd8fe97e1ba6c442047acc194bee15,10,read,view,rule,1.0
+openhands-OpenAI__GPT-5-sphinx-doc__~3d032c#21,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-sphinx-doc__sphinx-7757-7d0865d6,21,reproduce,python <<EOF,rule,0.9
+openhands-OpenAI__GPT-5-django__djan~48563d#4,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-django__django-16032-20a5e8c7,4,search,grep,rule,0.9
+sweagent-OpenAI__GPT-5-ponylang__pon~46e1d8#2,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-ponylang__ponyc-1057-f7b52e61,2,read,open,rule,1.0
+spulec__freezegun.5f171db0.pr_527.y1~7eca63#13,SWE-smith,SWE-agent,spulec__freezegun.5f171db0.pr_527.y1wve1wy,13,reproduce,python reproduce_error.py,rule,0.9
+chatcmpl-5de0d5ec100887986b650f2d20f~e60539#60,SWE-rebench,OpenHands,chatcmpl-5de0d5ec100887986b650f2d20f50131,60,reproduce,python final_verification.py,rule,0.9
+openhands-OpenAI__GPT-5-keras-team__~a848bb#9,CodeTraceBench,OpenHands,openhands-OpenAI__GPT-5-keras-team__keras-19636-c39cfb90,9,search,grep,rule,0.9
+sweagent-OpenAI__GPT-5-mui__material~ccede6#15,CodeTraceBench,SWE-agent,sweagent-OpenAI__GPT-5-mui__material-ui-26807-0de9c978,15,search,grep,rule,0.9
