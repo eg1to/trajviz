@@ -112,7 +112,7 @@ def http_error(e: PipelineError) -> HTTPException:
 def get_processed(tid: str) -> ProcessedTrajectory:
     pt = pipeline.load_cached(tid) if tid.isalnum() else None
     if pt is None:
-        raise HTTPException(404, detail={"code": "not_found", "message": f"trajetória {tid!r} não encontrada (processe-a de novo via upload/biblioteca)"})
+        raise HTTPException(404, detail={"code": "not_found", "message": f"trajetória {tid!r} não encontrada — reabra pela biblioteca (ou reenvie o arquivo)"})
     return pt
 
 

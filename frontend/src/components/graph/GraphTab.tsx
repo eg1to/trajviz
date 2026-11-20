@@ -16,6 +16,9 @@ import { useTheme } from '@/theme/useTheme'
 import { useUI } from '@/store/ui'
 import { edgeTypes, nodeTypes } from './nodes'
 
+/** Zoom mínimo legível: abaixo disso o texto dos nós (10–11 px) vira borrão. */
+export const MIN_READABLE_ZOOM = 0.75
+
 export function GraphTab(props: { id: string; trajectory: Trajectory; metrics: Metrics | undefined }) {
   return <ReactFlowProvider><GraphInner {...props} /></ReactFlowProvider>
 }
@@ -38,6 +41,15 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
 
   const graph = useMemo(() => buildGraph({ steps, filters: ui.filters, compact, expanded: ui.expanded, loops, gt, showGT: ui.showGT, outcome }),
     [steps, ui.filters, compact, ui.expanded, loops, gt, ui.showGT, outcome.label, outcome.tone]) // eslint-disable-line react-hooks/exhaustive-deps
+  /** Enquadra o grafo inteiro se couber com zoom ≥ MIN_READABLE_ZOOM; senão mostra as primeiras linhas nesse zoom (o resto se alcança rolando). */
+  const fitReadable = useCallback((duration = 0) => {
+    const el = box.current
+    if (!el || !graph.nodes.length) return
+    const W = el.clientWidth - 40 - (mini ? 176 : 0), H = el.clientHeight - 80 - (mini ? 0 : 0)
+    const zFit = Math.min(W / Math.max(graph.width, 1), H / Math.max(graph.height, 1))
+    if (zFit >= MIN_READABLE_ZOOM) rf.fitView({ padding: pad, duration })
+    else rf.setViewport({ x: 24, y: 56, zoom: MIN_READABLE_ZOOM }, { duration })
+  }, [graph.nodes.length, graph.width, graph.height, mini, pad, rf])
   const visibleCount = useMemo(() => steps.filter((s) => passesFilters(s, ui.filters)).length, [steps, ui.filters])
 
   // seleção vinda de fora (faixa, inspetor, URL): expande o grupo que contém o passo e centraliza
@@ -62,10 +74,18 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
     const items = buildItems(steps.filter((s) => passesFilters(s, ui.filters)), compact, ui.expanded)
     const keys = new Set(items.filter((it) => itemLastIdx(it) >= a && itemFirstIdx(it) <= b).map((it) => it.key))
     const nodes = graph.nodes.filter((n) => keys.has(n.id))
-    if (nodes.length) rf.fitView({ nodes, padding: pad, duration: 300, maxZoom: 1.3 })
+    if (nodes.length) rf.fitView({ nodes, padding: pad, duration: 300, minZoom: MIN_READABLE_ZOOM, maxZoom: 1.3 })
   }, [ui.range]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { const t = setTimeout(() => rf.fitView({ padding: pad, duration: 0 }), 50); return () => clearTimeout(t) }, [id, compact, mini]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { // enquadramento inicial; se a URL já traz um passo, centraliza nele em vez de ir ao topo
+    const t = setTimeout(() => {
+      const sel = useUI.getState().selectedIdx
+      const node = sel == null ? undefined : graph.nodes.find((n) => n.type === 'step' && (n.data.step as Step).idx === sel)
+      if (node) rf.setCenter(node.position.x + 72, node.position.y + 29, { zoom: Math.max(MIN_READABLE_ZOOM, 0.9), duration: 0 })
+      else fitReadable(0)
+    }, 80)
+    return () => clearTimeout(t)
+  }, [id, compact, mini, ui.filters]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onNodeClick = useCallback((_: unknown, n: Node) => { if (n.type === 'step') ui.select((n.data.step as Step).idx) }, [ui])
   const miniColor = useCallback((n: Node) => (n.type === 'step' ? fill(kindOf(n.data.step as Step), dark) : n.type === 'group' ? fill(n.data.kind as never, dark) : 'transparent'), [dark])
@@ -92,16 +112,16 @@ function GraphInner({ id, trajectory, metrics }: { id: string; trajectory: Traje
         </label>
         {(ui.filters.cats.length > 0 || ui.filters.onlyErrors || ui.filters.onlyLoops || ui.filters.hideSpecial) &&
           <button className="text-primary hover:underline" onClick={() => ui.setFilters({ cats: [], onlyErrors: false, onlyLoops: false, hideSpecial: false })}>limpar filtros</button>}
-        <span className="ml-auto text-muted-foreground" data-testid="visible-count">{visibleCount} de {steps.length} passos · {graph.nodes.filter((n) => n.type === 'step' || n.type === 'group').length} nós</span>
+        <span className="ml-auto text-muted-foreground" data-testid="visible-count">rolar = mover · Ctrl+rolar = zoom · {visibleCount} de {steps.length} passos · {graph.nodes.filter((n) => n.type === 'step' || n.type === 'group').length} nós</span>
         <Button size="sm" variant="outline" onClick={toggleMini} aria-pressed={mini} data-testid="toggle-minimap"><Map />Minimapa</Button>
-        <Button size="sm" variant="outline" onClick={() => rf.fitView({ padding: pad, duration: 250 })}><Maximize />Enquadrar</Button>
+        <Button size="sm" variant="outline" onClick={() => fitReadable(250)} data-testid="fit" title="Enquadra o grafo; se não couber em zoom legível, mostra as primeiras linhas (role para ver o resto)"><Maximize />Enquadrar</Button>
         <Button size="sm" variant="outline" onClick={doExport} data-testid="export-graph"><Download />Exportar PNG</Button>
       </div>
       <div ref={box} className="relative min-h-0 flex-1" data-testid="graph-canvas">
         {visibleCount === 0 ? <div className="flex h-full items-center justify-center text-muted-foreground" data-testid="graph-empty">Nenhum passo com esses filtros.</div> : (
           <ReactFlow nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} onNodeClick={onNodeClick}
-            nodesDraggable={false} nodesConnectable={false} edgesFocusable={false} minZoom={0.04} maxZoom={2} onlyRenderVisibleElements
-            fitView fitViewOptions={{ padding: pad }}>
+            nodesDraggable={false} nodesConnectable={false} edgesFocusable={false} minZoom={0.04} maxZoom={2} panOnScroll onlyRenderVisibleElements
+            fitViewOptions={{ padding: pad }}>
             <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
             <Controls showInteractive={false} data-no-export />
             {mini && <MiniMap pannable zoomable nodeColor={miniColor} nodeStrokeWidth={1} maskColor={dark ? 'rgba(0,0,0,0.45)' : 'rgba(240,240,240,0.55)'} data-no-export

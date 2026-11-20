@@ -115,3 +115,69 @@ test('revisão visual: rótulo do nó, numeração, arquivos criados e minimapa'
   const box = await kpi.boundingBox(), card = await page.getByTestId('card-kpis').boundingBox()
   expect(box!.x + box!.width).toBeLessThanOrEqual(card!.x + card!.width)
 })
+
+// ---------------------------------------------------------------- 2ª revisão
+const zoomOf = async (page: import('@playwright/test').Page) => {
+  const t = (await page.locator('.react-flow__viewport').getAttribute('style')) ?? ''
+  return Number(t.match(/scale\(([\d.]+)\)/)?.[1] ?? 0)
+}
+
+test('upload de log genérico: formato generic_chat, agente "desconhecido" e título = nome do arquivo', async ({ page }) => {
+  await page.goto('/')
+  await page.waitForSelector('[data-testid=lib-row]')
+  await page.getByTestId('file-input').setInputFiles('../backend/tests/fixtures/generic_calc.json')
+  await page.waitForSelector('[data-testid=step-node]')
+  await expect(page.getByTestId('traj-title')).toHaveText('generic_calc')
+  await expect(page.getByTestId('format-badge')).toContainText('generic_chat')
+  await expect(page.getByTestId('traj-header')).toContainText('desconhecido')
+  await expect(page.getByTestId('traj-header')).not.toContainText('OpenHands')
+  await expect(page.getByTestId('n-steps')).toHaveText('10')
+})
+
+test('404 mostra "reabra pela biblioteca"; falha de rede é outra tela', async ({ page }) => {
+  await page.goto('/t/0000000000000000')
+  await expect(page.getByTestId('not-found')).toContainText('Trajetória não encontrada — reabra pela biblioteca')
+  await expect(page.getByTestId('network-error')).toHaveCount(0)
+  await page.route('**/api/trajectories/**', (r) => r.abort())
+  await page.goto('/t/1111111111111111')
+  await expect(page.getByTestId('network-error')).toContainText('API indisponível')
+  await expect(page.getByTestId('not-found')).toHaveCount(0)
+})
+
+test('tema escuro: o nó "Entregar" não some no fundo escuro', async ({ page }) => {
+  await openSample(page, 'swe-rebench')
+  const n = Number(((await page.getByTestId('n-steps').textContent()) ?? '0').replace(/\D/g, ''))
+  await page.goto(page.url().split('?')[0] + `?step=${n - 1}`)  // o último passo (finish) é o nó "Entregar"; a vista centraliza nele
+  await page.waitForSelector('[data-testid=step-node][data-kind=submit]')
+  await page.getByTestId('theme-toggle').click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  const bg = await page.locator('[data-testid=step-node][data-kind=submit]').first().evaluate((e) => getComputedStyle(e).backgroundColor)
+  expect(bg).not.toBe('rgb(34, 34, 34)')  // #222 → variante clara no escuro
+  const [r, g, b] = bg.match(/\d+/g)!.map(Number)
+  expect((r + g + b) / 3).toBeGreaterThan(180)
+  await page.getByTestId('theme-toggle').click()
+  const light = await page.locator('[data-testid=step-node][data-kind=submit]').first().evaluate((e) => getComputedStyle(e).backgroundColor)
+  expect(light).toBe('rgb(34, 34, 34)')
+})
+
+test('SWE-smith: um único selo "não validado" no cabeçalho', async ({ page }) => {
+  await openSample(page, 'swe-smith')
+  await expect(page.getByTestId('outcome-badge')).toHaveText('não validado')
+  const n = await page.getByTestId('traj-header').getByText('não validado').count()
+  expect(n).toBe(1)
+})
+
+test('Enquadrar respeita o zoom mínimo legível; esconde observações em barras', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('lib-search').fill('fix-ocaml-gc')
+  await page.locator('[data-testid=lib-row]').first().click()  // 141 passos
+  await page.waitForSelector('[data-testid=step-node]')
+  await page.waitForTimeout(500)
+  expect(await zoomOf(page)).toBeGreaterThanOrEqual(0.74)
+  await page.getByTestId('fit').click()
+  await page.waitForTimeout(500)
+  expect(await zoomOf(page)).toBeGreaterThanOrEqual(0.74)
+  await page.getByTestId('tab-dashboard').click()
+  await expect(page.locator('[data-testid=chart-obs] .recharts-bar-rectangle').first()).toBeVisible()
+  await expect(page.locator('[data-testid=chart-obs] .recharts-line')).toHaveCount(0)  // sem curva suavizada
+})

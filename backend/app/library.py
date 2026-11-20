@@ -76,8 +76,7 @@ def _build() -> list[tuple[LibraryItem, Path]]:
     items = []
     for sid, path, meta in _entries():
         sha = hashlib.sha256(path.read_bytes()).hexdigest()
-        key = pipeline.cache_key(sha, path.name, 0, None, False)  # a biblioteca abre só com regras (use_llm padrão = falso)
-        items.append((LibraryItem(id=sid, cache_id=key[:16], **meta), path))
+        items.append((LibraryItem(id=sid, cache_id=pipeline.content_id(sha, 0, None), **meta), path))  # id estável: só o conteúdo
     return items
 
 
@@ -100,7 +99,7 @@ def list_items(dataset: str | None = None, agent: str | None = None, resolved: b
         if q and q.lower() not in " ".join(str(x or "") for x in (it.id, it.task, it.agent, it.model, it.format)).lower():
             continue
         item = it.model_copy()
-        for m in pipeline.cache_dir().glob(f"{it.cache_id}*.meta.json"):  # já processado: usa o resumo real
+        for m in pipeline._files(it.cache_id or "", ".meta.json"):  # já processado (versão atual): usa o resumo real
             d = json.loads(m.read_text())
             item.processed, item.n_steps = True, d["n_steps"]
             item.resolved = d["resolved"] if d.get("resolved") is not None else item.resolved

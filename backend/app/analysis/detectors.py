@@ -228,19 +228,52 @@ def detect_repeated(traj: Trajectory) -> Trajectory:
 
 # ----------------------------------------------------------------------------- no_new_info
 SED_RANGE = re.compile(r"sed\s+-n\s+['\"]?(\d+),(\d+)p")
+ABBREVIATED = "<NOTE>This file is too large to display entirely"
+EMPTY_OUT = re.compile(r"did not produce any output|^\(?no output\)?\.?$|^$", re.I)
+INF = 10**9
+WHOLE = (1, INF)
+UNKNOWN = None
+
+
+def _as_int(x) -> int | None:
+    try:
+        return int(str(x).strip())
+    except ValueError:
+        return None
 
 
 def _range(s: Step):
+    """(início, fim) lido; WHOLE = arquivo inteiro; UNKNOWN (None) = intervalo ilegível (nunca conta como cobertura)."""
     vr = s.action.args.get("view_range")
-    if isinstance(vr, (list, tuple)) and len(vr) == 2:
-        return tuple(str(x) for x in vr)
+    if isinstance(vr, str):  # xml/ticks entregam "[10, 20]" como string
+        try:
+            vr = json.loads(vr)
+        except ValueError:
+            return UNKNOWN
+    if isinstance(vr, (list, tuple)):
+        if len(vr) != 2:
+            return UNKNOWN
+        a, b = _as_int(vr[0]), _as_int(vr[1])
+        if a is None or b is None:
+            return UNKNOWN
+        return (a, INF if b == -1 else b)
     m = SED_RANGE.search(s.action.command or "")
-    return (m.group(1), m.group(2)) if m else None
+    if m:
+        return (int(m.group(1)), int(m.group(2)))
+    return WHOLE if (s.action.tool == "editor" or s.action.command) else UNKNOWN
+
+
+def _covers(prior: tuple[int, int], new: tuple[int, int]) -> bool:
+    return prior[0] <= new[0] and prior[1] >= new[1]
 
 
 def detect_no_new_info(traj: Trajectory) -> Trajectory:
+    """(a) observação idêntica (≥ 20 chars, fora de "sem saída") a uma anterior de read/search/explore;
+    (b) releitura de um trecho já COBERTO por uma leitura anterior do mesmo arquivo sem edição nesse arquivo desde então.
+    Cobertura exige intervalo legível (view_range lista/string/sed -n) e leitura completa e não abreviada: o `<NOTE>This file is too
+    large…` do SWE-agent mostra só um resumo, então ver um trecho depois dele traz informação nova."""
     seen_obs: dict[str, int] = {}
-    reads: dict[str, dict] = {}  # path -> {range: idx}
+    reads: dict[str, list[tuple[tuple[int, int], int]]] = {}  # path -> [((ini, fim), idx)]
     for s in traj.steps:
         if ignored(s):
             continue
@@ -249,19 +282,20 @@ def detect_no_new_info(traj: Trajectory) -> Trajectory:
                 reads.pop(f.path, None)
         if s.category not in ("read", "search", "explore") or s.observation is None:
             continue
-        # (b) releitura sem edição
+        o = s.observation
+        # (b) releitura coberta
         if s.category == "read" and s.files:
             f = next((f for f in s.files if f.mode == "read"), None)
-            if f:
-                rg = _range(s)
-                prior = reads.setdefault(f.path, {})
-                hit = prior.get(None) if None in prior else prior.get(rg)
+            rg = _range(s) if f else UNKNOWN
+            if f and rg is not UNKNOWN and "error" not in s.flags:  # observação de erro (ex.: view_range inválido) não é releitura redundante
+                hit = next((i for prior, i in reads.get(f.path, []) if _covers(prior, rg)), None)
                 if hit is not None:
                     add_flag(s, "no_new_info", f"releitura de {f.path} sem edição desde o passo {hit}", hit)
-                prior[rg] = s.idx
+                if ABBREVIATED not in (o.content or "")[:200] and not o.truncated and "error" not in s.flags:
+                    reads.setdefault(f.path, []).append((rg, s.idx))
         # (a) observação idêntica
-        n = norm_obs(s.observation.content)
-        if len(n) >= 20:
+        n = norm_obs(o.content)
+        if len(n) >= 20 and not EMPTY_OUT.search(n):
             if n in seen_obs and "no_new_info" not in s.flags:
                 add_flag(s, "no_new_info", f"observação idêntica ao passo {seen_obs[n]}", seen_obs[n])
             seen_obs.setdefault(n, s.idx)

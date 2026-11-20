@@ -5,7 +5,7 @@ import pytest
 
 from app.adapters import generic_chat, openhands_chat, sweagent_smith
 from app.schema import Trajectory
-from tests.conftest import jload
+from tests.conftest import FX, jload
 
 
 # ----------------------------------------------------------------------------- openhands_chat
@@ -132,3 +132,29 @@ def test_generic_anthropic_style():
     assert t.problem_statement == "fix the bug"
     assert t.steps[0].action.command == "ls" and t.steps[0].observation.content == "a.py" and t.steps[0].observation.is_error is False
     assert t.steps[0].thought == "Listing" and t.steps[1].action.tool == "message"
+
+
+# ----------------------------------------------------------------------------- generic vs OpenHands (evidência específica)
+def test_generic_openai_log_is_not_openhands():
+    from app.adapters.detect import detect, parse_any
+    msgs = jload("generic_calc.json")
+    name, conf = detect(msgs)
+    assert name == "generic_chat" and conf < 0.9
+    assert openhands_chat.can_parse(msgs) == 0.0  # bash/str_replace_editor/finish/call_N não bastam
+    t = parse_any(FX / "generic_calc.json")
+    assert t.source_format == "generic_chat" and t.agent == "desconhecido" and t.model is None
+    assert len(t.steps) == 10 and t.steps[-1].action.tool == "message" and t.steps[-2].action.tool == "submit"
+    assert t.problem_statement.startswith("The calculator in calc.py")
+    assert [s.action.tool for s in t.steps[:4]] == ["bash", "editor", "bash", "bash"] and t.steps[0].native_id == "call_1"
+    assert t.steps[4].action.command == "str_replace" and t.steps[3].observation.content.startswith("F")
+
+
+def test_openhands_needs_specific_evidence():
+    base = [{"role": "user", "content": "x"}]
+    call = lambda cid, name: {"role": "assistant", "content": "", "tool_calls": [{"id": cid, "type": "function", "function": {"name": name, "arguments": "{}"}}]}  # noqa: E731
+    assert openhands_chat.can_parse(base + [call("call_1", "bash")]) == 0.0
+    assert openhands_chat.can_parse(base + [call("call_1", "execute_bash")]) >= 0.9  # ferramenta do OpenHands
+    assert openhands_chat.can_parse(base + [call("chatcmpl-tool-ab12", "bash")]) >= 0.9  # id do OpenHands
+    footer = {"role": "tool", "tool_call_id": "call_1", "content": "ok\n[The command completed with exit code 0.]"}
+    assert openhands_chat.can_parse(base + [call("call_1", "bash"), footer]) >= 0.9  # rodapé de shell do OpenHands
+    assert openhands_chat.can_parse({"trajectory": jload("generic_calc.json")}) == 0.9  # linha Parquet só com `trajectory`

@@ -93,16 +93,38 @@ def effective_llm(use_llm: bool | None) -> tuple[bool, str | None]:
     return use_llm, None
 
 
-def cache_key(content_sha: str, filename: str, row: int, fmt: str | None, llm: bool) -> str:
+def content_id(content_sha: str, row: int, fmt: str | None) -> str:
+    """ID público ESTÁVEL: hash só do conteúdo (+ row e format_hint). Não depende da versão do pipeline, do nome do arquivo nem do LLM."""
+    return hashlib.sha256(f"{content_sha}|{row}|{fmt}".encode()).hexdigest()[:16]
+
+
+def cache_variant(filename: str, llm: bool) -> str:
+    """O que mais muda o resultado para o MESMO conteúdo: nome (manifest do CodeTraceBench) e uso do LLM/modelo."""
     model = LLMConfig.from_env().model if llm else ""
-    return hashlib.sha256(f"{content_sha}|{sanitize_name(filename)}|{row}|{fmt}|{llm}|{model}|{PIPELINE_VERSION}".encode()).hexdigest()
+    return hashlib.sha256(f"{sanitize_name(filename)}|{llm}|{model}".encode()).hexdigest()[:8]
+
+
+def cache_key(content_sha: str, filename: str, row: int, fmt: str | None, llm: bool) -> str:
+    """Chave do cache = id + versão do pipeline + variante. Reprocessar com outra versão troca só o arquivo, não o id."""
+    return f"{content_id(content_sha, row, fmt)}.{PIPELINE_VERSION}.{cache_variant(filename, llm)}"
+
+
+def _files(pid: str, suffix: str = ".json") -> list[Path]:
+    return sorted((p for p in cache_dir().glob(f"{pid}.{PIPELINE_VERSION}.*{suffix}") if suffix == ".meta.json" or not p.name.endswith(".meta.json")),
+                  key=lambda p: p.stat().st_mtime, reverse=True)
 
 
 def load_cached(pid: str) -> ProcessedTrajectory | None:
-    for p in cache_dir().glob(f"{pid}*.json"):
-        if not p.name.endswith(".meta.json"):
-            return ProcessedTrajectory.model_validate_json(p.read_text())
+    """Carrega pelo id público. Só serve arquivos da versão ATUAL do pipeline (cache velho = não encontrado → reprocessar)."""
+    pid = pid.split(".")[0]
+    for p in _files(pid):
+        return ProcessedTrajectory.model_validate_json(p.read_text())
     return None
+
+
+def load_cached_key(key: str) -> ProcessedTrajectory | None:
+    p = cache_dir() / f"{key}.json"
+    return ProcessedTrajectory.model_validate_json(p.read_text()) if p.exists() else None
 
 
 def save_cached(pt: ProcessedTrajectory, key: str) -> None:
@@ -163,7 +185,7 @@ def process(path_or_bytes: Any, filename: str, *, format_hint: str | None = None
     llm_on, llm_warn = effective_llm(use_llm)
     sha = hashlib.sha256(content).hexdigest()
     key = cache_key(sha, name, row, format_hint, llm_on)
-    hit = load_cached(key)
+    hit = load_cached_key(key)
     if hit is not None:
         return hit
     warnings = [llm_warn] if llm_warn else []
@@ -221,7 +243,7 @@ def process(path_or_bytes: Any, filename: str, *, format_hint: str | None = None
     if llm is not None and llm.errors:
         warnings.append(f"LLM: {'; '.join(sorted(set(llm.errors)))}")
     metrics = compute_metrics(traj)
-    pt = ProcessedTrajectory(id=key[:16], format_detected=name_det, confidence=conf,
+    pt = ProcessedTrajectory(id=content_id(sha, row, format_hint), format_detected=name_det, confidence=conf,
                              source=SourceInfo(filename=name, sha256=sha, row=row, format_hint=format_hint, sample_id=sample_id),
                              trajectory=traj, metrics=metrics, warnings=warnings, llm_used=llm_on)
     save_cached(pt, key)
@@ -232,7 +254,6 @@ def recompute(pt: ProcessedTrajectory) -> ProcessedTrajectory:
     """Reaplica detectores + métricas (usado depois de corrigir um rótulo) e regrava o cache."""
     run_detectors(pt.trajectory)
     pt.metrics = compute_metrics(pt.trajectory)
-    for p in cache_dir().glob(f"{pt.id}*.json"):
-        if not p.name.endswith(".meta.json"):
-            p.write_text(pt.model_dump_json())
+    for p in _files(pt.id):  # regrava as variantes da versão atual deste id (a correção do usuário vale para todas)
+        p.write_text(pt.model_dump_json())
     return pt

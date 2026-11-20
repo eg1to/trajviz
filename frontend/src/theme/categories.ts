@@ -38,8 +38,10 @@ export const ERROR_COLOR = '#D55E00'
 export function fill(kind: Kind, dark: boolean): string {
   const k = KINDS[kind]
   if (k.special) return dark ? '#2b2f38' : '#E4E4E7'
+  if (dark && kind === 'submit') return DARK_SUBMIT // #222 some no fundo escuro: variante clara só no tema escuro
   return k.color
 }
+export const DARK_SUBMIT = '#E8E8E8'
 
 function lum(hex: string): number {
   const n = parseInt(hex.slice(1), 16)
@@ -63,7 +65,7 @@ export function textOn(bg: string): string {
 export function textFor(kind: Kind, dark: boolean): string {
   const k = KINDS[kind]
   if (k.special) return dark ? '#d4d4d8' : '#3f3f46'
-  return textOn(k.color)
+  return textOn(fill(kind, dark))
 }
 
 /** Passo → tipo visual (message/keys/harness têm prioridade sobre a categoria). */

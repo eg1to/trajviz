@@ -1,0 +1,82 @@
+{
+ "1": {
+  "verdict": "correto",
+  "why": "[142,151] está contido em [102,151], lido antes sem edição desse arquivo"
+ },
+ "2": {
+  "verdict": "correto",
+  "why": "mesmo intervalo [371,404] do passo anterior, sem edição"
+ },
+ "3": {
+  "verdict": "correto",
+  "why": "[25,45] está dentro da leitura COMPLETA (não abreviada) do passo 7"
+ },
+ "4": {
+  "verdict": "correto",
+  "why": "[1219,1240] ⊂ [1171,1271]"
+ },
+ "5": {
+  "verdict": "correto",
+  "why": "[1026,1028] ⊂ [996,1052]; as edições entre os passos foram em reproduce_bug.py, não em parser.py"
+ },
+ "6": {
+  "verdict": "correto",
+  "why": "3ª leitura do mesmo intervalo [371,404]"
+ },
+ "7": {
+  "verdict": "correto",
+  "why": "observação byte a byte idêntica ao passo 6 (mesmo intervalo; as edições foram em outros arquivos)"
+ },
+ "8": {
+  "verdict": "correto",
+  "why": "[300,305] ⊂ [256,320]"
+ },
+ "9": {
+  "verdict": "correto",
+  "why": "[256,368] dentro da leitura completa do passo 1 (não abreviada: começa em 1)"
+ },
+ "10": {
+  "verdict": "correto",
+  "why": "[142,143] ⊂ [133,146]"
+ },
+ "11": {
+  "verdict": "correto",
+  "why": "[78,96] dentro da leitura completa (não abreviada) do passo 14"
+ },
+ "12": {
+  "verdict": "correto",
+  "why": "mesmo intervalo [1273,1330] do passo 5"
+ },
+ "13": {
+  "verdict": "correto",
+  "why": "[250,254] ⊂ [250,260]"
+ },
+ "14": {
+  "verdict": "correto",
+  "why": "[1171,1220] ⊂ [1171,1271]"
+ },
+ "15": {
+  "verdict": "correto",
+  "why": "[1315,1335] ⊂ [1315,1340]"
+ },
+ "16": {
+  "verdict": "correto",
+  "why": "mesmo intervalo [374,379]; o passo 15 editou outras linhas do arquivo e a observação saiu idêntica"
+ },
+ "17": {
+  "verdict": "correto",
+  "why": "mesmo intervalo [53,69] do passo 2"
+ },
+ "18": {
+  "verdict": "correto",
+  "why": "[75,118] dentro da leitura completa do passo 3"
+ },
+ "19": {
+  "verdict": "correto",
+  "why": "mesmo intervalo [882,957] do passo 3"
+ },
+ "20": {
+  "verdict": "correto",
+  "why": "[540,542] ⊂ [523,616]"
+ }
+}

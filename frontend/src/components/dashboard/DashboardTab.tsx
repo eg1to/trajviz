@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend as RLegend, Line, ReferenceDot, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, Legend as RLegend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Loader2 } from 'lucide-react'
 import type { Metrics, Trajectory } from '@/api/client'
 import { DashCard } from './DashCard'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { CATEGORY_ORDER, ERROR_COLOR, KINDS, PHASES, PHASE_COLOR, type Kind } from '@/theme/categories'
+import { CATEGORY_ORDER, ERROR_COLOR, KINDS, PHASES, PHASE_COLOR, fill, type Kind } from '@/theme/categories'
 import { outcomeOf } from '@/lib/steps'
 import { fmtInt, fmtPct, cn, roundTicks } from '@/lib/utils'
 import { useUI } from '@/store/ui'
@@ -66,6 +66,7 @@ function Kpis({ m, trajectory }: { m: Metrics; trajectory: Trajectory }) {
 
 // ---------------------------------------------------------------- esforço por categoria
 function EffortCard({ m }: { m: Metrics }) {
+  const { dark } = useTheme()
   const include = useUI((s) => s.includeSpecial)
   const setInclude = useUI((s) => s.setIncludeSpecial)
   const e = m.effort
@@ -86,7 +87,7 @@ function EffortCard({ m }: { m: Metrics }) {
             <YAxis type="category" dataKey="name" tick={AXIS} width={118} interval={0} />
             <Tooltip formatter={(v, _n, p) => [`${fmtPct(Number(v))} (${(p.payload as { count: number }).count} passos)`, 'participação']} contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} cursor={{ fill: 'var(--muted)' }} />
             <Bar dataKey="pct" isAnimationActive={false} label={{ position: 'right', fontSize: 11, fill: 'var(--muted-foreground)', formatter: (v: unknown) => fmtPct(Number(v)) }}>
-              {rows.map((r) => <Cell key={r.kind} fill={KINDS[r.kind].special ? '#9ca3af' : KINDS[r.kind].color} stroke={KINDS[r.kind].special ? 'var(--foreground)' : undefined} strokeDasharray={KINDS[r.kind].special ? '3 2' : undefined} />)}
+              {rows.map((r) => <Cell key={r.kind} fill={KINDS[r.kind].special ? '#9ca3af' : fill(r.kind, dark)} stroke={KINDS[r.kind].special ? 'var(--foreground)' : undefined} strokeDasharray={KINDS[r.kind].special ? '3 2' : undefined} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -233,21 +234,22 @@ function ObsCard({ m }: { m: Metrics }) {
   const go = useGoStep()
   const { dark } = useTheme()
   const trunc = new Set(m.problems.truncated.idx)
-  const data = m.context.obs_chars.map((v, i) => ({ idx: i, chars: v }))
+  const data = m.context.obs_chars.map((v, i) => ({ idx: i, chars: v, truncated: trunc.has(i) }))
   return (
     <DashCard id="observacoes" title="Tamanho das observações por passo" subtitle={`total ${fmtInt(m.context.total_obs_chars)} chars · máx ${fmtInt(m.context.max_obs_chars)} · ${m.context.n_truncated} truncadas`} className="xl:col-span-2">
       <div style={{ height: 200 }} data-testid="chart-obs">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ left: 0, right: 8, top: 6, bottom: 0 }} onClick={(e) => { const i = (e as unknown as { activeLabel?: number }).activeLabel; if (typeof i === 'number') go(i) }}>
+          <BarChart data={data} margin={{ left: 0, right: 8, top: 6, bottom: 0 }} barCategoryGap={data.length > 150 ? 0 : '12%'}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
-            <XAxis dataKey="idx" tick={AXIS} /><YAxis tick={AXIS} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))} />
-            <Tooltip formatter={(v) => [`${fmtInt(Number(v))} chars`, 'observação']} labelFormatter={(l) => `passo #${l}`} contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} />
-            <Line type="monotone" dataKey="chars" stroke={dark ? '#56B4E9' : '#0072B2'} dot={false} strokeWidth={1.4} isAnimationActive={false} />
-            {[...trunc].map((i) => <ReferenceDot key={i} x={i} y={data[i]?.chars ?? 0} r={4} fill={ERROR_COLOR} stroke="#fff" ifOverflow="visible" />)}
-          </ComposedChart>
+            <XAxis dataKey="idx" tick={AXIS} minTickGap={16} /><YAxis tick={AXIS} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))} />
+            <Tooltip formatter={(v) => [`${fmtInt(Number(v))} chars`, 'observação']} labelFormatter={(l) => `passo #${l}`} contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} cursor={{ fill: 'var(--muted)' }} />
+            <Bar dataKey="chars" isAnimationActive={false} cursor="pointer" onClick={(d) => { const i = (d as unknown as { idx?: number }).idx; if (typeof i === 'number') go(i) }}>
+              {data.map((d) => <Cell key={d.idx} fill={d.truncated ? ERROR_COLOR : dark ? '#56B4E9' : '#0072B2'} />)}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground"><span className="inline-block size-2 rounded-full" style={{ background: ERROR_COLOR }} />observação truncada pela ferramenta · clique na linha para abrir o passo</p>
+      <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground"><span className="inline-block size-2 rounded-sm" style={{ background: ERROR_COLOR }} />barra laranja = observação truncada pela ferramenta · clique numa barra para abrir o passo</p>
     </DashCard>
   )
 }

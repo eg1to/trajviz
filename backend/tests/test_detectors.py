@@ -167,6 +167,37 @@ def test_no_new_info_ranges():
     assert "no_new_info" in flags(t, 1)  # leitura inteira anterior cobre o intervalo
 
 
+def _view(i, rg, obs, abbreviated=False):
+    o = ("<NOTE>This file is too large to display entirely. Showing abbreviated version.</NOTE>\n" if abbreviated else "") + obs
+    return S(i, "read", tool="editor", cmd="view", args={"command": "view", "path": "/testbed/a.py", **({"view_range": rg} if rg else {})}, files=[("a.py", "read")], obs=o)
+
+
+def test_no_new_info_audit_fixes_swe_smith_false_positives():
+    # xml entrega view_range como STRING "[a, b]": intervalos diferentes não se cobrem (antes virava "leitura inteira")
+    t = run_detectors(T(_view(0, "[1330, 1350]", "aaa " * 12), _view(1, "[45, 47]", "bbb " * 12), _view(2, "[1332, 1340]", "ccc " * 12)))
+    assert not flags(t, 1) & {"no_new_info"} and "no_new_info" in flags(t, 2) and t.steps[2].flag_refs["no_new_info"] == 0
+    # leitura inteira ABREVIADA (<NOTE>This file is too large…) não cobre trechos: ver um trecho depois traz informação nova
+    t = run_detectors(T(_view(0, None, "all " * 20, abbreviated=True), _view(1, [100, 120], "ddd " * 12)))
+    assert not flags(t, 1) & {"no_new_info"}
+    # leitura inteira COMPLETA cobre; intervalo maior (superset) ou só sobreposto NÃO é redundante
+    t = run_detectors(T(_view(0, None, "all " * 20), _view(1, [100, 120], "ddd " * 12)))
+    assert "no_new_info" in flags(t, 1)
+    t = run_detectors(T(_view(0, [936, 947], "eee " * 12), _view(1, [936, 950], "fff " * 12), _view(2, [940, 960], "ggg " * 12)))
+    assert not any("no_new_info" in s.flags for s in t.steps)
+    t = run_detectors(T(_view(0, [10, 20], "hhh " * 12), _view(1, [10, 20], "hhh " * 12)))
+    assert "no_new_info" in flags(t, 1)
+
+
+def test_no_new_info_ignores_error_observations_and_empty_outputs():
+    err = S(1, "read", tool="editor", cmd="view", args={"command": "view", "path": "/testbed/a.py", "view_range": [277, 500]}, files=[("a.py", "read")],
+            obs="Invalid `view_range`: [277, 500]. Its first element `277` should be within the range of lines of the file: [1, 276]")
+    t = run_detectors(T(_view(0, None, "x " * 30), err))
+    assert "error" in flags(t, 1) and "no_new_info" not in flags(t, 1)
+    empty = "Your command ran successfully and did not produce any output."
+    t = run_detectors(T(S(0, "search", cmd="grep -r a src", obs=empty), S(1, "search", cmd="find . -name b | xargs grep c", obs=empty)))
+    assert not any("no_new_info" in s.flags for s in t.steps)  # saída vazia ≠ mesma informação
+
+
 def test_no_new_info_only_for_read_search_explore():
     t = run_detectors(T(S(0, "reproduce", cmd="python a.py", obs=LONG), S(1, "reproduce", cmd="python b.py", obs=LONG)))
     assert all("no_new_info" not in s.flags for s in t.steps)

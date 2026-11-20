@@ -16,11 +16,21 @@ def is_openai_msgs(msgs: Any) -> bool:
             and any(m.get("role") == "assistant" and m.get("tool_calls") for m in msgs))
 
 
+OH_FOOTER = "[The command completed with exit code"
+
+
 def oh_signature(msgs: list) -> bool:
+    """Evidência ESPECÍFICA de OpenHands: ferramenta `execute_bash`, ids `chatcmpl-tool-` ou o rodapé de shell do OpenHands.
+    Nomes genéricos (bash, str_replace_editor, finish) também aparecem em logs OpenAI comuns e NÃO bastam."""
     for m in msgs:
-        for tc in (m.get("tool_calls") or []) if isinstance(m, dict) else []:
+        if not isinstance(m, dict):
+            continue
+        for tc in m.get("tool_calls") or []:
             fn = tc.get("function") or {}
-            if fn.get("name") in OH_TOOLS and isinstance(fn.get("arguments"), str):
+            if fn.get("name") == "execute_bash" or str(tc.get("id", "")).startswith("chatcmpl-tool-"):
+                return True
+        if m.get("role") == "tool":
+            if str(m.get("tool_call_id", "")).startswith("chatcmpl-tool-") or OH_FOOTER in (m.get("content") if isinstance(m.get("content"), str) else str(m.get("content"))):
                 return True
     return False
 

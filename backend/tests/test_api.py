@@ -250,3 +250,23 @@ def test_openapi_has_all_endpoints(client):
               "/api/library", "/api/library/{sample_id}/open", "/api/taxonomy", "/api/health"]:
         assert p in paths, p
     assert "patch" in paths["/api/trajectories/{tid}/steps/{idx}"]
+
+
+def test_id_is_stable_when_the_pipeline_version_changes(client, monkeypatch):
+    data = (FX / "smith_xml.json").read_bytes()
+    a = up(client, "a.json", data, use_llm="false").json()["id"]
+    monkeypatch.setattr(pipeline, "PIPELINE_VERSION", "versao-nova")
+    # cache da versão antiga não é servido: reabrir pela biblioteca/upload reprocessa e MANTÉM o id
+    r = client.get(f"/api/trajectories/{a}")
+    assert r.status_code == 404 and "reabra pela biblioteca" in r.json()["detail"]["message"]
+    b = up(client, "a.json", data, use_llm="false").json()["id"]
+    assert a == b and client.get(f"/api/trajectories/{a}").status_code == 200
+    assert pipeline.content_id("x", 0, None) == pipeline.content_id("x", 0, None) != pipeline.content_id("x", 1, None)
+    assert pipeline.content_id("x", 0, None) != pipeline.content_id("x", 0, "generic_chat")
+
+
+def test_generic_upload_detected_as_generic(client):
+    r = up(client, "generic_calc.json", (FX / "generic_calc.json").read_bytes(), use_llm="false")
+    assert r.status_code == 200 and r.json()["format_detected"] == "generic_chat" and r.json()["n_steps"] == 10
+    t = client.get(f"/api/trajectories/{r.json()['id']}").json()
+    assert t["trajectory"]["agent"] == "desconhecido" and t["source_filename"] == "generic_calc.json" and t["trajectory"]["task_id"] is None

@@ -78,8 +78,8 @@ def parse(source: Any, *, meta: dict | None = None) -> Trajectory:
     msgs = _msgs(source)
     steps, problem = _anthropic_steps(msgs) if _is_anthropic(msgs) else chat_steps(msgs)
     row = source if isinstance(source, dict) else {}
-    t = Trajectory(id=str(row.get("id") or "generic"), source_format=NAME, problem_statement=problem, steps=steps,
-                   model=row.get("model"), resolved=row.get("resolved"))
+    t = Trajectory(id=str(row.get("id") or "generic"), source_format=NAME, agent=row.get("agent") or "desconhecido", problem_statement=problem,
+                   steps=steps, model=row.get("model"), resolved=row.get("resolved"))
     if meta:
         t.meta.update(meta)
     return t

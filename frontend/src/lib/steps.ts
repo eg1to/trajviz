@@ -61,3 +61,12 @@ export function outcomeOf(t: Trajectory | undefined): { label: 'PASS' | 'FAIL' |
 
 /** Número do passo relacionado a uma flag (repeated/no_new_info → passo original). */
 export const flagRef = (s: Step, f: string): number | undefined => (s.flag_refs ?? {})[f]
+
+/** Sem task_id (logs genéricos): nome do arquivo enviado; senão o início da 1ª mensagem do usuário. */
+export function displayTitle(taskId: string | null | undefined, filename: string | null | undefined, problem: string | null | undefined, id: string): string {
+  if (taskId) return taskId
+  const name = (filename ?? '').replace(/\.(tar\.zst|jsonl|json|traj|parquet|zip)$/i, '').trim()
+  if (name) return name
+  const p = (problem ?? '').replace(/\s+/g, ' ').trim()
+  return p ? (p.length > 70 ? p.slice(0, 69) + '…' : p) : id
+}

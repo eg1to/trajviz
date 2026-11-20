@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { BarChart3, GitFork, Loader2, SearchX } from 'lucide-react'
+import { BarChart3, GitFork, Loader2, SearchX, ServerCrash } from 'lucide-react'
 import { useMetrics, useTrajectory } from '@/api/hooks'
 import { ApiError } from '@/api/client'
 import { Inspector } from '@/components/Inspector'
@@ -66,9 +66,14 @@ export default function TrajectoryPage() {
 
   if (traj.isLoading) return <Centered><Loader2 className="size-6 animate-spin" /><p>Carregando trajetória…</p></Centered>
   if (traj.error || !traj.data) {
-    const notFound = traj.error instanceof ApiError && traj.error.status === 404
-    return <Centered><SearchX className="size-7" /><p className="font-medium text-foreground">{notFound ? 'Trajetória não encontrada' : 'Não foi possível carregar a trajetória'}</p>
-      <p className="max-w-md text-xs">{(traj.error as Error | null)?.message}</p><Button asChild variant="outline"><Link to="/">Voltar à biblioteca</Link></Button></Centered>
+    const err = traj.error instanceof ApiError ? traj.error : null
+    const notFound = err?.status === 404
+    const network = err?.status === 0
+    return <Centered data-testid={notFound ? 'not-found' : network ? 'network-error' : 'load-error'}>
+      {network ? <ServerCrash className="size-7" /> : <SearchX className="size-7" />}
+      <p className="font-medium text-foreground">{notFound ? 'Trajetória não encontrada — reabra pela biblioteca' : network ? 'API indisponível' : 'Não foi possível carregar a trajetória'}</p>
+      <p className="max-w-md text-center text-xs">{notFound ? 'O link aponta para uma trajetória que não está mais processada (cache limpo ou regras atualizadas). Abra a amostra de novo pela biblioteca ou reenvie o arquivo; o id continua o mesmo.' : err?.message ?? (traj.error as Error | null)?.message}</p>
+      <div className="flex gap-2">{network && <Button variant="outline" onClick={() => traj.refetch()}>Tentar de novo</Button>}<Button asChild variant="outline"><Link to="/">Voltar à biblioteca</Link></Button></div></Centered>
   }
   const loops = metrics.data?.problems.loop_ranges ?? []
 
@@ -94,6 +99,6 @@ export default function TrajectoryPage() {
   )
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">{children}</div>
+function Centered({ children, ...p }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+  return <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground" {...p}>{children}</div>
 }

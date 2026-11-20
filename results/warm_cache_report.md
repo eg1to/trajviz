@@ -6,20 +6,20 @@
 
 | dataset | traj. | passos médios | s / trajetória | s / 100 passos |
 |---|---:|---:|---:|---:|
-| codetracebench | 58 | 46.5 | 0.002 | 0.004 |
-| swe-rebench | 50 | 63.7 | 0.002 | 0.004 |
-| swe-smith | 60 | 30.7 | 0.001 | 0.004 |
-| **total** | 168 | — | 0.002 | 0.004 |
+| codetracebench | 58 | 46.5 | 0.062 | 0.133 |
+| swe-rebench | 50 | 63.7 | 0.037 | 0.058 |
+| swe-smith | 60 | 30.7 | 0.001 | 0.002 |
+| **total** | 168 | — | 0.033 | 0.071 |
 
-Meta: < 2 s por trajetória de 100 passos → ✅. Mais lenta: `codetracebench/openhands-OpenAI__GPT-5-huggingface__transformers-19590-8adf6ec7` (46 passos, 0.01 s).
+Meta: < 2 s por trajetória de 100 passos → ✅. Mais lenta: `codetracebench/openhands-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pov-ray-aa2667f5` (500 passos, 0.50 s).
 
 ## % de passos com cada flag (por dataset; sem passos keys/harness)
 
 | dataset | passos | error | test_fail | test_pass | repeated | no_new_info | loop | truncated |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| codetracebench | 2596 | 9.0% | 1.6% | 1.0% | 1.9% | 2.9% | 3.8% | 1.0% |
+| codetracebench | 2596 | 9.0% | 1.6% | 1.0% | 1.9% | 2.3% | 3.8% | 1.0% |
 | swe-rebench | 3181 | 4.6% | 2.9% | 6.9% | 0.6% | 3.4% | 3.6% | 0.6% |
-| swe-smith | 1838 | 8.1% | 0.5% | 0.7% | 1.0% | 12.6% | 8.8% | 3.3% |
+| swe-smith | 1838 | 8.1% | 0.5% | 0.7% | 1.0% | 2.8% | 8.8% | 3.3% |
 
 Artefatos não suportados (só logs): codetracebench: 2
 
