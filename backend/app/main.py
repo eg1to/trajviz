@@ -30,9 +30,14 @@ FLAGS_DOC = {"error": "o comando falhou (exit code ≠ 0 ou padrão de erro; gre
              "no_new_info": "leitura/busca/exploração sem informação nova", "loop": "faz parte de um ciclo repetido",
              "truncated": "observação truncada pela ferramenta"}
 
+def cors_origins() -> list[str]:
+    """CORS_ORIGINS: lista separada por vírgula (padrão: o front em http://localhost:5173)."""
+    return [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()] or ["http://localhost:5173"]
+
+
 app = FastAPI(title="trajviz API", version="0.4.0",
               description="Visualizador de trajetórias de agentes de código: upload → formato canônico + rótulos + flags + métricas.")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=cors_origins(), allow_methods=["*"], allow_headers=["*"])
 
 
 def results_dir() -> Path:

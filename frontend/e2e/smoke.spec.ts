@@ -199,3 +199,14 @@ test('Ark: observação não registrada mostra o aviso; a edição mostra o diff
   await expect(page.getByTestId('format-badge')).toContainText('ark_trace')
   await expect(page.getByTestId('n-steps')).toHaveText('9')
 })
+
+test('biblioteca com a API fora do ar mostra "API indisponível" e tenta de novo', async ({ page }) => {
+  await page.route('**/api/library*', (r) => r.abort())
+  await page.goto('/')
+  await expect(page.getByTestId('lib-error')).toContainText('API indisponível', { timeout: 30_000 })
+  await expect(page.getByTestId('lib-empty')).toHaveCount(0)
+  await page.unroute('**/api/library*')
+  await page.getByTestId('lib-retry').click()
+  await expect(page.getByTestId('lib-row').first()).toBeVisible()
+  await expect(page.getByTestId('lib-error')).toHaveCount(0)
+})

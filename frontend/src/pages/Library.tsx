@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileUp, Loader2, Search, TriangleAlert, Upload } from 'lucide-react'
+import { FileUp, Loader2, Search, ServerCrash, TriangleAlert, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { useLibrary, useOpenSample, useUpload } from '@/api/hooks'
-import type { LibraryItem, UploadResponse } from '@/api/client'
+import { ApiError, type LibraryItem, type UploadResponse } from '@/api/client'
 import { Logo } from '@/components/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Badge } from '@/components/ui/badge'
@@ -58,7 +58,7 @@ export default function Library() {
             <FilterSelect label="Agente" value={filters.agent} onChange={(v) => setFilters({ ...filters, agent: v })} options={agents.map((a) => [a, a])} testid="filter-agent" />
             <FilterSelect label="Resolved" value={filters.resolved} onChange={(v) => setFilters({ ...filters, resolved: v })} options={[['true', 'Resolvida'], ['false', 'Não resolvida']]} testid="filter-resolved" />
           </div>
-          <LibraryTable items={lib.data} loading={lib.isLoading} openingId={open.isPending ? (open.variables?.id ?? null) : null}
+          <LibraryTable items={lib.data} loading={lib.isLoading} error={lib.isError ? lib.error : null} retrying={lib.isFetching} onRetry={() => { void lib.refetch(); void all.refetch() }} openingId={open.isPending ? (open.variables?.id ?? null) : null}
             onOpen={(it) => open.mutate({ id: it.id }, { onSuccess: goTo })} />
         </section>
       </main>
@@ -135,7 +135,18 @@ function ResolvedBadge({ item }: { item: LibraryItem }) {
   </span>
 }
 
-function LibraryTable({ items, loading, onOpen, openingId }: { items?: LibraryItem[]; loading: boolean; onOpen: (i: LibraryItem) => void; openingId: string | null }) {
+function LibraryTable({ items, loading, error, retrying, onRetry, onOpen, openingId }: { items?: LibraryItem[]; loading: boolean; error?: Error | null; retrying?: boolean; onRetry: () => void; onOpen: (i: LibraryItem) => void; openingId: string | null }) {
+  if (error) {  // erro de rede/servidor ≠ "nenhuma amostra": a API pode simplesmente estar fora do ar
+    const down = error instanceof ApiError ? error.status === 0 : true
+    return (
+      <div className="flex flex-col items-center gap-2 rounded-md border bg-card p-8 text-center text-muted-foreground" data-testid="lib-error" role="alert">
+        <ServerCrash className="size-6" />
+        <p className="font-medium text-foreground">{down ? 'API indisponível' : 'Não foi possível carregar a biblioteca'}</p>
+        <p className="max-w-md text-xs">{down ? 'Não consegui falar com a API. Confira se ela está no ar e se a URL (VITE_API_URL) e o CORS_ORIGINS estão certos.' : error.message}</p>
+        <Button variant="outline" onClick={onRetry} disabled={retrying} data-testid="lib-retry">{retrying ? <Loader2 className="size-3.5 animate-spin" /> : null}Tentar de novo</Button>
+      </div>
+    )
+  }
   if (loading) return <div className="rounded-md border bg-card p-8 text-center text-muted-foreground"><Loader2 className="mx-auto mb-2 size-5 animate-spin" />Carregando biblioteca…</div>
   if (!items?.length) return <div className="rounded-md border bg-card p-8 text-center text-muted-foreground" data-testid="lib-empty">Nenhuma amostra com esses filtros.</div>
   return (

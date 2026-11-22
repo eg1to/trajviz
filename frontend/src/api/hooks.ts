@@ -11,7 +11,7 @@ export const qk = {
 
 export const useTaxonomy = () => useQuery({ queryKey: qk.taxonomy, queryFn: api.taxonomy, staleTime: Infinity })
 export const useLibrary = (p: LibraryParams) =>
-  useQuery({ queryKey: qk.library(p), queryFn: () => api.library(p), placeholderData: keepPreviousData })
+  useQuery({ queryKey: qk.library(p), queryFn: () => api.library(p), placeholderData: keepPreviousData, retry: 1 })
 export const useTrajectory = (id: string) => useQuery({ queryKey: qk.trajectory(id), queryFn: () => api.trajectory(id), staleTime: Infinity, retry: false })
 export const useMetrics = (id: string) => useQuery({ queryKey: qk.metrics(id), queryFn: () => api.metrics(id), staleTime: Infinity, retry: false })
 export const useFullStep = (id: string, idx: number | null, enabled: boolean) =>

@@ -270,3 +270,12 @@ def test_generic_upload_detected_as_generic(client):
     assert r.status_code == 200 and r.json()["format_detected"] == "generic_chat" and r.json()["n_steps"] == 10
     t = client.get(f"/api/trajectories/{r.json()['id']}").json()
     assert t["trajectory"]["agent"] == "desconhecido" and t["source_filename"] == "generic_calc.json" and t["trajectory"]["task_id"] is None
+
+
+def test_cors_origins_por_ambiente(monkeypatch):
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    assert main.cors_origins() == ["http://localhost:5173"]
+    monkeypatch.setenv("CORS_ORIGINS", " http://localhost:5174 ,http://127.0.0.1:5174,, ")
+    assert main.cors_origins() == ["http://localhost:5174", "http://127.0.0.1:5174"]
+    monkeypatch.setenv("CORS_ORIGINS", "")
+    assert main.cors_origins() == ["http://localhost:5173"]

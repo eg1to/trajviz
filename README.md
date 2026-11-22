@@ -50,7 +50,7 @@ npm run dev
 
 Se a porta 8000 estiver ocupada, suba a API em outra (`--port 8010`) e aponte o front para ela com
 `frontend/.env.local`: `VITE_API_URL=http://localhost:8010` (o padrão é `http://localhost:8000`).
-O CORS da API só libera `http://localhost:5173`.
+Variáveis de ambiente (para portas ocupadas): `VITE_PORT` (porta do front, padrão 5173), `VITE_API_URL` (URL da API para o front, padrão `http://localhost:8000`) e `CORS_ORIGINS` (origens liberadas na API, separadas por vírgula, padrão `http://localhost:5173`). Ex.: `CORS_ORIGINS=http://localhost:5174 uv run uvicorn app.main:app --port 8010` e `VITE_PORT=5174 VITE_API_URL=http://localhost:8010 npm run dev`. Os e2e usam as mesmas variáveis.
 O front **só consome a API** (`docs/openapi.json`); depois de mudar o schema: `cd frontend && npm run gen:api`.
 Abra uma amostra direto num passo: `http://localhost:5173/t/<id>?step=42&view=graph&filter=error`
 (`view=graph|dashboard`, `filter=error,loop,nospecial,cat:edit`, `range=10-30`, `compact=0|1`, `gt=0`).
@@ -103,7 +103,7 @@ cd frontend && npm run screenshots                    # results/screenshots/*.pn
 cd backend  && uv run python scripts/pick_showcase.py # reescolhe as amostras das capturas
 ```
 
-Os testes e2e sobem a API (porta 8011) e o front com cache e `results/` isolados (`frontend/test-results/`).
+Os testes e2e sobem a API (porta 8011, ou a de `VITE_API_URL`) e o front (porta `VITE_PORT`) com cache e `results/` isolados (`frontend/test-results/`).
 
 ### Amostras das capturas (`results/screenshots/`)
 

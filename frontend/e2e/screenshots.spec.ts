@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test'
 // Capturas do pôster/README: 1600×1000, tema claro, escala 2×. As amostras vêm de e2e/showcase.json
 // (geradas por `uv run python scripts/pick_showcase.py` no backend: escolhidas por loops, ciclos edit→test e gabarito).
 const OUT = path.resolve(import.meta.dirname, '..', '..', 'results', 'screenshots')
-const API = `http://localhost:${process.env.TRAJVIZ_API_PORT ?? '8011'}`
+const API = process.env.VITE_API_URL ?? `http://localhost:${process.env.TRAJVIZ_API_PORT ?? '8011'}`
 const showcase = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'showcase.json'), 'utf8')) as Record<string, { id: string }>
 
 test.use({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 2, colorScheme: 'light' })
