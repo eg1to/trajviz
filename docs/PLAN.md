@@ -2,6 +2,21 @@
 
 Versão para o Claude Code. Plano completo (com justificativas) no documento do TCC.
 
+> **Plano × realizado (atualizado em 21/11/2026).** O plano original está preservado abaixo, a partir do §1. Esta tabela marca o que foi feito, o que mudou e por quê; detalhes em [PROCESSO.md](PROCESSO.md) e [decisions.md](decisions.md).
+>
+> | § | situação | o que mudou em relação ao plano e por quê |
+> |---|---|---|
+> | 1 Objetivo | ✅ feito | Os três diferenciais existem (zero rotulação manual, dashboard, multiformato). Relações entre passos continuam fora (TCC II). |
+> | 2 Datasets | ✅ feito | Achados da Fase 1 corrigiram o que se sabia pelos cards ([DADOS.md](DADOS.md)). Entrou um 4º conjunto: 15 traces reais do **Ark** (agente do orientador). |
+> | 3 Estrutura | ✅ com diferenças | Adaptadores com outros nomes e em maior número (10: `openhands_chat`, `sweagent_smith`, `generic_chat`, 5 do CodeTraceBench, `claude_code_session`, `ark_trace`); `datasets/loaders.py` não foi criado (a leitura ficou em `adapters/detect.py`); entraram `pipeline.py`, `library.py`, `config.py`. Mapa atual em [ARQUITETURA.md](ARQUITETURA.md). |
+> | 4 Endpoints | ✅ com diferenças | `POST /api/library/sample` virou `POST /api/library/{sample_id}/open`; entraram `GET …/steps/{idx}`, `GET /api/taxonomy`, `GET /api/health`; upload aceita também `.zip`, `.log`, `.txt` ([ARQUITETURA.md §5](ARQUITETURA.md#5-api)). |
+> | 5 Rotulação | ✅ feito | `other` passou a ser a 11ª categoria formal; regras de `python`, teclas e protocolo do harness acrescentadas ([ROTULACAO_E_DETECTORES.md](ROTULACAO_E_DETECTORES.md)). |
+> | 6 Detectores | ✅ com mudanças | Entraram `test_fail`/`test_pass` e `truncated`; `repeated` ignora repetição após edição; `no_new_info` e `loop` foram corrigidos depois de auditorias (80% e 35% de falsos positivos). |
+> | 7 Métricas | ✅ feito | Todos os itens; mais fases por terço, passos especiais (`message`/`keys`/`harness`) à parte e arquivos criados pelo agente. |
+> | 8 Telas | ⚠️ parcial | Telas 1–3 feitas; **4 (Comparar, stretch) não foi implementada**. O grafo usa um layout em serpentina próprio, não dagre. |
+> | 9 Avaliação | ⚠️ quase completa | Itens 1–3 feitos (gold de 210 passos, cobertura e custo, detectores × gabarito) e mais: auditorias, resolvidas × não resolvidas, comparação com o TraceView. **Pendente:** o gold held-out de 90 passos, criado para medir a acurácia fora das amostras de desenvolvimento ([AVALIACAO.md](AVALIACAO.md)). |
+> | 10 Cronograma | ✅ adiantado | As fases 0–7 foram concluídas em 19–20/11 (tag `v0.1-mvp` em 20/11); 21/11 foi usado para o Ark, portas configuráveis e a documentação. |
+
 ## 1. Objetivo e diferenciais
 App web que recebe um log bruto de agente de código e vai direto para a visualização.
 1. **Zero rotulação manual** — classificador de regras + fallback em LLM rotula cada ação no upload.

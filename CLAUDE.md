@@ -3,18 +3,19 @@
 TCC I (Projeto Orientado em Computação I, DCC/UFMG). Aluno: Pedro Henrique Egito Aguiar. Orientador: Marco Túlio Valente.
 
 ## Objetivo
-Enviar um log bruto de agente de código (OpenHands, SWE-agent, CodeTraceBench, chat genérico) e ver
+Enviar um log bruto de agente de código (OpenHands, SWE-agent, CodeTraceBench, Ark, Claude Code, chat genérico) e ver
 imediatamente: grafo da trajetória + faixa de fases + inspetor de passos + dashboard de métricas.
 **Nenhuma rotulação manual.** Referência principal: TraceView (SOAR-Lab), que exige rotular cada ação
 e cada relação à mão antes de visualizar e não tem dashboard.
 
 Plano completo: `docs/PLAN.md`. Formatos dos dados: `docs/formats.md` (gerado na fase 1).
-Decisões: `docs/decisions.md` — acrescente uma linha sempre que tomar uma decisão de design.
+Decisões: `docs/decisions.md` (por tema) — acrescente uma linha no tema certo sempre que tomar uma decisão de design.
+Mapa da documentação: ver a seção "Documentação" no fim deste arquivo.
 
 ## Arquitetura
 - `backend/` — Python 3.12, `uv`, FastAPI, Pydantic v2.
   Pipeline: `adapters/` → `schema.py` (modelo canônico TAR) → `labeling/` → `analysis/` → JSON.
-- `frontend/` — Vite + React + TypeScript, Tailwind, shadcn/ui, `@xyflow/react` (grafo) + dagre,
+- `frontend/` — Vite + React + TypeScript, Tailwind, shadcn/ui, `@xyflow/react` (grafo; layout em serpentina próprio, sem dagre),
   Recharts, TanStack Query, Zustand.
 - O front **só consome o JSON canônico**. Nenhuma lógica de parsing ou de rotulação no front.
 - Sem banco de dados no MVP: cache em disco (`backend/.cache/`, chave = hash do arquivo).
@@ -87,7 +88,7 @@ Testes: `npm test` (vitest), `npm run test:e2e` (Playwright, API em :8011 com ca
   - taxonomia no system prompt com prompt caching;
   - cache local por hash do passo (nunca pagar duas vezes);
   - contador de tokens/custo gravado em `backend/.cache/llm_usage.json`;
-  - o app tem que funcionar sem chave (passo fica `other`, `label_source="fallback"`).
+  - o app tem que funcionar sem chave (passo de baixa confiança fica com o melhor palpite da regra e `label_source="fallback"`; `other` só quando a regra não tem palpite).
 - Nunca carregar um dataset inteiro na memória. Ler Parquet com `pyarrow` em lotes
   (`iter_batches`) e salvar amostras em `data/samples/`.
 - `data/raw/` e `data/samples/` grandes não vão para o git (ver `.gitignore`).
@@ -106,8 +107,10 @@ Pare e consulte o Pedro antes de:
 - `cd frontend && npm run dev`
 - `cd frontend && npm run gen:api` (gera tipos a partir de `http://localhost:8000/openapi.json`)
 - `docker compose up --build` (web :5173 e API :8010; `WEB_PORT`/`API_PORT`; `backend/.env` opcional)
+- Portas ocupadas no modo desenvolvimento: `VITE_PORT` (front, padrão 5173), `VITE_API_URL` (API para o front, padrão `http://localhost:8000`), `CORS_ORIGINS` (API, padrão `http://localhost:5173`); o Playwright usa as mesmas.
 
 ## Estado atual
+- [x] Fase 0 — estrutura inicial, plano, script de download retomável do CodeTraceBench (`611e069`)
 - [x] Fase 1 — exploração dos datasets (`docs/formats.md`, `data/samples/`, `backend/scripts/explore_dataset.py`)
 - [x] Fase 2 — schema + adaptadores + detecção de formato (`backend/app/schema.py`, `backend/app/adapters/`, `results/parse_report.md`)
 - [x] Fase 3 — rotulação (regras + fallback Haiku) (`backend/app/labeling/`, `results/labeling_report.md`, `results/gold/gold_steps_cego.csv`)
@@ -115,5 +118,23 @@ Pare e consulte o Pedro antes de:
 - [x] Fase 5 — frontend: biblioteca, faixa de fases, grafo, inspetor, dashboard (`frontend/`; capturas em `results/screenshots/`)
 - [x] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`; gold manual `results/gold/gold_steps_cego_pedro.csv`, 210 passos, 1 anotador): regras 94,3% de acurácia, F1 macro 0,92; LLM 91,4%; `setup` é a categoria fraca (sugestões em `results/eval_classifier_sugestoes.md`, não aplicadas). Reproduzir: `cd backend && uv run python scripts/evaluate.py [--gold CSV] && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
 - [x] Fase 7 — entrega do MVP (`v0.1-mvp`): gold held-out cego (`results/gold/gold_holdout_cego.csv`, `make_gold_sample.py --holdout`; `evaluate.py --gold … --tag holdout` gera `eval_classifier_holdout.md` e a tabela desenvolvimento × held-out no `RESULTS.md`), comparação com o TraceView (`docs/comparacao_traceview.md`, capturas em `results/screenshots/comparacao/`, `frontend/e2e/comparacao.mjs`), mapeamento de taxonomias (`docs/taxonomia_mapeamento.md`), Docker (`docker-compose.yml`: `api` + `web`/nginx; `WEB_PORT`/`API_PORT`), README + `docs/demo.gif`, roteiro da demo (`docs/roteiro_demo.md`, URLs validadas por `frontend/e2e/demo-urls.mjs`) e o adaptador stretch `claude_code_session` (`.jsonl` de `~/.claude/projects/`).
-  **Pendências:** (1) Pedro rotular o gold held-out e rodar o `evaluate.py --tag holdout` (sem isso não há número held-out); (2) completar a seção ASE'25 de `docs/taxonomia_mapeamento.md` (TODO); (3) decidir se uma sessão real do Claude Code entra na biblioteca como demo (nenhum log real foi incluído no repositório); (4) a tela "Comparar" não foi implementada.
+  Pendências da Fase 7: consolidadas em "Pendências que só o Pedro resolve", abaixo.
 - [x] Formato `ark_trace` — traces do Ark (`backend/app/adapters/ark_trace.py`, `docs/formats.md` §11, `results/screenshots/06-ark-*`): 15 traces v2 na biblioteca (dataset "Ark"); v1 só como fixtures/teste de integração.
+- [x] Portas e CORS configuráveis + estado "API indisponível" na biblioteca (`63677e4`).
+- [x] Documentação completa do MVP (21/11/2026): ver "Documentação" abaixo.
+
+**Testes (21/11/2026):** backend 468 (`uv run pytest`), vitest 13, e2e 14 (`npm run test:e2e`), 6 capturas (`npm run screenshots`).
+
+**Pendências que só o Pedro resolve:** (1) rotular o gold held-out e rodar `evaluate.py --gold … --tag holdout`; (2) completar a seção ASE'25 de `docs/taxonomia_mapeamento.md`; (3) revisar os vereditos das auditorias de detectores (hoje "pré-avaliação do assistente"); (4) versionar em `prompts/` os prompts das fases 2–7 e posteriores; (5) decidir se uma sessão real do Claude Code entra como demo; (6) problemas da revisão no navegador de 21/11 (`docs/LIMITACOES_E_TRABALHOS_FUTUROS.md` §2), cuja correção foi pedida e interrompida; (7) a tela "Comparar" não foi implementada; (8) licença do TraceView não declarada no clone.
+
+## Documentação
+Cada assunto tem um "lar"; os outros docs linkam para ele.
+- `README.md` — porta de entrada: o que é, início rápido, formatos, resultados principais, mapa.
+- `docs/ARQUITETURA.md` — pipeline, módulos, modelo canônico, API, cache/ids, segurança, como adicionar um formato.
+- `docs/ROTULACAO_E_DETECTORES.md` — taxonomia, camadas, LLM, definição e histórico de cada detector.
+- `docs/AVALIACAO.md` — metodologia e resultados (todo número com fonte em `results/`).
+- `docs/DADOS.md` — datasets, licenças, download, amostras, achados, traces do Ark. Formatos campo a campo: `docs/formats.md`.
+- `docs/PROCESSO.md` — fases, desenvolvimento assistido por IA, papel humano, o que deu errado.
+- `docs/LIMITACOES_E_TRABALHOS_FUTUROS.md` — limitações, problemas conhecidos, TCC II.
+- `docs/decisions.md` — decisões por tema · `docs/GLOSSARIO.md` — termos · `docs/MAPA_RELATORIO.md` — capítulos do relatório · `CHANGELOG.md`.
+- `docs/comparacao_traceview.md`, `docs/taxonomia_mapeamento.md`, `docs/roteiro_demo.md`, `docs/PLAN.md` (plano × realizado).

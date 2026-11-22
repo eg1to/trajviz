@@ -6,7 +6,10 @@ Os ids (`/t/<id>`) são o hash do conteúdo do arquivo, então são os mesmos em
 ## Preparação (antes de começar)
 
 1. `docker compose up --build` (web em `http://localhost:5173`, API em `http://localhost:8010`), com `data/samples/` preenchida (as trajetórias abaixo vêm de lá).
-2. Abrir o stack uma vez e rodar `cd frontend && node e2e/demo-urls.mjs` — confirma que todas as URLs respondem e **pré-aquece o cache** (a 1ª abertura de cada amostra processa o arquivo; as demais são instantâneas).
+2. **Preparar o cache antes de validar as URLs.** Os links `/t/<id>` só funcionam se a trajetória já estiver no cache **da versão atual** do pipeline. Num ambiente novo, depois de limpar `backend/.cache/` ou depois de mudar qualquer regra, eles dão 404 ("reabra pela biblioteca") até a amostra ser reprocessada (limitação conhecida: [LIMITACOES_E_TRABALHOS_FUTUROS.md](LIMITACOES_E_TRABALHOS_FUTUROS.md#2-problemas-conhecidos-do-mvp), item 6). O id não muda ao reprocessar. Antes da banca:
+   - processar a biblioteca inteira: `cd backend && uv run python scripts/warm_cache.py` (ou abrir pela biblioteca as amostras `swe-rebench/chatcmpl-831fa55b…` e `swe-rebench/chatcmpl-dd059e8e…`);
+   - enviar uma vez pelo upload o arquivo do momento 6 (`../traceview/evaluation_samples/pytest-dev__pytest-5692__eval_02_fix-and-test.traj`), que não está na biblioteca: só assim `/t/90b7a9c28a9c71a3` existe;
+   - só então rodar `cd frontend && node e2e/demo-urls.mjs [url_base]`, que **apenas confere** que as URLs abrem (e grava as capturas do plano B); ele não reprocessa nada.
 3. Abas prontas no navegador (tema claro, janela ≥ 1400 px de largura):
    - **A** editor com o log bruto: `data/samples/swe-rebench/chatcmpl-dd059e8e169114015e62f521024377e5.json` (368 KB; uma única linha de JSON gigante);
    - **B** `http://localhost:5173/`;
@@ -43,6 +46,6 @@ Folga: ~0 s. Se faltar tempo, cortar o momento 4 do loop (`?step=24`) e a segund
    5. dashboard → `results/screenshots/demo/05-dashboard-nao-resolvida.png`, `…/05b-dashboard-resolvida.png`, `results/screenshots/02-swe-rebench-resolvida-dashboard-completo.png`, e o agregado `results/figures/metricas_resolvidas_vs_nao.png`;
    6. TraceView → `results/screenshots/comparacao/pytest-5692-traceview-ingest.png` (nada rotulado), `…-rotulacao-acoes.png`, `…-analise.png` ao lado de `pytest-5692-trajviz-grafo.png`.
 2. **GIF** do fluxo completo: `docs/demo.gif` (17 s; biblioteca → upload → grafo → inspetor → dashboard).
-3. **Só a API caiu, o front está de pé**: o front mostra "API indisponível" com "Tentar de novo"; subir de novo com `docker compose up -d api` (health em `http://localhost:8010/api/health`). O cache em `backend/.cache/` mantém os ids, então os links `/t/<id>` voltam a funcionar sem reprocessar.
-4. **Sem o Docker**: modo desenvolvimento do README (`uv run uvicorn app.main:app --port 8010` + `npm run dev` com `frontend/.env.local`).
+3. **Só a API caiu, o front está de pé**: o front mostra "API indisponível" com "Tentar de novo"; subir de novo com `docker compose up -d api` (health em `http://localhost:8010/api/health`). O cache em `backend/.cache/` mantém os ids, então os links `/t/<id>` voltam a funcionar sem reprocessar (desde que o cache não tenha sido apagado; senão, ver o item 2 da preparação).
+4. **Sem o Docker**: modo desenvolvimento do README (`uv run uvicorn app.main:app --port 8010` + `npm run dev` com `frontend/.env.local`). Se a 5173 estiver ocupada, usar `VITE_PORT`, `VITE_API_URL` e `CORS_ORIGINS` (README, "Modo desenvolvimento") e trocar a porta nas URLs deste roteiro.
 5. Se o TraceView não subir: usar as capturas de `results/screenshots/comparacao/` e os números de `docs/comparacao_traceview.md`.

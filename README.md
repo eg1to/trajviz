@@ -1,138 +1,155 @@
 # trajviz
 
-Visualizador de trajetórias de agentes de código, **sem rotulação manual**. Você envia o log bruto de um agente
-(OpenHands, SWE-agent, mini-SWE, Terminus2, CodeTraceBench ou chat genérico) e vê na hora o grafo da trajetória,
-a faixa de fases, o inspetor de cada passo e um dashboard de métricas com detectores de erro, repetição e loop.
-Um classificador de regras (com fallback opcional em LLM) rotula cada ação no upload; a referência, o TraceView, exige rotular tudo à mão.
+Visualizador de trajetórias de agentes de código **sem rotulação manual**. Você envia o log bruto de um agente (OpenHands, SWE-agent, mini-SWE, Terminus2, Ark, Claude Code ou chat genérico) e vê na hora a faixa de fases, o grafo da trajetória, o inspetor de cada passo e um dashboard com detectores de erro, repetição e loop.
+O problema que resolve: entender onde um agente se perdeu exige ler centenas de passos, e a ferramenta de referência (TraceView) pede que cada ação e cada relação sejam rotuladas à mão antes de mostrar qualquer coisa. No trajviz, uma rotulação em camadas (regras, com fallback opcional em LLM) rotula cada passo no upload.
 
 TCC I — DCC/UFMG · Pedro Henrique Egito Aguiar · Orientador: Marco Túlio Valente
 
 ![Grafo de uma trajetória do CodeTraceBench com gabarito](results/screenshots/05-ctb-gabarito-grafo.png)
 
-*Faixa de fases (topo), grafo em serpentina com modo compacto, arcos de loop, marcadores do gabarito do CodeTraceBench e inspetor do passo à direita.*
+*Faixa de fases (topo), grafo em serpentina com modo compacto, marcadores do gabarito do CodeTraceBench e inspetor do passo à direita.*
 
 ![Demo: biblioteca → upload → grafo → inspetor → dashboard](docs/demo.gif)
 
-*Do upload ao dashboard (gravado com Playwright; `frontend/e2e/demo-gif.mjs`).*
+## Diferenciais frente ao TraceView
 
-## Como rodar
+| | TraceView | trajviz |
+|---|---|---|
+| Rotulação | manual: 44 rótulos (8 passos) a 158 (27 passos) para a visualização completa | **automática: 0 rótulos**; correção opcional por passo |
+| Formatos | SWE-agent, JSON/JSONL, texto | **10 adaptadores com detecção automática** sobre um modelo canônico |
+| Métricas | resumo de relações e tabela de execuções | **dashboard por trajetória** e detectores automáticos |
+| Relações semânticas entre passos | **sim** (a contribuição central dele) | não (TCC II) |
 
-### Docker (recomendado)
+Medidas, capturas e ressalvas: [docs/comparacao_traceview.md](docs/comparacao_traceview.md).
+
+## Início rápido
+
+### Docker
 
 ```bash
 mkdir -p backend/.cache data/samples data/raw/codetracebench   # pastas montadas como volume
 docker compose up --build
-# web: http://localhost:5173   ·   API (Swagger): http://localhost:8010/docs
+# web: http://localhost:5173 · API (Swagger): http://localhost:8010/docs
 ```
 
-- Portas: `WEB_PORT` (padrão 5173) e `API_PORT` (padrão 8010), por exemplo `API_PORT=8020 WEB_PORT=8080 docker compose up --build`.
-  O nginx do `web` repassa `/api` para a API, então o front funciona em qualquer porta (sem CORS).
-- Volumes: `data/samples/` (biblioteca), `data/raw/codetracebench/` (opcional; manifest e artefatos do CodeTraceBench, para o gabarito) e `backend/.cache/` (cache em disco e contador de custo do LLM).
-  Sem amostras em `data/samples/` a biblioteca fica vazia, mas o **upload funciona**.
-- `backend/.env` é opcional. Sem ele (ou sem `ANTHROPIC_API_KEY`) o fallback em LLM fica desligado e o app usa só as regras.
-  Para ligá-lo: `cp backend/.env.example backend/.env` e preencha `ANTHROPIC_API_KEY`, `LABEL_LLM_ENABLED=1`, `LLM_MODEL`, `LLM_BUDGET_USD`.
-  A chave nunca é impressa nem versionada; a API só usa o LLM quando o upload pede (`use_llm=true`).
-- Os containers rodam como root por padrão (arquivos criados em `backend/.cache/` ficam de root). Para usar seu usuário: `LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose up --build` com as pastas já criadas.
+- Portas: `WEB_PORT` (padrão 5173) e `API_PORT` (padrão 8010), ex.: `WEB_PORT=8080 API_PORT=8020 docker compose up --build`. O nginx do `web` repassa `/api` para a API, então não há CORS em nenhuma porta.
+- Volumes: `data/samples/` (biblioteca), `data/raw/codetracebench/` (opcional, gabarito do CodeTraceBench) e `backend/.cache/` (cache e contador de custo do LLM). Sem amostras a biblioteca fica vazia, mas o upload funciona.
+- Para não criar arquivos de root: `LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose up --build`.
 
 ### Modo desenvolvimento
 
 ```bash
-# backend  → http://localhost:8000/docs
-cd backend
-uv sync
-uv run uvicorn app.main:app --reload
-
-# frontend → http://localhost:5173
-cd frontend
-npm install
-npm run dev
+# a partir da raiz, em dois terminais
+cd backend && uv sync && uv run uvicorn app.main:app --reload     # API em http://localhost:8000
+cd frontend && npm install && npm run dev                          # web em http://localhost:5173
 ```
 
-Se a porta 8000 estiver ocupada, suba a API em outra (`--port 8010`) e aponte o front para ela com
-`frontend/.env.local`: `VITE_API_URL=http://localhost:8010` (o padrão é `http://localhost:8000`).
-Variáveis de ambiente (para portas ocupadas): `VITE_PORT` (porta do front, padrão 5173), `VITE_API_URL` (URL da API para o front, padrão `http://localhost:8000`) e `CORS_ORIGINS` (origens liberadas na API, separadas por vírgula, padrão `http://localhost:5173`). Ex.: `CORS_ORIGINS=http://localhost:5174 uv run uvicorn app.main:app --port 8010` e `VITE_PORT=5174 VITE_API_URL=http://localhost:8010 npm run dev`. Os e2e usam as mesmas variáveis.
-O front **só consome a API** (`docs/openapi.json`); depois de mudar o schema: `cd frontend && npm run gen:api`.
-Abra uma amostra direto num passo: `http://localhost:5173/t/<id>?step=42&view=graph&filter=error`
-(`view=graph|dashboard`, `filter=error,loop,nospecial,cat:edit`, `range=10-30`, `compact=0|1`, `gt=0`).
-Atalhos: `j`/`k` ou ← → navegam entre passos, `Esc` limpa a seleção.
+Com portas ocupadas, use as variáveis de ambiente:
+
+| variável | onde | padrão | para quê |
+|---|---|---|---|
+| `VITE_PORT` | front | `5173` | porta do Vite |
+| `VITE_API_URL` | front | `http://localhost:8000` | URL da API (também lida de `frontend/.env.local`) |
+| `CORS_ORIGINS` | API | `http://localhost:5173` | origens liberadas, separadas por vírgula |
+
+```bash
+# a partir da raiz, em dois terminais
+cd backend  && CORS_ORIGINS=http://localhost:5174 uv run uvicorn app.main:app --port 8010
+cd frontend && VITE_PORT=5174 VITE_API_URL=http://localhost:8010 npm run dev
+```
+
+**LLM (opcional).** Sem `backend/.env` o app usa só regras. Para ligar o fallback: `cp backend/.env.example backend/.env` e preencha `ANTHROPIC_API_KEY`, `LABEL_LLM_ENABLED=1`, `LLM_MODEL` (padrão `claude-haiku-5-5`) e `LLM_BUDGET_USD` (padrão 0,50 por execução). A API só chama o LLM quando o upload pede (`use_llm=true`); a chave nunca é impressa nem versionada.
+
+**Uso.** Arraste um arquivo na página inicial ou abra uma amostra da biblioteca. Links abrem direto num passo: `/t/<id>?step=42&view=graph&filter=error` (`view=graph|dashboard`, `filter=error,loop,nospecial,cat:edit`, `range=10-30`, `compact=0|1`, `gt=0`). Teclas: `j`/`k` ou ← → navegam, `Esc` limpa a seleção.
 
 ## Formatos suportados
 
-Detecção automática (`backend/app/adapters/detect.py`); todos viram o esquema canônico (`backend/app/schema.py`). Upload aceita `.json`, `.jsonl`, `.traj`, `.log`, `.txt`, `.parquet` (1 linha), `.tar.zst` e `.zip` (até 200 MB).
+Upload de `.json`, `.jsonl`, `.traj`, `.log`, `.txt`, `.parquet` (uma linha, `row`), `.tar.zst` e `.zip`, até 200 MB. Detecção automática; detalhes em [docs/formats.md](docs/formats.md).
 
 | formato | origem | adaptador | observações |
 |---|---|---|---|
-| OpenHands (log de chat) | SWE-rebench | `openhands_chat` | `resolved` e `exit_status` da fonte |
-| SWE-agent (nativo, xml e ticks) | SWE-smith | `sweagent_smith` | ação decidida por mensagem (o split `tool` mistura formatos); `resolved` **não validado** |
-| Sessão do Claude Code (`.jsonl` de `~/.claude/projects/`) | Claude Code | `claude_code_session` | 1 passo por `tool_use`; fixture sintética; mapeia Read/Grep/Glob/Edit/Write/Bash às regras existentes |
-| Trace do Ark (`agent_trace.log`) | [Ark](https://github.com/mtov/ark) (agente do orientador) | `ark_trace` | 1 passo por `[response N]`; o Ark **não registra** a saída de leituras/listagens/buscas nem de testes que passaram (o inspetor avisa); 15 traces reais na biblioteca |
-| Chat genérico OpenAI/Anthropic | qualquer | `generic_chat` | só testado com mensagens sintéticas; agente = "desconhecido" |
-| SWE-agent `.traj` | CodeTraceBench, TraceView | `ctb_sweagent` | abre também os `.traj` avulsos do `evaluation_samples/` do TraceView |
-| mini-SWE `.traj.json` | CodeTraceBench | `ctb_miniswe` | 2 de 60 artefatos sem JSON → erro claro (`UnsupportedArtifact`) |
+| OpenHands (lista de mensagens) | SWE-rebench | `openhands_chat` | `resolved` e `exit_status` da fonte; exit code no texto |
+| SWE-agent nativo, xml e ticks | SWE-smith | `sweagent_smith` | ação decidida por mensagem (o split `tool` mistura formatos); `resolved` **não validado** |
+| SWE-agent `.traj` | CodeTraceBench, TraceView | `ctb_sweagent` | abre também as amostras do TraceView |
+| mini-SWE-agent `.traj.json` | CodeTraceBench | `ctb_miniswe` | 2 de 60 artefatos sem JSON → `UnsupportedArtifact` |
 | Terminus2 (episódios) | CodeTraceBench | `ctb_terminus2` | 1 passo por episódio |
-| OpenHands (log de LLM e eventos) | CodeTraceBench | `ctb_openhands_swe`, `ctb_openhands_events` | alinhamento da cauda é hipótese |
+| OpenHands (log de chamadas LLM) | CodeTraceBench / SWE-bench | `ctb_openhands_swe` | alinhamento do gabarito por hipótese |
+| OpenHands (eventos) | CodeTraceBench / TerminalBench | `ctb_openhands_events` | alinhamento da cauda por hipótese |
+| Sessão do Claude Code (`.jsonl`) | `~/.claude/projects/` | `claude_code_session` | 1 passo por `tool_use`; fixture sintética |
+| Trace do Ark (`agent_trace.log`) | [Ark](https://github.com/mtov/ark) | `ark_trace` | o Ark **não registra** a saída de leituras, buscas e testes que passaram (o inspetor avisa) |
+| Chat genérico OpenAI/Anthropic | qualquer | `generic_chat` | só testado com mensagens sintéticas; agente "desconhecido" |
 
-Artefatos do CodeTraceBench (`.tar.zst`/diretório) trazem o gabarito (`ground_truth`: passos incorretos/inúteis) a partir do manifest em `data/raw/codetracebench/`.
+Artefatos do CodeTraceBench (`.tar.zst` ou diretório) trazem o **gabarito** (passos incorretos e inúteis) a partir do manifest em `data/raw/codetracebench/`.
+
+## Funcionalidades
+
+- **Faixa de fases:** um segmento por passo, colorido pela categoria (paleta segura para daltonismo), com marcas de erro, teste e loop.
+- **Grafo em serpentina:** ordem cronológica, modo compacto para trajetórias longas, filtros, minimapa, exportação PNG.
+- **Inspetor:** rótulo (corrigível), flags com motivo e link para o passo relacionado, pensamento, ação, observação, arquivos.
+- **Dashboard:** desfecho, esforço por categoria e fase, ferramentas e executáveis, 1ª edição, ciclos editar → testar, problemas clicáveis, arquivos lidos × editados, tamanho das observações.
+- **Detectores:** `error`, `test_fail`/`test_pass`, `repeated`, `no_new_info`, `loop`, `truncated` ([docs/ROTULACAO_E_DETECTORES.md](docs/ROTULACAO_E_DETECTORES.md)).
+- **Gabarito do CodeTraceBench:** passos anotados como incorretos/inúteis marcados no grafo e comparados com as flags.
+- **Biblioteca:** 185 amostras (SWE-rebench, SWE-smith, CodeTraceBench, Ark) com filtros e busca.
 
 ## Resultados principais
 
-Detalhes, ressalvas e scripts em [`results/RESULTS.md`](results/RESULTS.md).
+Metodologia, intervalos e ressalvas em [docs/AVALIACAO.md](docs/AVALIACAO.md); relatórios brutos em [results/RESULTS.md](results/RESULTS.md).
 
-- **Classificador de ações** (gold manual cego, 210 passos, 1 anotador): regras com acurácia **94,3%** [IC95 90,5–97,4] e F1 macro **0,92**; LLM (Haiku 5.5 em todos os passos) 91,4%; `setup` é a categoria fraca. O gold de desenvolvimento saiu das mesmas amostras usadas para escrever as regras, então pode ser otimista: há um gold **held-out** (90 passos de trajetórias fora de `data/samples/`) pronto para ser rotulado (`results/gold/gold_holdout_cego.csv`); ainda sem resultado.
-- **Detectores × CodeTraceBench** (976 trajetórias): `error ∪ test_fail` acima do acaso para passos incorretos (lift 1,62×); `repeated ∪ no_new_info` indistinguível do acaso para passos inúteis; `loop` inconclusivo depois da correção.
-- **Resolvidas × não resolvidas** (SWE-rebench, 2.000 trajetórias): as resolvidas são menores (mediana 56 × 68 passos), com mais passos de teste (12,8% × 10,7%) e menos `no_new_info`; efeitos pequenos a médios e **associativos** (confundidos por tarefa, limite de iterações e agente).
-- **Velocidade**: o pipeline leva mediana de 34 ms por trajetória (p95 89 ms); do upload ao grafo na tela, ~0,9 s.
-- **Comparação com o TraceView** ([`docs/comparacao_traceview.md`](docs/comparacao_traceview.md)): 0 rótulos manuais no trajviz × 44 (8 passos) a 158 (27 passos) no TraceView para a mesma visualização completa; o TraceView tem relações entre passos, que o trajviz **não** tem.
+- **Rotulação:** regras com acurácia de **94,3%** [IC 95% 90,5–97,4] e F1 macro 0,92 contra um gold manual cego de 210 passos, 1 anotador (`results/eval_classifier.md`, linha 102). Haiku 5.5 em todos os passos: 91,4%. O gold saiu das amostras usadas para escrever as regras; o gold held-out ainda não foi rotulado.
+- **Cobertura:** 97,4% a 99,8% dos passos rotulados só por regras (`results/labeling_report.md`, linhas 11–18); custo total do LLM no projeto: **US$ 0,0320** (`backend/.cache/llm_usage.json`).
+- **Detectores × gabarito do CodeTraceBench** (976 trajetórias): `error ∪ test_fail` fica 1,62× acima do acaso para passos incorretos [1,44–1,80]; `repeated ∪ no_new_info` é indistinguível do acaso para passos inúteis (0,80×) (`results/eval_detectors.md`, linhas 34 e 49).
+- **Resolvidas × não resolvidas** (SWE-rebench, 2.000): as resolvidas são menores (mediana 56 × 68 passos, δ de Cliff −0,34) e têm mais passos de teste (12,8% × 10,7%); associação, não causa (`results/batch_stats.md`, linhas 28 e 33).
+- **Velocidade:** pipeline com mediana de 34 ms por trajetória (p95 89 ms; `results/batch_stats.md`, linha 18); do upload ao grafo, ~0,85 s.
+- **TraceView:** 0 rótulos manuais × 44–158 para a mesma visualização completa ([docs/comparacao_traceview.md](docs/comparacao_traceview.md)).
 
 ## Limitações
 
-- **Sem relações entre passos** (Thought→Action, Result→Thought…): o grafo mostra categoria, ordem cronológica e loops. Fica para o TCC II.
-- Rótulos **automáticos**: acurácia medida só em 210 passos com 1 anotador; categorias raras têm IC largo; o gold held-out ainda não foi rotulado.
-- O `resolved` do SWE-smith não é validado; o `step_id` do CodeTraceBench tem semântica diferente por agente e o alinhamento da cauda do OpenHands/Terminus2 é hipótese.
-- `generic_chat` só foi testado com mensagens sintéticas; logs genéricos aparecem como agente "desconhecido".
-- Sem tela de comparação entre execuções, sem estudo com usuários, sem banco de dados (cache em disco).
-- A biblioteca depende de amostras em `data/samples/` (fora do git); uploads funcionam sem elas.
+Sem relações semânticas entre passos; rótulos automáticos com gold de um anotador e held-out pendente; detectores fracos contra o gabarito do CodeTraceBench (`loop` conservador); `resolved` do SWE-smith não validado; o Ark não registra várias observações e só há traces com Haiku 5.5 (o Sonnet 5.5 foi recusado pela API); sem estudo com usuários. Lista completa e problemas conhecidos da interface em [docs/LIMITACOES_E_TRABALHOS_FUTUROS.md](docs/LIMITACOES_E_TRABALHOS_FUTUROS.md).
 
-### Testes e capturas
+## Testes
 
 ```bash
-cd backend  && uv run pytest                          # backend (454 testes)
-cd frontend && npm test                               # vitest (paleta, contraste, URL ⇄ estado)
-cd frontend && npm run test:e2e                       # Playwright: fumaça (biblioteca → passo → dashboard → problema)
-cd frontend && npm run screenshots                    # results/screenshots/*.png (1600×1000, tema claro, 2×)
-cd backend  && uv run python scripts/pick_showcase.py # reescolhe as amostras das capturas
+# a partir da raiz
+cd backend  && uv run pytest            # 468 testes, fixtures reais
+cd frontend && npm test                 # vitest (13)
+cd frontend && npm run test:e2e         # Playwright (14); sobe API e front com cache isolado
+cd frontend && npm run screenshots      # results/screenshots/*.png (amostras em e2e/showcase.json)
 ```
 
-Os testes e2e sobem a API (porta 8011, ou a de `VITE_API_URL`) e o front (porta `VITE_PORT`) com cache e `results/` isolados (`frontend/test-results/`).
+Os e2e usam `VITE_PORT` e `VITE_API_URL` (padrão: front 5173, API 8011).
 
-### Amostras das capturas (`results/screenshots/`)
+## Estrutura do repositório
 
-| captura | amostra | por que |
-|---|---|---|
-| `01-biblioteca` | — | biblioteca + upload |
-| `02-swe-rebench-resolvida-*` | `swe-rebench/chatcmpl-831fa55b…` (96 passos, PASS) | 8 ciclos edit→test (4 terminaram em pass), 6 erros |
-| `03-swe-rebench-nao-resolvida-*` | `swe-rebench/chatcmpl-dd059e8e…` (56 passos, FAIL) | 1 loop, 6 ciclos (3 terminaram em test_fail) |
-| `04-swe-smith-*` | `swe-smith/ticks/john-kurkowski__tldextract…` (76 passos) | 6 ciclos, 9 repetidos/sem informação nova; "resolved não validado" |
-| `05-ctb-gabarito-*` | `codetracebench/terminus2-…fix-ocaml-gc…` (141 passos, FAIL) | 26 passos anotados no gabarito; modo compacto (o `loop` corrigido não marca esta trajetória) |
-
-Cada trajetória tem `-grafo`, `-dashboard` (topo) e `-dashboard-completo` (viewport alto).
-
-Para o fallback de rotulação por LLM (opcional), copie `backend/.env.example` para `backend/.env` e preencha
-`ANTHROPIC_API_KEY`, `LABEL_LLM_ENABLED=1`, `LLM_MODEL`, `LLM_BUDGET_USD`. A chave nunca é impressa nem versionada;
-a API só usa o LLM quando o upload pede (`use_llm=true`).
-
-## Dados
-
-Coloque os datasets em `data/raw/` (fora do git):
-
-- `data/raw/swe-rebench/` — nebius/SWE-rebench-openhands-trajectories
-- `data/raw/swe-smith/` — SWE-bench/SWE-smith-trajectories
-- `data/raw/codetracebench/` — NJU-LINK/CodeTraceBench
-
-Os formatos estão documentados em `docs/formats.md`.
+```
+backend/    app/ (schema, adapters, labeling, analysis, pipeline, main) · tests/ · scripts/ (exploração, avaliação, figuras)
+frontend/   src/ (api, pages, components, store, theme) · e2e/ (Playwright, capturas, demo)
+docs/       documentação (mapa abaixo) · openapi.json · demo.gif
+results/    relatórios de avaliação, gold, figuras, capturas, pacote do pôster
+data/       raw/ e samples/ (fora do git, exceto os traces do Ark) · inbox/ (não versionado)
+prompts/    prompts das fases para o Claude Code
+```
 
 ## Documentação
 
-- `docs/PLAN.md` — plano do MVP
-- `docs/formats.md` — formatos dos datasets
-- `docs/decisions.md` — registro de decisões
+| documento | para quê |
+|---|---|
+| [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | pipeline, módulos, modelo canônico TAR, API, cache, segurança, como adicionar um formato |
+| [docs/ROTULACAO_E_DETECTORES.md](docs/ROTULACAO_E_DETECTORES.md) | taxonomia, rotulação em camadas, fallback em LLM, definição de cada detector |
+| [docs/AVALIACAO.md](docs/AVALIACAO.md) | metodologia e resultados (gold, gabarito, auditorias, estatística, ameaças à validade) |
+| [docs/DADOS.md](docs/DADOS.md) | datasets, download, amostras, achados sobre os dados, traces do Ark |
+| [docs/formats.md](docs/formats.md) | formatos brutos campo a campo e assinaturas de detecção |
+| [docs/PROCESSO.md](docs/PROCESSO.md) | como o MVP foi construído (fases, IA, papel humano, o que deu errado) |
+| [docs/LIMITACOES_E_TRABALHOS_FUTUROS.md](docs/LIMITACOES_E_TRABALHOS_FUTUROS.md) | limitações, problemas conhecidos, TCC II |
+| [docs/decisions.md](docs/decisions.md) | registro de decisões por tema |
+| [docs/comparacao_traceview.md](docs/comparacao_traceview.md) · [docs/taxonomia_mapeamento.md](docs/taxonomia_mapeamento.md) | comparação com o TraceView e mapeamento de taxonomias |
+| [docs/roteiro_demo.md](docs/roteiro_demo.md) | roteiro de 5 minutos para a banca |
+| [docs/MAPA_RELATORIO.md](docs/MAPA_RELATORIO.md) | capítulos do relatório e fontes de cada um |
+| [docs/GLOSSARIO.md](docs/GLOSSARIO.md) · [docs/PLAN.md](docs/PLAN.md) · [CHANGELOG.md](CHANGELOG.md) | termos, plano original × realizado, versões |
+
+## Créditos
+
+- **Autor:** Pedro Henrique Egito Aguiar · **Orientador:** Marco Túlio Valente · Projeto Orientado em Computação I, DCC/UFMG, 2026.
+- **Datasets:** [nebius/SWE-rebench-openhands-trajectories](https://huggingface.co/datasets/nebius/SWE-rebench-openhands-trajectories) (CC-BY-4.0), [SWE-bench/SWE-smith-trajectories](https://huggingface.co/datasets/SWE-bench/SWE-smith-trajectories) (MIT), [NJU-LINK/CodeTraceBench](https://huggingface.co/datasets/NJU-LINK/CodeTraceBench) (MIT); licenças conforme os cards dos datasets.
+- **Ark:** agente de código de Marco Túlio Valente (<https://github.com/mtov/ark>, MIT).
+- **TraceView:** SOAR-Lab (<https://github.com/SOAR-Lab/agent-traj-visualization>), referência principal; usado como clonado, só para a comparação.
+- Código escrito com o Claude Code (Anthropic) a partir de prompts por fase; o papel do autor está em [docs/PROCESSO.md](docs/PROCESSO.md).

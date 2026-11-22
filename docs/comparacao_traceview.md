@@ -52,7 +52,7 @@ Leitura honesta dos números:
 
 | recurso | TraceView | trajviz |
 |---|---|---|
-| Formatos de entrada | `.traj` (SWE-agent), JSON/JSONL, `.log`/`.txt` (parser de texto), `.zip`; mais as 40 execuções do AutoCodeRover já empacotadas | `.json`, `.jsonl`, `.traj`, `.parquet` (1 linha), `.tar.zst`, `.zip`; 8 adaptadores com detecção automática (OpenHands, SWE-agent/SWE-smith, mini-SWE, Terminus2, OpenAI/Anthropic genérico) sobre um esquema canônico |
+| Formatos de entrada | `.traj` (SWE-agent), JSON/JSONL, `.log`/`.txt` (parser de texto), `.zip`; mais as 40 execuções do AutoCodeRover já empacotadas | `.json`, `.jsonl`, `.traj`, `.parquet` (1 linha), `.tar.zst`, `.zip`; 8 adaptadores com detecção automática (OpenHands, SWE-agent/SWE-smith, mini-SWE, Terminus2, OpenAI/Anthropic genérico) sobre um esquema canônico. *Atualização de 21/11: hoje são 10 adaptadores (+ `claude_code_session` e `ark_trace`) e o upload aceita também `.log`/`.txt`.* |
 | Rotulação | **Manual**: categoria por iteração (8 rótulos) + relação por aresta (5 famílias, 2–5 rótulos cada); mínimo 5 + 5 para enviar | **Automática** (regras por ferramenta e por comando bash + fallback opcional em LLM); correção manual opcional por `PATCH` |
 | Taxonomia de ações | Explore, Locate, Search, Reproduce, Generate fix, Run tests, Refactor, Explain | `explore`, `search`, `read`, `edit`, `reproduce`, `test`, `setup`, `vcs`, `think`, `submit`, `other` em 4 fases (ver `docs/taxonomia_mapeamento.md`) |
 | Visões | Grafo T→A→R em modo *Iteration* ou *Detailed* (streamlit-agraph); inspetor (na página ou separado); filtros por relação; controles de layout | Grafo em serpentina com modo compacto para trajetórias longas; **faixa de fases**; inspetor de passo com navegação por teclado; filtros por erro/loop; exportação PNG |
@@ -77,7 +77,7 @@ Leitura honesta dos números:
 ## O que o trajviz faz melhor
 
 1. Zero rotulação: 0 rótulos × 44–158 para a mesma visualização completa; o log bruto vira grafo em < 1 s.
-2. Multiformato: o mesmo fluxo para 8 formatos de log; o TraceView espera o formato SWE-agent ou texto estruturado.
+2. Multiformato: o mesmo fluxo para 8 formatos de log na data da comparação (10 adaptadores em 21/11); o TraceView espera o formato SWE-agent ou texto estruturado.
 3. Dashboard e detectores automáticos (erros, repetições, loops, leitura sem informação nova).
 4. Trajetórias longas (modo compacto, faixa de fases) e avaliação quantitativa dos rótulos e detectores.
 
