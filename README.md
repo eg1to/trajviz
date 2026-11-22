@@ -44,19 +44,6 @@ cd backend && uv sync && uv run uvicorn app.main:app --reload     # API em http:
 cd frontend && npm install && npm run dev                          # web em http://localhost:5173
 ```
 
-Com portas ocupadas, use as variáveis de ambiente:
-
-| variável | onde | padrão | para quê |
-|---|---|---|---|
-| `VITE_PORT` | front | `5173` | porta do Vite |
-| `VITE_API_URL` | front | `http://localhost:8000` | URL da API (também lida de `frontend/.env.local`) |
-| `CORS_ORIGINS` | API | `http://localhost:5173` | origens liberadas, separadas por vírgula |
-
-```bash
-# a partir da raiz, em dois terminais
-cd backend  && CORS_ORIGINS=http://localhost:5174 uv run uvicorn app.main:app --port 8010
-cd frontend && VITE_PORT=5174 VITE_API_URL=http://localhost:8010 npm run dev
-```
 
 **LLM (opcional).** Sem `backend/.env` o app usa só regras. Para ligar o fallback: `cp backend/.env.example backend/.env` e preencha `ANTHROPIC_API_KEY`, `LABEL_LLM_ENABLED=1`, `LLM_MODEL` (padrão `claude-haiku-5-5`) e `LLM_BUDGET_USD` (padrão 0,50 por execução). A API só chama o LLM quando o upload pede (`use_llm=true`); a chave nunca é impressa nem versionada.
 
@@ -152,4 +139,3 @@ prompts/    prompts das fases para o Claude Code
 - **Datasets:** [nebius/SWE-rebench-openhands-trajectories](https://huggingface.co/datasets/nebius/SWE-rebench-openhands-trajectories) (CC-BY-4.0), [SWE-bench/SWE-smith-trajectories](https://huggingface.co/datasets/SWE-bench/SWE-smith-trajectories) (MIT), [NJU-LINK/CodeTraceBench](https://huggingface.co/datasets/NJU-LINK/CodeTraceBench) (MIT); licenças conforme os cards dos datasets.
 - **Ark:** agente de código de Marco Túlio Valente (<https://github.com/mtov/ark>, MIT).
 - **TraceView:** SOAR-Lab (<https://github.com/SOAR-Lab/agent-traj-visualization>), referência principal; usado como clonado, só para a comparação.
-- Código escrito com o Claude Code (Anthropic) a partir de prompts por fase; o papel do autor está em [docs/PROCESSO.md](docs/PROCESSO.md).
