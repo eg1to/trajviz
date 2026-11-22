@@ -41,15 +41,22 @@ Flags automáticas: `error`, `repeated`, `loop`, `no_new_info`, `truncated`.
 ## Adaptadores (Fase 2) — `backend/app/adapters/`
 `detect.parse_any(path|obj, row=0)` detecta e converte. Cada módulo: `NAME`, `can_parse(obj)->float`, `parse(source)->Trajectory`.
 `openhands_chat` (SWE-rebench) · `sweagent_smith` (SWE-smith; ação decidida por mensagem) · `generic_chat` (OpenAI/Anthropic) ·
-`ctb_openhands_swe`, `ctb_sweagent`, `ctb_miniswe`, `ctb_terminus2`, `ctb_openhands_events` + `codetracebench.py` · `claude_code_session` (Fase 7; `.jsonl` de sessão inteira = 1 trajetória) (`.tar.zst`/dir,
+`ctb_openhands_swe`, `ctb_sweagent`, `ctb_miniswe`, `ctb_terminus2`, `ctb_openhands_events` + `codetracebench.py` · `claude_code_session` (Fase 7; `.jsonl` de sessão inteira = 1 trajetória) · `ark_trace` (agente do orientador, `agent_trace.log`; ver abaixo) (`.tar.zst`/dir,
 manifest → `ground_truth` com `resolved_idx`/`resolved_via`). Testes: `cd backend && uv run pytest` (fixtures reais em `tests/fixtures/`,
 regeneráveis com `scripts/make_fixtures.py`); lote: `uv run python scripts/parse_samples.py`.
 Ficou de fora/limitações: nada do plano foi pulado; `files` só vem do `path` do editor (bash fica p/ a Fase 3); mini-SWE TB sem JSON
 (2/60) → `UnsupportedArtifact`; alinhamento da cauda de OpenHands-TB/Terminus2 e do OpenHands-SWE é hipótese; `generic_chat` só testado com mensagens sintéticas.
 
+## Formato Ark (`ark_trace`, pós-Fase 7)
+Trace do Ark (https://github.com/mtov/ark, cópia em `~/tcc/ark`; não alterar lá). `[request]` → problema; cada `[response N]` → passo (tool = 1ª palavra da ação); blocos `[edit_file]`/`[tests]`/`[finish]` → observação/resultado do passo anterior;
+`[validation_error]`/`[repair_attempt]` → `meta.ark.protocol_events` (ligados ao passo seguinte); `[workspace]`/`[error]`/`[run_summary]` → `meta.ark`. `resolved = status == "success"`. Detalhes: `docs/formats.md` §11.
+**O Ark não registra a saída de `read_file`/`list_files`/`find_text` nem de testes que passaram** → `observation=None` + aviso em `meta.ark.unrecorded_note` (o inspetor mostra); `no_new_info` não se aplica. Flags pelo resultado registrado (`detectors.detect_ark`).
+Upload aceita `.log`/`.txt`; modelo vem do `.meta.json` ao lado (ou do nome do arquivo). Fixtures: `backend/tests/fixtures/ark/` (+`v1/`); biblioteca: `data/samples/ark/` (15 traces v2, Haiku 5.5). Sonnet 5.5 foi recusado pela API (`refusal`/`reasoning_extraction`): só há Haiku no v2.
+Raw em `data/inbox/ark/` (+`v1_falhas_adaptador/`, não entra na biblioteca).
+
 ## Rotulação (Fase 3) — `backend/app/labeling/`
 `label_trajectory(traj, llm=None)`: `rules.py` (ferramenta) → `bash_parser.py` (bashlex, fallback shlex/regex; regras de `python` em `classify_python`) → `llm.py` (só confiança < 0,6).
-`Step.files` agora é `[{path, mode: read|edit|run}]`. Config por `backend/.env` (ver `.env.example`; a chave nunca é impressa). Testes: `uv run pytest` (249).
+`Step.files` agora é `[{path, mode: read|edit|run}]`. Config por `backend/.env` (ver `.env.example`; a chave nunca é impressa). Testes: `uv run pytest`.
 Relatórios: `scripts/label_report.py [--llm --budget 0.20]`, `scripts/make_gold_sample.py`. Limitação conhecida: o critério `other < 15%` mede cobertura, não acerto — o acerto foi medido na Fase 6 (gold manual).
 
 ## Detectores, métricas e API (Fase 4)
@@ -109,3 +116,4 @@ Pare e consulte o Pedro antes de:
 - [x] Fase 6 — avaliação e pacote de resultados (`results/RESULTS.md`; gold manual `results/gold/gold_steps_cego_pedro.csv`, 210 passos, 1 anotador): regras 94,3% de acurácia, F1 macro 0,92; LLM 91,4%; `setup` é a categoria fraca (sugestões em `results/eval_classifier_sugestoes.md`, não aplicadas). Reproduzir: `cd backend && uv run python scripts/evaluate.py [--gold CSV] && uv run python scripts/figures.py && uv run python scripts/poster_pack.py`
 - [x] Fase 7 — entrega do MVP (`v0.1-mvp`): gold held-out cego (`results/gold/gold_holdout_cego.csv`, `make_gold_sample.py --holdout`; `evaluate.py --gold … --tag holdout` gera `eval_classifier_holdout.md` e a tabela desenvolvimento × held-out no `RESULTS.md`), comparação com o TraceView (`docs/comparacao_traceview.md`, capturas em `results/screenshots/comparacao/`, `frontend/e2e/comparacao.mjs`), mapeamento de taxonomias (`docs/taxonomia_mapeamento.md`), Docker (`docker-compose.yml`: `api` + `web`/nginx; `WEB_PORT`/`API_PORT`), README + `docs/demo.gif`, roteiro da demo (`docs/roteiro_demo.md`, URLs validadas por `frontend/e2e/demo-urls.mjs`) e o adaptador stretch `claude_code_session` (`.jsonl` de `~/.claude/projects/`).
   **Pendências:** (1) Pedro rotular o gold held-out e rodar o `evaluate.py --tag holdout` (sem isso não há número held-out); (2) completar a seção ASE'25 de `docs/taxonomia_mapeamento.md` (TODO); (3) decidir se uma sessão real do Claude Code entra na biblioteca como demo (nenhum log real foi incluído no repositório); (4) a tela "Comparar" não foi implementada.
+- [x] Formato `ark_trace` — traces do Ark (`backend/app/adapters/ark_trace.py`, `docs/formats.md` §11, `results/screenshots/06-ark-*`): 15 traces v2 na biblioteca (dataset "Ark"); v1 só como fixtures/teste de integração.

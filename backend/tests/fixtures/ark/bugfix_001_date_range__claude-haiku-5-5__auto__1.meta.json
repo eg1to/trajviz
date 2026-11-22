@@ -1,0 +1,18 @@
+{
+  "task": "bugfix_001_date_range",
+  "model": "claude-haiku-5-5",
+  "mode": "auto",
+  "max_iterations": "default",
+  "started_at": "2026-11-21T00:04:09",
+  "sanitized": true,
+  "exit_code": 0,
+  "note": null,
+  "run_summary": {
+    "status": "success",
+    "total_tokens": 7346,
+    "elapsed_seconds": 7.36,
+    "tool_counts": "list_files=1, read_file=2, edit_file=1, run_tests=2, finish=1"
+  },
+  "estimated_cost_usd": 0.00118,
+  "log_file": "bugfix_001_date_range__claude-haiku-5-5__auto__1.log"
+}

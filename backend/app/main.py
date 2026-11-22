@@ -149,7 +149,7 @@ def taxonomy():
 @app.post("/api/trajectories", response_model=UploadResponse, tags=["trajectories"],
           responses={413: {"model": ErrorDetail}, 422: {"model": ErrorDetail}})
 async def upload(file: UploadFile = File(...), format: str | None = Form(None), row: int = Form(0), use_llm: bool | None = Form(None)):
-    """Aceita .json, .jsonl, .traj, .parquet, .tar.zst e .zip (diretório). Limite: 200 MB.
+    """Aceita .json, .jsonl, .traj, .log, .txt, .parquet, .tar.zst e .zip (diretório). Limite: 200 MB.
 
     `use_llm` (padrão: falso) liga o fallback Haiku para passos ambíguos; exige LABEL_LLM_ENABLED=1 e ANTHROPIC_API_KEY no servidor."""
     chunks, size = [], 0

@@ -1,0 +1,147 @@
+[request]
+The checkout team wants to support a new promotion code: `BUY2GET50`.
+
+Please implement that feature in the checkout flow.
+
+Expected behavior:
+- only items marked as eligible may participate in the promotion;
+- clearance items must never count toward the promotion and must never receive the discount;
+- quantities count as repeated units;
+- expand eligible, non-clearance items into individual unit prices;
+- sort those eligible unit prices from highest to lowest;
+- split the sorted eligible unit prices into consecutive groups of three units;
+- for each full group of three, apply a 50% discount to the cheapest unit in that group;
+- invalid promotion codes should be ignored;
+- the final total should still be rounded to two decimals.
+
+Do not change the intended non-promotional behavior.
+
+[response 1]
+thought: I need to explore the workspace to find the checkout flow code before making changes.
+action: list_files .
+
+[response 2]
+thought: I need to read the checkout, pricing, and promotions code to understand the current flow before making changes.
+action: read_file src/checkout.py
+
+[response 3]
+thought: I need to see the promotions module, where the discount logic lives, before editing anything.
+action: read_file src/promotions.py
+
+[response 4]
+thought: promotion_discount currently returns 0.0 for valid codes. I need to see item structure and pricing before implementing. I've read checkout.py and promotions.py; I should check pricing.py for item fields (price, quantity, eligible, clearance).
+action: read_file src/pricing.py
+
+[response 5]
+thought: promotions.py has a stub returning 0.0. I have read it and pricing.py already has eligible_unit_prices. I'll implement promotion_discount using eligible_unit_prices, sorting descending, and discounting the cheapest unit in each full group of three.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -1,6 +1,9 @@
+ PROMOTIONS = {
+     "BUY2GET50": "buy_2_get_50",
+ }
++
++
++from src.pricing import eligible_unit_prices
+ 
+ 
+ def promotion_discount(items: list[dict], promotion_code: str | None) -> float:
+@@ -10,4 +13,12 @@
+     if promotion_code not in PROMOTIONS:
+         return 0.0
+ 
++    if PROMOTIONS[promotion_code] == "buy_2_get_50":
++        unit_prices = sorted(eligible_unit_prices(items), reverse=True)
++        discount = 0.0
++        for start in range(0, len(unit_prices) - len(unit_prices) % 3, 3):
++            cheapest_in_group = unit_prices[start + 2]
++            discount += cheapest_in_group * 0.5
++        return round(discount, 2)
++
+     return 0.0
+
+
+[response 6]
+thought: I need to re-read src/promotions.py since its earlier contents were invalidated by the edit, before deciding the next step.
+action: read_file src/promotions.py
+
+[response 7]
+thought: The promotion logic is already implemented in src/promotions.py, and the file was just re-read showing the edit. The workspace has the feature. The edit placed the import after the PROMOTIONS dict, which is valid Python but unconventional. Tests should be run to validate behavior before finishing.
+action: run_tests
+
+[tests]
+status: failed
+detail:
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_______________________ test_rounds_only_the_final_total _______________________
+
+    def test_rounds_only_the_final_total():
+        items = [
+            {"sku": "A", "price": 19.99, "quantity": 2, "is_eligible": True, "is_clearance": False},
+            {"sku": "B", "price": 9.99, "quantity": 1, "is_eligible": True, "is_clearance": False},
+        ]
+    
+>       assert calculate_order_total(items, "BUY2GET50") == 44.98
+E       AssertionError: assert 44.97 == 44.98
+E        +  where 44.97 = calculate_order_total([{'sku': 'A', 'price': 19.99, 'quantity': 2, 'is_eligible': True, ...}, {'sku': 'B', 'price': 9.99, 'quantity': 1, 'is_eligible': True, ...}], 'BUY2GET50')
+
+tests/test_checkout.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_checkout.py::test_rounds_only_the_final_total - AssertionEr...
+1 failed, 6 passed in 0.02s
+
+[response 8]
+thought: The failing test expects the final total rounded only once. Current discount is 9.99*0.5=4.995 which rounds to 5.00 in `promotion_discount`, but the test expects the discount to be unrounded (total 59.97-... let's check): base = 49.97, discount = 4.995 → total 44.975 → round → 44.97 (banker's/float). Expected 44.98 means the discount must not be rounded to two decimals before subtraction. I need to remove the intermediate rounding in promotions.py.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -19,6 +19,6 @@
+         for start in range(0, len(unit_prices) - len(unit_prices) % 3, 3):
+             cheapest_in_group = unit_prices[start + 2]
+             discount += cheapest_in_group * 0.5
+-        return round(discount, 2)
++        return discount
+ 
+     return 0.0
+
+
+[response 9]
+thought: One test is failing after my edit. I need to re-read src/promotions.py to verify the current state before running tests again.
+action: read_file src/promotions.py
+
+[response 10]
+thought: The promotion logic is implemented, but the test failed earlier with 44.97 vs 44.98 and I have not re-run tests since the edit. The rounding issue may stem from the discount computed per-group; the expected behavior is to round only the final total, which the code already does. I should re-run tests to see the current state.
+action: run_tests
+
+[tests]
+status: passed
+
+[response 11]
+thought: The promotion logic is implemented and all tests pass, including the previously failing rounding test. Reading the workspace files and running tests confirmed the behavior, so the task is complete.
+action: finish
+
+[finish]
+status: completed
+stage: finish
+
+[workspace]
+status: committed
+
+[run_summary]
+status: success
+total_tokens: 21639
+elapsed_seconds: 14.95
+tool_counts: list_files=1, read_file=5, edit_file=2, run_tests=3, finish=1
+

@@ -42,7 +42,9 @@ function actionView(step: Step): { lang: Lang; code: string; diff?: { o: string;
   return { lang: 'plain', code: a.raw || JSON.stringify(args, null, 1) }
 }
 
-export function Inspector({ id, steps, gt }: { id: string; steps: Step[]; gt: GTSets }) {
+export type Unrecorded = { note: string; idx: number[] }
+
+export function Inspector({ id, steps, gt, unrecorded }: { id: string; steps: Step[]; gt: GTSets; unrecorded?: Unrecorded | null }) {
   const selected = useUI((s) => s.selectedIdx)
   const select = useUI((s) => s.select)
   const { width, handleProps } = useResizable()
@@ -50,7 +52,7 @@ export function Inspector({ id, steps, gt }: { id: string; steps: Step[]; gt: GT
   return (
     <aside className="relative flex shrink-0 flex-col border-l bg-card" style={{ width }} data-testid="inspector" aria-label="Inspetor de passo">
       <div {...handleProps} className="absolute -left-1 top-0 z-10 h-full w-2 cursor-col-resize hover:bg-primary/30" role="separator" aria-orientation="vertical" aria-label="Redimensionar inspetor" />
-      {step ? <StepDetail key={step.idx} id={id} step={step} total={steps.length} gt={gt} onNav={(d) => select(Math.max(0, Math.min(steps.length - 1, step.idx + d)))} onJump={select} steps={steps} />
+      {step ? <StepDetail key={step.idx} id={id} step={step} total={steps.length} gt={gt} onNav={(d) => select(Math.max(0, Math.min(steps.length - 1, step.idx + d)))} onJump={select} steps={steps} unrecorded={unrecorded} />
         : <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-muted-foreground" data-testid="inspector-empty">
           <FileSearch className="size-6" /><p className="font-medium text-foreground">Nenhum passo selecionado</p>
           <p className="text-xs">Clique num passo da faixa de fases ou do grafo. Atalhos: <kbd className="mono rounded border px-1">j</kbd>/<kbd className="mono rounded border px-1">k</kbd> ou ← → navegam.</p></div>}
@@ -58,7 +60,7 @@ export function Inspector({ id, steps, gt }: { id: string; steps: Step[]; gt: GT
   )
 }
 
-function StepDetail({ id, step, total, gt, onNav, onJump, steps }: { id: string; step: Step; total: number; gt: GTSets; onNav: (d: number) => void; onJump: (i: number) => void; steps: Step[] }) {
+function StepDetail({ id, step, total, gt, onNav, onJump, steps, unrecorded }: { id: string; step: Step; total: number; gt: GTSets; onNav: (d: number) => void; onJump: (i: number) => void; steps: Step[]; unrecorded?: Unrecorded | null }) {
   const tax = useTaxonomy()
   const correct = useCorrect(id)
   const [full, setFull] = useState(false)
@@ -148,7 +150,9 @@ function StepDetail({ id, step, total, gt, onNav, onJump, steps }: { id: string;
                 {full && fullQ.isLoading && <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="size-3 animate-spin" />carregando…</span>}
               </div>
             </div>
-          ) : <p className="text-xs italic text-muted-foreground">sem observação (ação final ou trajetória cortada)</p>}
+          ) : unrecorded?.idx.includes(step.idx)
+            ? <p className="text-xs italic text-muted-foreground" data-testid="observation-unrecorded">{unrecorded.note}</p>
+            : <p className="text-xs italic text-muted-foreground">sem observação (ação final ou trajetória cortada)</p>}
         </Section>
 
         {(step.files ?? []).length > 0 && (

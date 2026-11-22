@@ -9,7 +9,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from app import config, pipeline
-from app.adapters import codetracebench as ctb
+from app.adapters import ark_trace, codetracebench as ctb
 
 ROOT = Path(__file__).resolve().parents[2]
 SAMPLES = Path(__import__("os").environ.get("TRAJVIZ_SAMPLES_DIR", ROOT / "data" / "samples"))
@@ -55,6 +55,11 @@ def _entries() -> list[tuple[str, Path, dict]]:
                                                          "agent": "SWE-agent", "model": j.get("model"), "task": j.get("instance_id"),
                                                          "n_steps": sum(1 for m in msgs if m.get("role") == "assistant"),
                                                          "resolved": j.get("resolved")}))
+    for p in sorted((SAMPLES / "ark").glob("*.log")):  # traces reais do Ark (v2); o .meta.json ao lado dá modelo/tarefa
+        a = ark_trace.read(p)
+        steps = ark_trace.parse(a)
+        out.append((f"ark/{p.stem}", p, {"dataset": "ark", "format": "ark_trace", "agent": ark_trace.AGENT, "model": a.side.get("model"),
+                                         "task": a.side.get("task"), "n_steps": len(steps.steps), "resolved": steps.resolved}))
     ids_file = SAMPLES / "codetracebench" / "_sample_ids.json"
     if ids_file.exists():
         man = ctb.load_manifest()

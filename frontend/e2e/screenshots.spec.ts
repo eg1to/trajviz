@@ -75,3 +75,8 @@ test('CodeTraceBench com gabarito', async ({ page }) => {
     return { step: m.ground_truth?.incorrect_idx?.[0] ?? 0, range: lp ? [lp.range[0], lp.range[1]] : undefined }
   })
 })
+
+test('Ark (trace real do orientador)', async ({ page }) => {
+  await light(page)
+  await graphAndDashboard(page, 'ark', '06-ark', (m) => ({ step: m.problems.error.idx?.[0] ?? m.problems.test_fail.idx?.[0] ?? 0 }))
+})

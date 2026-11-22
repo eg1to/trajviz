@@ -121,7 +121,38 @@ def _first_line(text: str) -> str:
     return ""
 
 
+ARK = "ark_trace"
+
+
+def detect_ark(traj: Trajectory) -> Trajectory:
+    """Ark: o trace informa o resultado de edição/teste/finish (`meta["ark"]["outcomes"]`), então não há inferência por texto.
+    edit failed e finish_validation → `error` · tests failed e finish/post_apply_tests → `test_fail` · tests passed e finish completed → `test_pass`.
+    `rejected` (decisão do usuário) não é erro."""
+    if traj.source_format != ARK:
+        return traj
+    outs = (traj.meta.get("ark") or {}).get("outcomes") or {}
+    for s in traj.steps:
+        o = outs.get(str(s.idx))
+        if not o:
+            continue
+        st, stage, tool = o.get("status"), o.get("stage"), s.action.tool_native
+        if tool == "edit_file" and st == "failed":
+            add_flag(s, "error", f"edit_file falhou: {(o.get('detail') or '')[:120]}")
+        elif tool == "run_tests":
+            add_flag(s, "test_pass" if st == "passed" else "test_fail", f"[tests] status: {st}")
+        elif tool == "finish":
+            if st == "completed":
+                add_flag(s, "test_pass", "testes finais passaram")
+            elif stage == "post_apply_tests":
+                add_flag(s, "test_fail", "testes finais falharam (post_apply_tests)")
+            else:
+                add_flag(s, "error", f"finish recusado ({stage})")
+    return traj
+
+
 def detect_error(traj: Trajectory) -> Trajectory:
+    if traj.source_format == ARK:  # resultado vem do trace (detect_ark); varrer diffs por "Traceback"/"error:" daria falso positivo
+        return traj
     for s in traj.steps:
         if ignored(s) or s.observation is None or s.category in ("think", "submit"):
             continue
@@ -192,6 +223,8 @@ PASS_RX = [re.compile(r"\b(\d+) passed\b"), re.compile(r"(?m)^OK(?: \(.*\))?$"),
 def detect_test_result(traj: Trajectory) -> Trajectory:
     """pytest segue seus códigos de saída: 1 = test_fail · 0 = test_pass · 5 = sem flag · 2/3/4/outros = `error` (ver detect_error).
     unittest, tox e demais executores: qualquer exit ≠ 0 = test_fail (regra anterior)."""
+    if traj.source_format == ARK:
+        return traj
     for s in traj.steps:
         if ignored(s) or s.category != "test" or s.observation is None:
             continue
@@ -242,6 +275,9 @@ def action_key(s: Step):
     a = s.action
     if a.tool in SKIP_ACTIONS or ignored(s):
         return None
+    if a.tool_native == "edit_file":  # Ark: a ação só traz o caminho; o conteúdo está no diff. Edição que falhou não tem diff → nunca "repetida"
+        d = a.args.get("diff")
+        return ("ark_edit", a.raw, _h(d)) if d else ("ark_edit_sem_diff", s.idx)
     if a.tool == "editor":
         p = a.args.get("path") if isinstance(a.args.get("path"), str) else ""
         return ("editor", a.command, PREFIX_RE.sub("", p or ""), json.dumps(a.args.get("view_range")), _h(a.args.get("old_str")),
@@ -454,6 +490,6 @@ def detect_truncated(traj: Trajectory) -> Trajectory:
 def run_detectors(traj: Trajectory) -> Trajectory:
     """Ordem importa: test_fail/test_pass antes do loop (que os usa)."""
     clear_flags(traj)
-    for fn in (detect_error, detect_test_result, detect_repeated, detect_no_new_info, detect_loop, detect_truncated):
+    for fn in (detect_error, detect_test_result, detect_ark, detect_repeated, detect_no_new_info, detect_loop, detect_truncated):
         fn(traj)
     return traj

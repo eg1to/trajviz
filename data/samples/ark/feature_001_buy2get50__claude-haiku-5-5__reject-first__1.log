@@ -1,0 +1,195 @@
+[request]
+The checkout team wants to support a new promotion code: `BUY2GET50`.
+
+Please implement that feature in the checkout flow.
+
+Expected behavior:
+- only items marked as eligible may participate in the promotion;
+- clearance items must never count toward the promotion and must never receive the discount;
+- quantities count as repeated units;
+- expand eligible, non-clearance items into individual unit prices;
+- sort those eligible unit prices from highest to lowest;
+- split the sorted eligible unit prices into consecutive groups of three units;
+- for each full group of three, apply a 50% discount to the cheapest unit in that group;
+- invalid promotion codes should be ignored;
+- the final total should still be rounded to two decimals.
+
+Do not change the intended non-promotional behavior.
+
+[response 1]
+thought: I need to understand the checkout code first, so I'll list the workspace files.
+action: list_files .
+
+[response 2]
+thought: I need to read the checkout, pricing, and promotions modules to understand the current flow before editing.
+action: read_file src/checkout.py
+
+[response 3]
+thought: I need to see the existing promotions module to know how promotion_discount is implemented and what item fields exist.
+action: read_file src/promotions.py
+
+[response 4]
+thought: promotions.py has the BUY2GET50 code registered but the discount returns 0.0. I need item structure details to implement it, so I'll check pricing.py.
+action: read_file src/pricing.py
+
+[response 5]
+thought: The promotion_discount stub returns 0.0. I need to implement it using eligible_unit_prices from pricing.py, sorting descending, grouping by three, and discounting the cheapest unit in each full group by 50%. I've already read promotions.py, so I can edit it directly.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: rejected
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -1,6 +1,9 @@
+ PROMOTIONS = {
+     "BUY2GET50": "buy_2_get_50",
+ }
++
++
++from src.pricing import eligible_unit_prices
+ 
+ 
+ def promotion_discount(items: list[dict], promotion_code: str | None) -> float:
+@@ -10,4 +13,12 @@
+     if promotion_code not in PROMOTIONS:
+         return 0.0
+ 
++    if PROMOTIONS[promotion_code] == "buy_2_get_50":
++        unit_prices = sorted(eligible_unit_prices(items), reverse=True)
++        discount = 0.0
++        for start in range(0, len(unit_prices) - len(unit_prices) % 3, 3):
++            cheapest_in_group = unit_prices[start + 2]
++            discount += cheapest_in_group * 0.5
++        return round(discount, 2)
++
+     return 0.0
+
+
+[response 6]
+thought: The user rejected my previous edit to src/promotions.py, so I don't know why; I should re-read the file to confirm its current state before proposing a new edit.
+action: read_file src/promotions.py
+
+[response 7]
+thought: The previous edit to promotions.py was rejected, so I need to re-propose the change. I have promotions.py and pricing.py contents already in history, and eligible_unit_prices already handles eligibility and clearance exclusion. I'll edit promotions.py to implement the discount logic.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: failed
+path: src/promotions.py
+detail: edit_file requires old to appear exactly once in the target file; found 3 occurrences.
+
+[response 8]
+thought: The previous edit failed because the old block matched multiple times. I'll replace the whole `promotion_discount` function body, using the unique `return 0.0` tail with the function signature included so the match is unique.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -1,6 +1,9 @@
+ PROMOTIONS = {
+     "BUY2GET50": "buy_2_get_50",
+ }
++
++
++from src.pricing import eligible_unit_prices
+ 
+ 
+ def promotion_discount(items: list[dict], promotion_code: str | None) -> float:
+@@ -10,4 +13,13 @@
+     if promotion_code not in PROMOTIONS:
+         return 0.0
+ 
+-    return 0.0
++    if PROMOTIONS[promotion_code] != "buy_2_get_50":
++        return 0.0
++
++    unit_prices = sorted(eligible_unit_prices(items), reverse=True)
++    discount = 0.0
++    for start in range(0, len(unit_prices) - len(unit_prices) % 3, 3):
++        cheapest_in_group = unit_prices[start + 2]
++        discount += cheapest_in_group * 0.5
++
++    return round(discount, 2)
+
+
+[response 9]
+thought: The edit to src/promotions.py was applied. I should verify the current state of the file before running tests.
+action: run_tests
+
+[tests]
+status: failed
+detail:
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_______________________ test_rounds_only_the_final_total _______________________
+
+    def test_rounds_only_the_final_total():
+        items = [
+            {"sku": "A", "price": 19.99, "quantity": 2, "is_eligible": True, "is_clearance": False},
+            {"sku": "B", "price": 9.99, "quantity": 1, "is_eligible": True, "is_clearance": False},
+        ]
+    
+>       assert calculate_order_total(items, "BUY2GET50") == 44.98
+E       AssertionError: assert 44.97 == 44.98
+E        +  where 44.97 = calculate_order_total([{'sku': 'A', 'price': 19.99, 'quantity': 2, 'is_eligible': True, ...}, {'sku': 'B', 'price': 9.99, 'quantity': 1, 'is_eligible': True, ...}], 'BUY2GET50')
+
+tests/test_checkout.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_checkout.py::test_rounds_only_the_final_total - AssertionEr...
+1 failed, 6 passed in 0.02s
+
+[response 10]
+thought: The test failure shows a rounding discrepancy in the promotion discount. I need to re-read src/promotions.py to see the current state of my edit before deciding what to change.
+action: read_file src/promotions.py
+
+[response 11]
+thought: The test shows the discount is rounded to two decimals before being subtracted, causing a penny difference. The spec says only the final total should be rounded, so I should remove the intermediate rounding in promotions.py.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -22,4 +22,4 @@
+         cheapest_in_group = unit_prices[start + 2]
+         discount += cheapest_in_group * 0.5
+ 
+-    return round(discount, 2)
++    return discount
+
+
+[response 12]
+thought: The last test failure may stem from the promotion logic, and I edited src/promotions.py twice; I need to re-read the current file before further edits to confirm its contents.
+action: read_file src/promotions.py
+
+[response 13]
+thought: The promotion logic is now implemented and the failing test was caused by rounding in the discount, which the edit addressed. I should run the tests again to confirm the fix works before finishing.
+action: run_tests
+
+[tests]
+status: passed
+
+[response 14]
+thought: The promotion logic is implemented and the tests pass. I'll finish now, since the work is complete and Ark will run the final tests.
+action: finish
+
+[finish]
+status: completed
+stage: finish
+
+[workspace]
+status: committed
+
+[run_summary]
+status: success
+total_tokens: 27775
+elapsed_seconds: 17.32
+tool_counts: list_files=1, read_file=6, edit_file=4, run_tests=3, finish=1
+

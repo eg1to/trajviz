@@ -58,13 +58,14 @@ Atalhos: `j`/`k` ou ← → navegam entre passos, `Esc` limpa a seleção.
 
 ## Formatos suportados
 
-Detecção automática (`backend/app/adapters/detect.py`); todos viram o esquema canônico (`backend/app/schema.py`). Upload aceita `.json`, `.jsonl`, `.traj`, `.parquet` (1 linha), `.tar.zst` e `.zip` (até 200 MB).
+Detecção automática (`backend/app/adapters/detect.py`); todos viram o esquema canônico (`backend/app/schema.py`). Upload aceita `.json`, `.jsonl`, `.traj`, `.log`, `.txt`, `.parquet` (1 linha), `.tar.zst` e `.zip` (até 200 MB).
 
 | formato | origem | adaptador | observações |
 |---|---|---|---|
 | OpenHands (log de chat) | SWE-rebench | `openhands_chat` | `resolved` e `exit_status` da fonte |
 | SWE-agent (nativo, xml e ticks) | SWE-smith | `sweagent_smith` | ação decidida por mensagem (o split `tool` mistura formatos); `resolved` **não validado** |
 | Sessão do Claude Code (`.jsonl` de `~/.claude/projects/`) | Claude Code | `claude_code_session` | 1 passo por `tool_use`; fixture sintética; mapeia Read/Grep/Glob/Edit/Write/Bash às regras existentes |
+| Trace do Ark (`agent_trace.log`) | [Ark](https://github.com/mtov/ark) (agente do orientador) | `ark_trace` | 1 passo por `[response N]`; o Ark **não registra** a saída de leituras/listagens/buscas nem de testes que passaram (o inspetor avisa); 15 traces reais na biblioteca |
 | Chat genérico OpenAI/Anthropic | qualquer | `generic_chat` | só testado com mensagens sintéticas; agente = "desconhecido" |
 | SWE-agent `.traj` | CodeTraceBench, TraceView | `ctb_sweagent` | abre também os `.traj` avulsos do `evaluation_samples/` do TraceView |
 | mini-SWE `.traj.json` | CodeTraceBench | `ctb_miniswe` | 2 de 60 artefatos sem JSON → erro claro (`UnsupportedArtifact`) |

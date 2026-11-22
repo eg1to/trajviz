@@ -14,7 +14,7 @@ import pyarrow.parquet as pq
 import zstandard
 
 from app.adapters import (
-    codetracebench, ctb_miniswe, ctb_openhands_events, ctb_openhands_swe, ctb_sweagent, ctb_terminus2,
+    ark_trace, codetracebench, ctb_miniswe, ctb_openhands_events, ctb_openhands_swe, ctb_sweagent, ctb_terminus2,
     claude_code_session, generic_chat, openhands_chat, sweagent_smith,
 )
 from app.adapters.base import UnknownFormat, UnsupportedArtifact
@@ -22,7 +22,7 @@ from app.schema import Trajectory
 
 # ordem = ordem das assinaturas do §5 (desempate); generic_chat por último
 ADAPTERS = [openhands_chat, sweagent_smith, ctb_sweagent, ctb_miniswe, ctb_openhands_swe, ctb_openhands_events,
-            ctb_terminus2, claude_code_session, generic_chat]
+            ctb_terminus2, claude_code_session, ark_trace, generic_chat]
 BY_NAME = {m.NAME: m for m in ADAPTERS}
 MIN_CONF = 0.3
 
@@ -65,7 +65,7 @@ def read_parquet_row(path: Path, row: int = 0) -> dict:
 
 def load(src: Any, row: int = 0) -> Any:
     """Caminho → objeto Python (dict/list) ou Path (diretório / .tar.zst). Objetos passam direto."""
-    if not isinstance(src, (str, Path)):
+    if isinstance(src, ark_trace.ArkLog) or not isinstance(src, (str, Path)):  # ArkLog é um str, mas já é conteúdo
         return src
     p = Path(src)
     if p.is_dir() or p.name.endswith(".tar.zst"):
@@ -83,6 +83,8 @@ def load(src: Any, row: int = 0) -> Any:
                 if i == row:
                     return json.loads(line)
         raise IndexError(f"row={row} fora do .jsonl")
+    if suf in (".log", ".txt"):  # trace do Ark (texto em blocos); lê o .meta.json ao lado, se houver
+        return ark_trace.read(p)
     if suf in (".json", ".traj"):
         return json.loads(p.read_text())
     raise UnknownFormat(f"extensão não suportada: {p.name}")
@@ -91,6 +93,8 @@ def load(src: Any, row: int = 0) -> Any:
 def _top_keys(obj: Any) -> list[str]:
     if isinstance(obj, dict):
         return sorted(obj)
+    if isinstance(obj, str):
+        return [f"<texto de {len(obj)} caracteres; 1ª linha: {obj.lstrip()[:40]!r}>"]
     if isinstance(obj, list):
         return sorted({k for m in obj[:20] if isinstance(m, dict) for k in m}) or [f"<lista de {type(obj[0]).__name__ if obj else 'vazio'}>"]
     if isinstance(obj, Path) and obj.is_dir():

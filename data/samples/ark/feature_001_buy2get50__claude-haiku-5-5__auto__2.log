@@ -1,0 +1,115 @@
+[request]
+The checkout team wants to support a new promotion code: `BUY2GET50`.
+
+Please implement that feature in the checkout flow.
+
+Expected behavior:
+- only items marked as eligible may participate in the promotion;
+- clearance items must never count toward the promotion and must never receive the discount;
+- quantities count as repeated units;
+- expand eligible, non-clearance items into individual unit prices;
+- sort those eligible unit prices from highest to lowest;
+- split the sorted eligible unit prices into consecutive groups of three units;
+- for each full group of three, apply a 50% discount to the cheapest unit in that group;
+- invalid promotion codes should be ignored;
+- the final total should still be rounded to two decimals.
+
+Do not change the intended non-promotional behavior.
+
+[response 1]
+thought: I need to explore the workspace to find the checkout flow code before making changes.
+action: list_files .
+
+[response 2]
+thought: I need to read the checkout, pricing, and promotions code to understand the existing flow before making changes.
+action: read_file src/promotions.py
+
+[response 3]
+thought: The promotion_discount function is a stub returning 0.0. I need to see how checkout calls it and what item fields exist, so I'll look at checkout.py.
+action: read_file src/checkout.py
+
+[response 4]
+thought: I need to see the item shape and existing pricing/tests before implementing, so I'll read src/pricing.py.
+action: read_file src/pricing.py
+
+[response 5]
+thought: I have promotions.py, checkout.py, and pricing.py. pricing.py already has eligible_unit_prices which filters eligibility and clearance and expands quantities. I need to implement promotion_discount in promotions.py: sort descending, group by three, discount the cheapest (last) unit in each full group of three by 50%.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -10,4 +10,13 @@
+     if promotion_code not in PROMOTIONS:
+         return 0.0
+ 
+-    return 0.0
++    if PROMOTIONS[promotion_code] != "buy_2_get_50":
++        return 0.0
++
++    unit_prices = sorted(eligible_unit_prices(items), reverse=True)
++    discount = 0.0
++    for start in range(0, len(unit_prices) - len(unit_prices) % 3, 3):
++        cheapest_in_group = unit_prices[start + 2]
++        discount += cheapest_in_group * 0.5
++
++    return discount
+
+
+[response 6]
+thought: The promotions file was edited, but its current contents were invalidated, so I need to re-read it to verify the edit before deciding whether more changes or validation are needed.
+action: read_file src/promotions.py
+
+[response 7]
+thought: The promotion logic is already in place in src/promotions.py. The discount is computed from sorted eligible unit prices in groups of three. However, `eligible_unit_prices` is used in promotions.py but no import is visible in the read output, so I need to verify the imports at the top of the file before finishing.
+action: read_file src/promotions.py | 1:3
+
+[response 8]
+thought: The promotion logic is in place, but `src/promotions.py` uses `eligible_unit_prices` without importing it from `src/pricing.py`, which would raise a NameError. I need to fix the import before validating.
+action: edit_file src/promotions.py
+
+[edit_file]
+status: succeeded
+path: src/promotions.py
+diff:
+--- a/src/promotions.py
++++ b/src/promotions.py
+@@ -1,3 +1,5 @@
++from src.pricing import eligible_unit_prices
++
+ PROMOTIONS = {
+     "BUY2GET50": "buy_2_get_50",
+ }
+
+
+[response 9]
+thought: Two edits have been applied to src/promotions.py, but its current contents are no longer visible in history. I need to re-read the file to verify the implementation before running tests.
+action: read_file src/promotions.py
+
+[response 10]
+thought: The promotion logic is already implemented in src/promotions.py and reads correctly against the spec: eligible units are sorted descending, grouped by three, and the cheapest unit in each full group gets 50% off. Clearance filtering happens in eligible_unit_prices, invalid codes return 0, and rounding is applied in checkout. I should validate behavior with the test suite before finishing.
+action: run_tests
+
+[tests]
+status: passed
+
+[response 11]
+thought: The promotion logic is already implemented in src/promotions.py and the test suite passed. Reading the current file confirms the expected behavior: only eligible, non-clearance unit prices are used (via eligible_unit_prices), they are sorted high to low, grouped into threes, and the cheapest unit in each full group gets 50% off. Invalid codes return 0.0, and checkout.py rounds the total to two decimals. The non-promotional path is unchanged. Tests pass.
+action: finish
+
+[finish]
+status: completed
+stage: finish
+
+[workspace]
+status: committed
+
+[run_summary]
+status: success
+total_tokens: 20208
+elapsed_seconds: 14.49
+tool_counts: list_files=1, read_file=6, edit_file=2, run_tests=2, finish=1
+

@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { openSample } from './helpers'
 
-test('biblioteca lista as amostras dos três datasets e filtra', async ({ page }) => {
+test('biblioteca lista as amostras dos datasets e filtra', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByTestId('lib-row').first()).toBeVisible()
   const total = await page.getByTestId('lib-row').count()
   expect(total).toBeGreaterThan(50)
-  for (const ds of ['swe-rebench', 'swe-smith', 'codetracebench']) await expect(page.locator(`[data-testid=lib-row][data-dataset="${ds}"]`).first()).toBeVisible()
+  for (const ds of ['swe-rebench', 'swe-smith', 'codetracebench', 'ark']) await expect(page.locator(`[data-testid=lib-row][data-dataset="${ds}"]`).first()).toBeVisible()
   await page.getByTestId('lib-search').fill('zzzz-nao-existe')
   await expect(page.getByTestId('lib-empty')).toBeVisible()
   await page.getByTestId('lib-search').fill('')
@@ -180,4 +180,22 @@ test('Enquadrar respeita o zoom mínimo legível; esconde observações em barra
   await page.getByTestId('tab-dashboard').click()
   await expect(page.locator('[data-testid=chart-obs] .recharts-bar-rectangle').first()).toBeVisible()
   await expect(page.locator('[data-testid=chart-obs] .recharts-line')).toHaveCount(0)  // sem curva suavizada
+})
+
+test('Ark: observação não registrada mostra o aviso; a edição mostra o diff; upload de .log', async ({ page }) => {
+  await openSample(page, 'ark')
+  await expect(page.getByTestId('traj-header')).toContainText('Ark')
+  await expect(page.getByTestId('traj-header')).toContainText('claude-haiku-5-5')
+  const base = page.url().split('?')[0]
+  await page.goto(`${base}?step=1`) // read_file: o Ark não grava a saída
+  await expect(page.getByTestId('observation-unrecorded')).toHaveText('saída não registrada pelo trace do Ark')
+  await expect(page.getByTestId('observation')).toHaveCount(0)
+  await page.goto(`${base}?step=2`) // edit_file: diff registrado
+  await expect(page.getByTestId('observation')).toContainText('--- a/')
+  await page.goto('/')
+  await page.waitForSelector('[data-testid=lib-row]')
+  await page.getByTestId('file-input').setInputFiles('../backend/tests/fixtures/ark/bugfix_002_order_totals__claude-haiku-5-5__reject-first__1.log')
+  await page.waitForSelector('[data-testid=step-node]')
+  await expect(page.getByTestId('format-badge')).toContainText('ark_trace')
+  await expect(page.getByTestId('n-steps')).toHaveText('9')
 })

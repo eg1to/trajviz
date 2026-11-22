@@ -62,5 +62,21 @@
     "gt": 26,
     "gt_inc": 23,
     "task": "fix-ocaml-gc"
+  },
+  "ark": {
+    "id": "ark/feature_001_buy2get50__claude-haiku-5-5__reject-first__1",
+    "dataset": "ark",
+    "agent": "Ark",
+    "resolved": true,
+    "n": 14,
+    "loops": 0,
+    "cycles": 2,
+    "passed": 1,
+    "failed": 1,
+    "errors": 1,
+    "repeated": 0,
+    "gt": 0,
+    "gt_inc": 0,
+    "task": "feature_001_buy2get50"
   }
 }

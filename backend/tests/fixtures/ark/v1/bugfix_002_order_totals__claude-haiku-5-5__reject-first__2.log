@@ -1,0 +1,86 @@
+[request]
+Some customers are getting too much discount at checkout.
+
+When a percentage coupon is applied, the final total is lower than expected for certain orders. Support suspects the same coupon effect may be getting applied twice somewhere in the checkout flow.
+
+Expected behavior:
+- a percentage coupon should affect the order only once;
+- promotional items must never receive the coupon;
+- invalid coupon codes should be ignored;
+- the final total should still be rounded to two decimals.
+
+Please investigate the checkout flow and fix the bug without changing the intended pricing rules.
+
+[response 1]
+thought: I need to locate the checkout and discount code first, so I'll list the workspace files.
+action: list_files ~/tcc/ark/ark-workspace
+
+[response 2]
+thought: The checkout flow likely spans pricing, discounts, and checkout modules. I'll start by reading the checkout module to see how the coupon is applied.
+action: read_file src/checkout.py
+
+[response 3]
+thought: `checkout.py` applies the coupon twice: once through `subtotal_after_coupon` and again through `discount_amount`. I need to see how the helpers in `discounts.py` and `pricing.py` handle the coupon before deciding on a fix, so I'll read `discounts.py` first.
+action: read_file src/discounts.py
+
+[response 4]
+thought: `checkout.py` applies the coupon through `subtotal_after_coupon` and then again through `discount_amount`. I need to see `pricing.py` to confirm how that function handles the coupon and promotional items before I change anything.
+action: read_file src/pricing.py
+
+[response 5]
+thought: `calculate_order_total` applies the percentage coupon in `subtotal_after_coupon`, then subtracts `discount_amount` on the full subtotal, which includes promotional items. That applies the coupon twice and discounts promo items. I'll remove the second discount and drop its unused import.
+action: edit_file src/checkout.py
+
+[edit_file]
+status: failed
+path: <invalid>
+detail: Invalid edit_file input. Use path:, old:, and new: with triple-backtick blocks.
+
+[validation_error]
+reason: Model response is missing the required Action field.
+response:
+Thought: `calculate_order_total` applies the coupon twice. `subtotal_after_coupon` already discounts non-promotional lines, then `discount_amount` takes the coupon off the full subtotal again, including promotional items. Removing the second discount fixes both problems and kee
+
+[repair_attempt]
+kind: Protocol repair
+reason: Model response is missing the required Action field.
+
+[response 7]
+thought: `calculate_order_total` applies the coupon twice. `subtotal_after_coupon` already discounts non-promotional lines, then `discount_amount` takes the coupon percent off the full subtotal, including promotional items. Removing the second discount and returning the rounded per-line result fixes both the double application and the promo leak.
+action: edit_file src/checkout.py
+
+[edit_file]
+status: failed
+path: <invalid>
+detail: Invalid edit_file input. Use path:, old:, and new: with triple-backtick blocks.
+
+[response 9]
+thought: The coupon is applied twice. `subtotal_after_coupon` already discounts non-promotional items, then `discount_amount` discounts the full subtotal again, including promotional items. I'll remove the second discount so the coupon applies once.
+action: edit_file src/checkout.py
+
+[edit_file]
+status: failed
+path: <invalid>
+detail: Invalid edit_file input. Use path:, old:, and new: with triple-backtick blocks.
+
+[validation_error]
+reason: Model response is missing the required Action field.
+response:
+Thought: Checkout applies the coupon percent to each line via `subtotal_after_coupon`, then subtracts a second percent discount computed on the full undiscounted subtotal with `discount_amount`. That double
+
+[repair_attempt]
+kind: Protocol repair
+reason: Model response is missing the required Action field.
+
+[error]
+stage: agentic_loop
+type: ValueError
+detail: Model response is missing the required Action field.
+tools_called: list_files, read_file, read_file, read_file, edit_file, edit_file, edit_file
+
+[run_summary]
+status: failed
+total_tokens: 23019
+elapsed_seconds: 22.43
+tool_counts: list_files=1, read_file=3, edit_file=3
+

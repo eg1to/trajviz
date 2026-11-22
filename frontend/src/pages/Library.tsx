@@ -14,9 +14,9 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn, fmtInt } from '@/lib/utils'
 
-const ACCEPT = '.json,.jsonl,.traj,.parquet,.tar.zst,.zip'
-const FORMATS = ['openhands_chat', 'sweagent_smith', 'ctb_sweagent', 'ctb_miniswe', 'ctb_openhands_swe', 'ctb_openhands_events', 'ctb_terminus2', 'claude_code_session', 'generic_chat']
-const DATASET_LABEL: Record<string, string> = { 'swe-rebench': 'SWE-rebench', 'swe-smith': 'SWE-smith', codetracebench: 'CodeTraceBench' }
+const ACCEPT = '.json,.jsonl,.traj,.log,.txt,.parquet,.tar.zst,.zip'
+const FORMATS = ['openhands_chat', 'sweagent_smith', 'ctb_sweagent', 'ctb_miniswe', 'ctb_openhands_swe', 'ctb_openhands_events', 'ctb_terminus2', 'claude_code_session', 'ark_trace', 'generic_chat']
+const DATASET_LABEL: Record<string, string> = { 'swe-rebench': 'SWE-rebench', 'swe-smith': 'SWE-smith', codetracebench: 'CodeTraceBench', ark: 'Ark' }
 
 export default function Library() {
   const nav = useNavigate()
@@ -102,7 +102,7 @@ function UploadCard({ onDone }: { onDone: (r: UploadResponse) => void }) {
       >
         {upload.isPending ? <><Loader2 className="size-5 animate-spin" /><span>Processando… (detecção → rótulos → métricas)</span></>
           : <><Upload className="size-5" /><span className="font-medium text-foreground">Arraste um log de agente ou clique para escolher</span>
-            <span className="text-xs">.json · .jsonl · .traj · .parquet · .tar.zst · .zip — até 200 MB. Vai direto para a visualização, sem rotulação manual.</span></>}
+            <span className="text-xs">.json · .jsonl · .traj · .log · .txt · .parquet · .tar.zst · .zip — até 200 MB. Vai direto para a visualização, sem rotulação manual.</span></>}
         <input ref={inputRef} type="file" accept={ACCEPT} hidden data-testid="file-input" onChange={(e) => { const f = e.target.files?.[0]; if (f) send(f); e.target.value = '' }} />
       </div>
       <div className="space-y-2.5 text-xs">

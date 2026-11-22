@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Escolhe amostras com padrões interessantes (loops, ciclos edit→test, gabarito) para as capturas do front.
+"""Escolhe amostras com padrões interessantes (loops, ciclos edit→test, gabarito, trace do Ark) para as capturas do front.
 Escreve frontend/e2e/showcase.json e imprime a justificativa de cada escolha."""
 from __future__ import annotations
 
@@ -39,6 +39,7 @@ def main() -> None:
         "ctb_gt": best([r for r in rows if r["dataset"] == "codetracebench" and r["gt_inc"] > 0 and r["n"] >= 30 and r["loops"] > 0],
                             lambda r: (r["gt"], r["loops"], r["errors"])) or best([r for r in rows if r["dataset"] == "codetracebench" and r["gt_inc"] > 0],
                                                                              lambda r: (r["loops"], r["gt"], r["n"])),
+        "ark": best([r for r in rows if r["dataset"] == "ark"], lambda r: (r["failed"] > 0, r["errors"] > 0, r["cycles"], r["n"])),  # trace real do Ark
     }
     out = {k: v for k, v in picks.items() if v}
     (ROOT / "frontend" / "e2e" / "showcase.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))

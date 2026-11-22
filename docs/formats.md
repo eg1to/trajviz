@@ -403,3 +403,23 @@ Contagem do 1º executável de cada segmento (`;`, `&&`, `||`, `|`, quebra de li
 | anotação humana | — | — | passos incorretos/inúteis por estágio (405/1.000 `verified` com ≥1) |
 
 *Amostras*: SWE-rebench 2.040 linhas (120 primeiras de cada um dos 17 row groups); SWE-smith ~250 primeiras linhas de cada um dos 8 arquivos/split; CTB: manifests completos + 60 artefatos. As médias podem estar levemente enviesadas pela ordem dos arquivos.
+
+## 11. Ark (`ark_trace`) — traces do agente do orientador
+
+Fonte: `src/ark/{traces,agentic_loop,tools}.py` do Ark (https://github.com/mtov/ark). O Ark grava um `agent_trace.log` (texto, blocos `[tipo]` separados por linha em branco; o arquivo é apagado a cada execução). Dados reais: 15 traces v2 (Haiku 5.5) + `v1_falhas_adaptador/` (traces anteriores à correção do adaptador do Ark, com falhas de protocolo).
+
+| bloco | campos | vira |
+|---|---|---|
+| `[request]` | prompt | `problem_statement` |
+| `[response N]` | `thought:`, `action: <ferramenta> <args>` | 1 passo (`native_id`=N; N conta também respostas inválidas, então há buracos; `idx` é contínuo) |
+| `[edit_file]` | `status: succeeded/failed/rejected`, `path`, `diff:`, `detail:` | observação do passo `edit_file`: diff (succeeded), `detail` (failed → `is_error`), diff + nota (rejected → subcategoria `edit_rejected`, sem flag `error`) |
+| `[tests]` | `status: passed/failed`, `detail:` (só se falhou) | failed → observação = saída + `test_fail`; passed → `test_pass`, sem observação |
+| `[finish]` | `status`, `stage: finish/finish_validation/post_apply_tests` | completed → `submit` + `test_pass`; `finish_validation` → `error`; `post_apply_tests` → `test_fail` (+ saída) |
+| `[validation_error]`, `[repair_attempt]` | `reason`, `response` / `kind` | `meta.ark.protocol_events` (e `meta.protocol_events`), com `next_step` = passo seguinte (`null` se o run terminou antes) |
+| `[workspace]`, `[error]`, `[run_summary]` | `committed`/`rolled_back`; `stage/type/detail/tools_called`; `status/total_tokens/elapsed_seconds/tool_counts` | `meta.ark.*`; `resolved = (status == "success")`, `exit_status = status` (`success`, `max_iterations_reached`, `failed`) |
+
+Ferramentas: `list_files`→explore · `read_file "path | a:b"`→read · `find_text "texto | dir"`→search · `run_tests`→test · `edit_file "path"`→edit · `finish`→submit (`Action.tool` = `submit`, `tool_native` = `finish`). Modelo/tarefa/modo vêm do `.meta.json` ao lado do log ou, na falta dele, do nome `tarefa__modelo__modo__n.log`.
+
+**Limitação (observações não registradas).** O trace **não grava a saída** de `read_file`, `list_files`, `find_text` nem a de testes que passaram. Nesses passos `observation = null` e o inspetor mostra "saída não registrada pelo trace do Ark" (lista em `meta.ark.unrecorded`). Consequências: `no_new_info` não se aplica (nada a comparar); `repeated` vale só pela ação; o conteúdo lido não aparece. O `tool_counts` do `run_summary` conta o `finish` como `run_tests` (o Ark roda os testes ao finalizar); é guardado como veio, sem conferência com os passos.
+
+**Sonnet 5.5.** O Ark com `claude-sonnet-5-5` foi recusado pela API (`stop_reason: refusal`, categoria `reasoning_extraction`; "Terms of Service… reverse engineering or duplicating model outputs"), mesmo com o thinking desligado (`thinking: {"type": "between_tools"}`); em 5 das 6 tarefas, só `simple_greeting` passou. Por isso o v2 só tem Haiku. Esses traces (`v1_falhas_adaptador/*sonnet*`) abrem no adaptador, mas os que falham antes da 1ª resposta têm 0 passos e o upload devolve 422 `empty_trajectory`. Ação inválida do modelo (ex.: `action: edit_`) fica como `other`.

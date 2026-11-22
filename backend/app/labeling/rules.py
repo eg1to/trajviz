@@ -22,6 +22,11 @@ SWE_SEARCH = {"search_file", "search_dir", "find_file"}
 SWE_EDIT = {"edit", "create", "insert", "replace", "undo_edit"}
 
 
+# Ark (camada 1: só o nome da ferramenta; o trace já separa ação e resultado)
+ARK_CATEGORY = {"list_files": C.explore, "read_file": C.read, "find_text": C.search, "run_tests": C.test, "edit_file": C.edit, "finish": C.submit}
+ARK_REJECTED = "Edição rejeitada pelo usuário"
+
+
 @dataclass
 class Label:
     category: C = C.other
@@ -58,6 +63,10 @@ def label_step_rules(step: Step, ctx: Ctx) -> Label:
     if harness_protocol(step):
         return Label(C.submit, "harness_protocol", 1.0, final=True)
     t = a.tool
+    if a.tool_native in ARK_CATEGORY and t in ("submit", *ARK_CATEGORY):
+        cat = ARK_CATEGORY[a.tool_native]
+        sub = "edit_rejected" if cat is C.edit and obs.startswith(ARK_REJECTED) else a.tool_native
+        return Label(cat, sub, 1.0, list(step.files), final=True)
     if t == "submit":
         return Label(C.submit, a.tool_native, 1.0, final=True)
     if t == "think" or t == "message":

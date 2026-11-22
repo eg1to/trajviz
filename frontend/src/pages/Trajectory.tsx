@@ -76,6 +76,8 @@ export default function TrajectoryPage() {
       <div className="flex gap-2">{network && <Button variant="outline" onClick={() => traj.refetch()}>Tentar de novo</Button>}<Button asChild variant="outline"><Link to="/">Voltar à biblioteca</Link></Button></div></Centered>
   }
   const loops = metrics.data?.problems.loop_ranges ?? []
+  const ark = traj.data.trajectory.meta?.ark as { unrecorded_note?: string; unrecorded?: number[] } | undefined  // aviso do backend (Ark não registra a saída de leituras)
+  const unrecorded = ark?.unrecorded_note && ark.unrecorded ? { note: ark.unrecorded_note, idx: ark.unrecorded } : null
 
   return (
     <div className="flex h-full flex-col">
@@ -93,7 +95,7 @@ export default function TrajectoryPage() {
               : <DashboardTab id={id} trajectory={traj.data.trajectory} metrics={metrics.data} loading={metrics.isLoading} />}
           </div>
         </div>
-        <Inspector id={id} steps={steps} gt={gt} />
+        <Inspector id={id} steps={steps} gt={gt} unrecorded={unrecorded} />
       </div>
     </div>
   )

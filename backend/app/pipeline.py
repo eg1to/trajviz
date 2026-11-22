@@ -26,7 +26,7 @@ from app.schema import Trajectory
 APP_DIR = Path(__file__).resolve().parent
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 MAX_EXTRACT_BYTES = 1024 * 1024 * 1024
-SUFFIXES = (".tar.zst", ".zip", ".parquet", ".jsonl", ".json", ".traj")
+SUFFIXES = (".tar.zst", ".zip", ".parquet", ".jsonl", ".json", ".traj", ".log", ".txt")
 
 
 def _version() -> str:
@@ -171,6 +171,13 @@ def _read(path_or_bytes: Any) -> bytes:
     return Path(path_or_bytes).read_bytes()
 
 
+def _sidecar(src: Any, name: str) -> bytes | None:
+    if isinstance(src, (bytes, bytearray)) or not name.lower().endswith((".log", ".txt")):
+        return None
+    sc = Path(src).with_suffix(".meta.json")
+    return sc.read_bytes() if sc.is_file() and sc.stat().st_size < 1_000_000 else None
+
+
 def process(path_or_bytes: Any, filename: str, *, format_hint: str | None = None, row: int = 0, use_llm: bool | None = None,
             sample_id: str | None = None) -> ProcessedTrajectory:
     content = _read(path_or_bytes)
@@ -193,6 +200,9 @@ def process(path_or_bytes: Any, filename: str, *, format_hint: str | None = None
         tmpd = Path(tmp)
         f = tmpd / name
         f.write_bytes(content)
+        side = _sidecar(path_or_bytes, name)
+        if side is not None:  # Ark: o .meta.json ao lado do .log traz o modelo/tarefa
+            (tmpd / (Path(name).stem + ".meta.json")).write_bytes(side)
         try:
             src: Any = extract_zip(f, tmpd / "zip" / name[: -len(".zip")]) if suffix == ".zip" else f
             if suffix == ".zip":  # um único diretório raiz dentro do zip
